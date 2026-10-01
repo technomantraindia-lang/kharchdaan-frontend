@@ -2,8 +2,9 @@ import React from 'react';
 import { 
   Home, ChevronRight, Sparkles, Store, ShieldCheck, 
   Coins, ArrowRight, ShoppingBag, CheckCircle2, QrCode, 
-  Layers, Percent, Truck, HelpCircle, Award, Star, MapPin, Smartphone
+  Layers, Percent, Truck, HelpCircle, Award, Star, MapPin
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const KiranaNetworkPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -130,7 +131,7 @@ export const KiranaNetworkPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/hiw-kirana-partner.jpg" alt="Locate Store" />
                     <div className="staple-card-content">
                       <h5>1. Locate Partner Store</h5>
-                      <span>Open KharchDaan app and find verified Kiranas near your GPS location.</span>
+                      <span>Open app & find verified Kiranas within 2-km radius.</span>
                     </div>
                   </div>
 
@@ -138,7 +139,7 @@ export const KiranaNetworkPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/hiw-step2-shopping.jpg" alt="Select Groceries" />
                     <div className="staple-card-content">
                       <h5>2. Pick Your Daily Items</h5>
-                      <span>Select genuine Atta, Oil, Spices, Dairy Milk, or Tea from the shelf.</span>
+                      <span>Select genuine Atta, Oil, Spices, Dairy Milk, or Tea.</span>
                     </div>
                   </div>
 
@@ -146,9 +147,66 @@ export const KiranaNetworkPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/topic-instant-payout.jpg" alt="Scan & Earn" />
                     <div className="staple-card-content">
                       <h5>3. Scan QR & Earn PV</h5>
-                      <span>Scan the KharchDaan QR at billing for instant discount + PV point credit!</span>
+                      <span>Scan QR at checkout for instant discount + PV point credit!</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Kirana Merchant Benefits Table */}
+                <h3 className="topic-table-title">Consumer & Kirana Merchant Win-Win Breakdown</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Beneficiary</th>
+                        <th>Traditional Supermarket</th>
+                        <th>KharchDaan Kirana Model</th>
+                        <th>Advantage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Local Consumer</strong></td>
+                        <td>0% PV / Fake points</td>
+                        <td>Up to 100% Matrix Cashback</td>
+                        <td><strong className="text-orange">Real Cash & PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Local Shopkeeper</strong></td>
+                        <td>Customers lost to apps</td>
+                        <td>Guaranteed footfall & margins</td>
+                        <td><strong className="text-orange">3x Monthly Footfall</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Local Economy</strong></td>
+                        <td>Profits sent overseas</td>
+                        <td>Funds retained in community</td>
+                        <td><strong className="text-orange">100% Indian Retail</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Pro Merchant Tip</strong>
+                    <p>Local grocery merchants can onboard for ₹0 deposit. Show customers how scanning the QR gives them cashbacks, transforming occasional shoppers into permanent monthly regulars!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products')}>
+                    <Store size={18} />
+                    <span>Find Partner Kirana Stores</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={() => onNavigate('kirana-merchant')}>
+                    <Sparkles size={18} />
+                    <span>Merchant Free Registration</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +241,18 @@ export const KiranaNetworkPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>KIRANA ONBOARDING FREE</span>
-                </div>
-                <h3>Are You A Grocery Shop Owner?</h3>
-                <p>Join 5,000+ merchants. Get free QR standee, high monthly footfall, and extra distribution margins.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹0 FREE</span>
-                  <span className="price-old">₹2,500</span>
-                  <span className="price-discount">100% WAIVED</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('kirana-merchant')}
-                >
-                  <Store size={16} />
-                  <span>Register Store as Partner</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>Kirana Partner Advantages</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> Free Custom QR Counter Standee</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Guaranteed Local Customer Footfall</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Instant Payout Direct to UPI</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Zero Commission Deductions</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Want to recommend your neighborhood store?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Refer a Kirana & Earn Bonus ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="neighbourhood-kirana-network"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Kirana Merchant Onboarding"
+              dealDesc="Join 5,000+ stores. Get free QR standee, recurring neighborhood footfall, and extra handling margins."
+              dealPrice="₹0 FREE"
+              dealOldPrice="₹2,500"
+              dealDiscount="100% WAIVED"
+              dealActionText="Register Store as Partner"
+              dealCategory="Grocery"
+            />
 
           </div>
 

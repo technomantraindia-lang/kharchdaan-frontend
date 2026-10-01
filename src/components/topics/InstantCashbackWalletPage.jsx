@@ -2,8 +2,9 @@ import React from 'react';
 import { 
   Home, ChevronRight, Sparkles, Wallet, ShieldCheck, 
   Coins, ArrowRight, ShoppingBag, CheckCircle2, Zap, 
-  Layers, Percent, Truck, HelpCircle, Award, Star, RefreshCw, CreditCard
+  Layers, Percent, Truck, HelpCircle, Award, Star
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const InstantCashbackWalletPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -138,7 +139,7 @@ export const InstantCashbackWalletPage = ({ onNavigate, onOpenAuth, onShopClick 
                     <img src="/images/hiw-step4-cashback.jpg" alt="PV Points Credited" />
                     <div className="staple-card-content">
                       <h5>2. Instant PV Credit</h5>
-                      <span>System auto-credits your cashback & 20-level team commissions.</span>
+                      <span>System auto-credits cashback & 20-level team commissions.</span>
                     </div>
                   </div>
 
@@ -146,9 +147,66 @@ export const InstantCashbackWalletPage = ({ onNavigate, onOpenAuth, onShopClick 
                     <img src="/images/topic-instant-payout.jpg" alt="UPI Transfer" />
                     <div className="staple-card-content">
                       <h5>3. 1-Click UPI Transfer</h5>
-                      <span>Click 'Withdraw' and receive cash directly into your bank account!</span>
+                      <span>Click 'Withdraw' and receive cash directly into bank account!</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">Payout Comparison: Traditional Schemes vs KharchDaan</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Feature</th>
+                        <th>Traditional MLM Platforms</th>
+                        <th>KharchDaan Instant Wallet</th>
+                        <th>Advantage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Payout Speed</strong></td>
+                        <td>30 - 45 Days Hold</td>
+                        <td>Instant (1-Click UPI)</td>
+                        <td><strong className="text-orange">Real-Time</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Minimum Withdrawal</strong></td>
+                        <td>₹2,500 - ₹5,000</td>
+                        <td>Just ₹100</td>
+                        <td><strong className="text-orange">Zero Lock-In</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Commission Usability</strong></td>
+                        <td>Forced store coupon</td>
+                        <td>Direct Bank UPI Transfer</td>
+                        <td><strong className="text-orange">100% Free Cash</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Pro Financial Tip</strong>
+                    <p>Link your primary Google Pay, PhonePe, or BHIM UPI ID in your account dashboard. Whenever your downline shops, enjoy instant notifications and 1-tap withdrawal directly to your savings account!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('instant-payouts')}>
+                    <Zap size={18} />
+                    <span>Explore Wallet Features</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Open Free Wallet</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +241,18 @@ export const InstantCashbackWalletPage = ({ onNavigate, onOpenAuth, onShopClick 
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>ZERO LOCK-IN WALLET</span>
-                </div>
-                <h3>Active Member Wallet</h3>
-                <p>Track your level commissions, retail cashbacks, and royalty pool dividends live 24/7.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">Instant</span>
-                  <span className="price-old">30 Days</span>
-                  <span className="price-discount">REAL-TIME</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('instant-payouts')}
-                >
-                  <Wallet size={16} />
-                  <span>View Wallet Features</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>Wallet Security Guarantees</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> 1-Click Instant UPI Transfer</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> 100% Audited Ledger Records</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Dual-Factor OTP Protection</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Government Tax (TDS) Compliant</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Need assistance with bank verification?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Banking Desk ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="instant-cashback-wallet"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Instant Payout Guarantee"
+              dealDesc="Track your commissions, retail cashbacks, and royalty pool dividends live 24/7."
+              dealPrice="Instant"
+              dealOldPrice="30 Days"
+              dealDiscount="REAL-TIME"
+              dealActionText="View Wallet Features"
+              dealCategory="Grocery"
+            />
 
           </div>
 

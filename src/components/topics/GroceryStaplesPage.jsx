@@ -4,6 +4,7 @@ import {
   Coins, ArrowRight, ShoppingBag, CheckCircle2, Package, 
   Layers, Percent, Truck, HelpCircle, Award, Star
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const GroceryStaplesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -54,13 +55,13 @@ export const GroceryStaplesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
         </div>
       </section>
 
-      {/* 2. MAIN CONTENT WITH MULTIPLE IMAGES & DETAILS */}
+      {/* 2. MAIN CONTENT */}
       <section className="topic-main-content-section">
         <div className="container">
           
           <div className="topic-layout-grid">
             
-            {/* Left Main Detailed Article */}
+            {/* Left Main Article */}
             <div className="topic-article-main-card">
               
               {/* Primary Visual Banner */}
@@ -151,6 +152,74 @@ export const GroceryStaplesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                   </div>
                 </div>
 
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">Monthly Kitchen Staples Price & PV Breakdown</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Essential Item</th>
+                        <th>Standard MRP</th>
+                        <th>KharchDaan Member Price</th>
+                        <th>Member Discount</th>
+                        <th>Matrix Point Volume</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Aashirvaad Shudh Chakki Atta (10kg)</strong></td>
+                        <td>₹475</td>
+                        <td>₹395</td>
+                        <td><span className="badge-split">17% OFF</span></td>
+                        <td><strong className="text-orange">75 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Fortune Sunlite Refined Oil (5L Jar)</strong></td>
+                        <td>₹790</td>
+                        <td>₹640</td>
+                        <td><span className="badge-split">19% OFF</span></td>
+                        <td><strong className="text-orange">110 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Daawat Super Basmati Rice (5kg)</strong></td>
+                        <td>₹650</td>
+                        <td>₹510</td>
+                        <td><span className="badge-split">22% OFF</span></td>
+                        <td><strong className="text-orange">95 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Tata Sampann Unpolished Toor Dal (2kg)</strong></td>
+                        <td>₹360</td>
+                        <td>₹290</td>
+                        <td><span className="badge-split">20% OFF</span></td>
+                        <td><strong className="text-orange">50 PV</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Pro Grocer Insight</strong>
+                    <p>Setting up your monthly ration as a recurring scheduled basket automatically locks in additional subscriber discounts and provides regular weekly PV commissions without manual re-ordering!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products', 'Grocery')}>
+                    <ShoppingBag size={18} />
+                    <span>Shop Grocery & Staples</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
+                </div>
+
                 {/* FAQ Section */}
                 <div className="topic-faq-section">
                   <h3 className="topic-faq-heading">Frequently Asked Questions</h3>
@@ -183,52 +252,18 @@ export const GroceryStaplesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>MONTHLY RATION SAVER</span>
-                </div>
-                <h3>Monthly Kitchen Staples Bundle</h3>
-                <p>Save ₹450+ on Atta + Oil + Dal + Rice combo pack with 150 Extra PV bonus.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹1,499</span>
-                  <span className="price-old">₹1,950</span>
-                  <span className="price-discount">23% OFF</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products', 'Grocery')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Shop Grocery & Staples</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>KharchDaan Staples Guarantee</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> 100% Original Brand Warranty</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Free Delivery on orders ₹499+</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Instant PV Credit on Checkout</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> UPI Cashback Eligible</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Need wholesale or bulk society supply?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Our Support Team ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="grocery-staples"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Monthly Kitchen Staples Bundle"
+              dealDesc="Save ₹450+ on Atta + Oil + Dal + Rice combo pack with 150 Extra PV bonus."
+              dealPrice="₹1,499"
+              dealOldPrice="₹1,950"
+              dealDiscount="23% OFF"
+              dealActionText="Shop Grocery & Staples"
+              dealCategory="Grocery"
+            />
 
           </div>
 

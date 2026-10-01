@@ -4,6 +4,7 @@ import {
   Coins, ArrowRight, ShoppingBag, CheckCircle2, Award, 
   Layers, Percent, Truck, HelpCircle, Star, BadgeCheck, FileCheck
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const GenuineBrandStockPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -138,7 +139,7 @@ export const GenuineBrandStockPage = ({ onNavigate, onOpenAuth, onShopClick }) =
                     <img src="/images/fortune-oil.jpg" alt="Adani Wilmar" />
                     <div className="staple-card-content">
                       <h5>Adani Wilmar & Edibles</h5>
-                      <span>Fortune Sunflower Oil, Kachi Ghani Mustard & Kohinoor Rice</span>
+                      <span>Fortune Sunflower Oil, Kachi Ghani Mustard & Rice</span>
                     </div>
                   </div>
 
@@ -146,9 +147,62 @@ export const GenuineBrandStockPage = ({ onNavigate, onOpenAuth, onShopClick }) =
                     <img src="/images/tata-tea.jpg" alt="Tata Consumer" />
                     <div className="staple-card-content">
                       <h5>Tata Consumer Products</h5>
-                      <span>Tata Tea Gold, Tata Salt, Tata Sampann Unpolished Dals</span>
+                      <span>Tata Tea Gold, Tata Salt, Tata Sampann Pulses</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">KharchDaan Authenticity & Supply Integrity Protocol</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Supply Stage</th>
+                        <th>Quality Verification Check</th>
+                        <th>Standard Guarantee</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>1. Manufacturer Dispatch</strong></td>
+                        <td>Direct OEM factory consignment waybill</td>
+                        <td><strong className="text-orange">Zero Intermediary Traders</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>2. Inbound Hub Check</strong></td>
+                        <td>Batch barcode & expiry verification</td>
+                        <td><strong className="text-orange">Fresh Harvest / Batch</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>3. Customer Delivery</strong></td>
+                        <td>Hologram tamper-proof security pack</td>
+                        <td><strong className="text-orange">100% Original Seal</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Pro Verification Tip</strong>
+                    <p>Every product delivered carries the original manufacturer batch number and official tax invoice. You can verify the product with the brand's national customer hotline anytime!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products')}>
+                    <ShoppingBag size={18} />
+                    <span>Shop Verified Brand Catalog</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +237,18 @@ export const GenuineBrandStockPage = ({ onNavigate, onOpenAuth, onShopClick }) =
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>AUTHENTICITY BADGE</span>
-                </div>
-                <h3>100% Brand Guarantee</h3>
-                <p>Shop with confidence. Zero fake stock, factory-fresh packaging, and full manufacturer warranty.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">Genuine</span>
-                  <span className="price-old">Duplicates</span>
-                  <span className="price-discount">100% VERIFIED</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Shop Verified Catalog</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>Authenticity Commitments</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> Direct Factory Mother Hub Sourcing</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Tamper-Proof Hologram Packaging</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Easy 48-Hour Return / Replacement</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Complete GST Tax Invoice Provided</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Have questions about a product batch code?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Quality Desk ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="genuine-brand-stock"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="100% Brand Guarantee"
+              dealDesc="Shop with confidence. Zero duplicate stock, factory-fresh packaging, and full manufacturer warranty."
+              dealPrice="Genuine"
+              dealOldPrice="Duplicates"
+              dealDiscount="100% VERIFIED"
+              dealActionText="Shop Verified Brands"
+              dealCategory="Grocery"
+            />
 
           </div>
 

@@ -4,6 +4,7 @@ import {
   Coins, ArrowRight, ShoppingBag, CheckCircle2, Coffee, 
   Layers, Percent, Truck, HelpCircle, Award, Star, Utensils
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const FoodBeveragesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -123,7 +124,7 @@ export const FoodBeveragesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                 </div>
 
                 {/* Popular Food Categories Visual Strip */}
-                <h3 className="topic-mid-title">Top Food & Beverage Categories</h3>
+                <h3 className="topic-mid-title">Top Essential Categories in Food & Beverages</h3>
                 
                 <div className="topic-staples-showcase-grid">
                   <div className="staple-card">
@@ -146,9 +147,70 @@ export const FoodBeveragesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/hiw-step2-shopping.jpg" alt="Biscuits & Snacks" />
                     <div className="staple-card-content">
                       <h5>Biscuits, Cookies & Namkeen</h5>
-                      <span>Parle-G, Good Day, Maggi 2-Minute Noodles, Bhujia & Chips</span>
+                      <span>Parle-G, Good Day, Maggi Noodles, Bhujia & Chips</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Comparison */}
+                <h3 className="topic-table-title">Beverage & Snack Savings vs Local Retail MRP</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Product Combo</th>
+                        <th>Standard MRP</th>
+                        <th>KharchDaan Member Price</th>
+                        <th>Direct Savings</th>
+                        <th>Point Volume (PV)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Tata Tea Gold (500g) + Sugar 1kg</strong></td>
+                        <td>₹385</td>
+                        <td>₹315</td>
+                        <td><span className="badge-split">18% OFF</span></td>
+                        <td><strong className="text-orange">45 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Cadbury Silk Celebration Pack (350g)</strong></td>
+                        <td>₹450</td>
+                        <td>₹360</td>
+                        <td><span className="badge-split">20% OFF</span></td>
+                        <td><strong className="text-orange">60 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Family Snack Mega Box (10 Items)</strong></td>
+                        <td>₹850</td>
+                        <td>₹649</td>
+                        <td><span className="badge-split">24% OFF</span></td>
+                        <td><strong className="text-orange">110 PV</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Pro Beverage Strategy</strong>
+                    <p>Tea and biscuits are consumed daily in every Indian office, shop, and home. Introduce your local office colleagues and friends to save on monthly pantry supplies and generate weekly passive PV!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products', 'Food')}>
+                    <ShoppingBag size={18} />
+                    <span>Shop Food & Beverages</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -162,7 +224,7 @@ export const FoodBeveragesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                         <strong>What brands of snacks and beverages are available?</strong>
                       </div>
                       <p className="faq-answer">
-                        We offer authentic products from Tata Consumer Products, Cadbury Mondelez, Nestle India, Britannia, Parle, PepsiCo, Coca-Cola, Dabur, and Bikaji.
+                        We offer authentic products from Tata Consumer Products, Cadbury Mondelez, Nestle India, Britannia, Parle, PepsiCo, Coca-Cola, Dabur, and Bikaji in factory-sealed tamper-proof packaging.
                       </p>
                     </div>
 
@@ -183,52 +245,18 @@ export const FoodBeveragesPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>TEA TIME SPECIAL DEAL</span>
-                </div>
-                <h3>Family Evening Snacks Combo</h3>
-                <p>Tata Tea Gold (500g) + Good Day Cookies 4-pack + Cadbury Celebration Box with 120 Extra PV bonus.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹599</span>
-                  <span className="price-old">₹780</span>
-                  <span className="price-discount">23% OFF</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products', 'Food')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Shop Food & Beverages</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>KharchDaan Quality Promise</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> 100% Brand Sealed Packaging</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Fresh Batch & Extended Shelf-life</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Multi-level Team PV Distribution</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Direct UPI Cashback Eligible</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Want to stock party snacks or office pantry?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Our Corporate Desk ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="food-beverages"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Family Tea-Time Snacks Combo"
+              dealDesc="Tata Tea Gold (500g) + Good Day Cookies 4-pack + Cadbury Silk Box with 120 Extra PV bonus."
+              dealPrice="₹599"
+              dealOldPrice="₹780"
+              dealDiscount="23% OFF"
+              dealActionText="Shop Food & Snacks"
+              dealCategory="Food"
+            />
 
           </div>
 

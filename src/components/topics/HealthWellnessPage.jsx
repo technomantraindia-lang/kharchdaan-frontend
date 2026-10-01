@@ -4,6 +4,7 @@ import {
   Coins, ArrowRight, ShoppingBag, CheckCircle2, HeartPulse, 
   Layers, Percent, Truck, HelpCircle, Award, Star, Leaf, Activity
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const HealthWellnessPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -130,7 +131,7 @@ export const HealthWellnessPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/health-wellness-ayurveda.jpg" alt="Chyawanprash & Immunity" />
                     <div className="staple-card-content">
                       <h5>Immunity & Chyawanprash</h5>
-                      <span>Dabur Chyawanprash 1kg, Baidyanath Kesari Kalp, Amla Murabba</span>
+                      <span>Dabur Chyawanprash 1kg, Baidyanath Kesari Kalp & Amla</span>
                     </div>
                   </div>
 
@@ -138,7 +139,7 @@ export const HealthWellnessPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/fortune-oil.jpg" alt="Pure Honey & Organic Ghee" />
                     <div className="staple-card-content">
                       <h5>Pure Honey & Vedic Ghee</h5>
-                      <span>100% Raw Forest Honey, A2 Desi Cow Cultured Ghee & Shilajit</span>
+                      <span>100% Raw Forest Honey & A2 Desi Cow Cultured Ghee</span>
                     </div>
                   </div>
 
@@ -146,9 +147,70 @@ export const HealthWellnessPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/dettol-handwash.jpg" alt="Herbal Personal Hygiene" />
                     <div className="staple-card-content">
                       <h5>Herbal Hygiene & Daily Care</h5>
-                      <span>Neem Face Wash, Medicated Herbal Soaps, Pain Relief Oils</span>
+                      <span>Neem Face Wash, Medicated Herbal Soaps & Pain Oils</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">Ayurvedic Immunity & Daily Wellness Price Table</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Ayurvedic Pack</th>
+                        <th>Standard MRP</th>
+                        <th>KharchDaan Member Price</th>
+                        <th>Direct Savings</th>
+                        <th>Boosted PV Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Dabur Chyawanprash Awaleha (1kg Jar)</strong></td>
+                        <td>₹415</td>
+                        <td>₹325</td>
+                        <td><span className="badge-split">22% OFF</span></td>
+                        <td><strong className="text-orange">80 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>100% Raw Forest Honey (500g Glass Jar)</strong></td>
+                        <td>₹320</td>
+                        <td>₹240</td>
+                        <td><span className="badge-split">25% OFF</span></td>
+                        <td><strong className="text-orange">65 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Organic Curcumin Turmeric (250g)</strong></td>
+                        <td>₹195</td>
+                        <td>₹145</td>
+                        <td><span className="badge-split">25% OFF</span></td>
+                        <td><strong className="text-orange">40 PV</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Ayurvedic Point Accelerator</strong>
+                    <p>Health and wellness purchases grant 1.5x bonus PV point multipliers, speeding up your matrix qualification and unlocking weekly royalty pools faster!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products', 'Health')}>
+                    <ShoppingBag size={18} />
+                    <span>Shop Health & Wellness</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +245,18 @@ export const HealthWellnessPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>IMMUNITY BOOSTER COMBO</span>
-                </div>
-                <h3>Ayurvedic Family Shield Bundle</h3>
-                <p>Dabur Chyawanprash (1kg) + Pure Raw Honey (500g) + Organic Haldi (200g) with 180 Extra PV bonus.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹699</span>
-                  <span className="price-old">₹950</span>
-                  <span className="price-discount">26% OFF</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products', 'Health')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Shop Health & Wellness</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>KharchDaan Purity Pledge</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> 100% Certified AYUSH Formulation</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Zero Adulteration & Tested Batches</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> High Point Volume (PV) Multiplier</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Instant UPI Cashback Credit</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Have specific dietary or wellness questions?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Ask Our Wellness Advisors ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="health-wellness"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Ayurvedic Family Shield Bundle"
+              dealDesc="Dabur Chyawanprash (1kg) + Pure Raw Honey (500g) + Organic Haldi (200g) with 180 Extra PV bonus."
+              dealPrice="₹699"
+              dealOldPrice="₹950"
+              dealDiscount="26% OFF"
+              dealActionText="Shop Health & Wellness"
+              dealCategory="Health"
+            />
 
           </div>
 

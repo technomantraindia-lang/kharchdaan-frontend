@@ -4,6 +4,7 @@ import {
   Coins, ArrowRight, ShoppingBag, CheckCircle2, PackageCheck, 
   Layers, Percent, Truck, HelpCircle, Award, Star, Flame, Zap
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const FamilyGroceryHamperPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -130,7 +131,7 @@ export const FamilyGroceryHamperPage = ({ onNavigate, onOpenAuth, onShopClick })
                     <img src="/images/aashirvaad-atta.jpg" alt="Aashirvaad Shudh Atta 10kg" />
                     <div className="staple-card-content">
                       <h5>Aashirvaad Atta (10kg) + Basmati Rice (5kg)</h5>
-                      <span>100% MP Shudh Chakki whole wheat flour & Daawat long grain basmati</span>
+                      <span>100% MP Chakki whole wheat flour & Daawat super grain</span>
                     </div>
                   </div>
 
@@ -138,7 +139,7 @@ export const FamilyGroceryHamperPage = ({ onNavigate, onOpenAuth, onShopClick })
                     <img src="/images/fortune-oil.jpg" alt="Fortune Sunlite Oil 5L" />
                     <div className="staple-card-content">
                       <h5>Fortune Sunflower Oil (5L) + Tata Salt</h5>
-                      <span>Refined Vitamin A & D fortified edible oil + vacuum evaporated iodized salt</span>
+                      <span>Refined Vitamin A & D fortified oil + iodized table salt</span>
                     </div>
                   </div>
 
@@ -146,9 +147,84 @@ export const FamilyGroceryHamperPage = ({ onNavigate, onOpenAuth, onShopClick })
                     <img src="/images/surf-excel.jpg" alt="Surf Excel & Tea" />
                     <div className="staple-card-content">
                       <h5>Tata Tea Gold (500g) + Surf Excel (2kg)</h5>
-                      <span>Rich aroma CTC tea blend + Matic detergent & Vim dishwash gel kit</span>
+                      <span>Rich aroma CTC tea blend + Matic detergent & Vim Gel</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">Full 15-Item Family Grocery Hamper Inventory</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Item Description</th>
+                        <th>Pack Size</th>
+                        <th>Retail MRP</th>
+                        <th>Hamper Value Split</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Aashirvaad Shudh Chakki Atta</strong></td>
+                        <td>10 kg Bag</td>
+                        <td>₹475</td>
+                        <td><span className="badge-split">Included</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Fortune Sunlite Refined Sunflower Oil</strong></td>
+                        <td>5 Litre Can</td>
+                        <td>₹790</td>
+                        <td><span className="badge-split">Included</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Daawat Super Basmati Rice</strong></td>
+                        <td>5 kg Pack</td>
+                        <td>₹650</td>
+                        <td><span className="badge-split">Included</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Tata Sampann Toor Dal + Chana Dal</strong></td>
+                        <td>2 kg Combo</td>
+                        <td>₹360</td>
+                        <td><span className="badge-split">Included</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Tata Tea Gold + Cadbury Celebration</strong></td>
+                        <td>500g + 350g</td>
+                        <td>₹550</td>
+                        <td><span className="badge-split">Included</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Surf Excel Matic + Vim Dishwash + Dettol</strong></td>
+                        <td>Full Hygiene Kit</td>
+                        <td>₹625</td>
+                        <td><span className="badge-split">Included</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Hamper Matrix Accelerator</strong>
+                    <p>Ordering the Monthly Family Grocery Hamper yields 500 High-Yield PV points that flow through all 20 tiers of your matrix downline, making it the fastest way to qualify for the Monthly Leadership Royalty Pool!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products', 'Grocery')}>
+                    <ShoppingBag size={18} />
+                    <span>Order Monthly Hamper Now</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +259,18 @@ export const FamilyGroceryHamperPage = ({ onNavigate, onOpenAuth, onShopClick })
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>MEGA VALUE HAMPER</span>
-                </div>
-                <h3>Monthly Deluxe Family Hamper</h3>
-                <p>15+ Essentials: Atta 10kg + Oil 5L + Rice 5kg + Dals 3kg + Tea + Spices + Cleaners + 500 Bonus PV.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹2,499</span>
-                  <span className="price-old">₹3,450</span>
-                  <span className="price-discount">28% OFF</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products', 'Grocery')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Order Monthly Hamper Now</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>Hamper Exclusive Benefits</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> Free Expedited Doorstep Delivery</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> 500 High-Yield Matrix PV Bonus</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> 100% Authentic Brand Packaging</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Instant UPI Cashback Credit</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Need corporate gifting hampers in bulk?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Corporate Hamper Desk ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="family-grocery-hamper"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Monthly Deluxe Family Hamper"
+              dealDesc="15+ Essentials: Atta 10kg + Oil 5L + Rice 5kg + Dals + Tea + Cleaners with 500 Bonus PV."
+              dealPrice="₹2,499"
+              dealOldPrice="₹3,450"
+              dealDiscount="28% OFF"
+              dealActionText="Order Family Hamper"
+              dealCategory="Grocery"
+            />
 
           </div>
 

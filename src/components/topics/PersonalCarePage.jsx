@@ -2,8 +2,9 @@ import React from 'react';
 import { 
   Home, ChevronRight, Sparkles, TrendingUp, ShieldCheck, 
   Coins, ArrowRight, ShoppingBag, CheckCircle2, Sparkle, 
-  Layers, Percent, Truck, HelpCircle, Award, Star, HeartHandshake
+  Layers, Percent, Truck, HelpCircle, Award, Star
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const PersonalCarePage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -130,7 +131,7 @@ export const PersonalCarePage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/surf-excel.jpg" alt="Laundry & Fabric Care" />
                     <div className="staple-card-content">
                       <h5>Laundry & Detergents</h5>
-                      <span>Surf Excel Matic, Ariel, Rin Bar, Comfort Fabric Conditioner</span>
+                      <span>Surf Excel Matic, Ariel, Rin Bar, Comfort Conditioner</span>
                     </div>
                   </div>
 
@@ -138,7 +139,7 @@ export const PersonalCarePage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/dettol-handwash.jpg" alt="Hygiene & Disinfectants" />
                     <div className="staple-card-content">
                       <h5>Hygiene & Handwash</h5>
-                      <span>Dettol Antiseptic, Lifebuoy Handwash, Savlon, Godrej No. 1</span>
+                      <span>Dettol Antiseptic, Lifebuoy Handwash, Savlon Soap</span>
                     </div>
                   </div>
 
@@ -146,9 +147,77 @@ export const PersonalCarePage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/hiw-step2-shopping.jpg" alt="Oral Care & Dishwash" />
                     <div className="staple-card-content">
                       <h5>Kitchen Cleaners & Oral Care</h5>
-                      <span>Vim Gel, Colgate MaxFresh, Sensodyne, Harpic & Lizol</span>
+                      <span>Vim Gel, Colgate MaxFresh, Sensodyne & Lizol</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">Personal Care & Cleaning Savings Matrix</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Product Bundle</th>
+                        <th>Standard MRP</th>
+                        <th>KharchDaan Member Price</th>
+                        <th>Savings</th>
+                        <th>Point Volume (PV)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Surf Excel Matic Top Load (2kg Refill)</strong></td>
+                        <td>₹430</td>
+                        <td>₹345</td>
+                        <td><span className="badge-split">20% OFF</span></td>
+                        <td><strong className="text-orange">60 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Dettol Liquid Handwash Refill (1.5L Mega Pack)</strong></td>
+                        <td>₹280</td>
+                        <td>₹215</td>
+                        <td><span className="badge-split">23% OFF</span></td>
+                        <td><strong className="text-orange">40 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Vim Dishwash Gel (750ml) + Scrubber Set</strong></td>
+                        <td>₹175</td>
+                        <td>₹135</td>
+                        <td><span className="badge-split">23% OFF</span></td>
+                        <td><strong className="text-orange">25 PV</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Colgate Strong Teeth (500g Value Saver)</strong></td>
+                        <td>₹240</td>
+                        <td>₹185</td>
+                        <td><span className="badge-split">23% OFF</span></td>
+                        <td><strong className="text-orange">35 PV</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Pro Hygiene Tip</strong>
+                    <p>Switching your household laundry and dishwashing products to KharchDaan generates regular 160+ monthly PV without adding a single rupee of extra overhead to your household budget!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products', 'Beauty')}>
+                    <ShoppingBag size={18} />
+                    <span>Shop Personal & Cleaning</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +252,18 @@ export const PersonalCarePage = ({ onNavigate, onOpenAuth, onShopClick }) => {
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>CLEAN HOME COMBO DEAL</span>
-                </div>
-                <h3>Monthly Household Hygiene Kit</h3>
-                <p>Surf Excel 2kg + Dettol 750ml Refill + Vim Gel 500ml + Harpic 1L with 140 Extra PV bonus.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹749</span>
-                  <span className="price-old">₹990</span>
-                  <span className="price-discount">24% OFF</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products', 'Beauty')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Shop Personal & Cleaning</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>KharchDaan Hygiene Guarantee</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> 100% Authentic Brand Seal</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Leak-Proof Transit Packaging</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Multi-tier Matrix PV Credit</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Instant UPI Payout Eligible</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Looking for bulk society sanitation orders?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Institutional Desk ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="personal-household-care"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Monthly Household Hygiene Kit"
+              dealDesc="Surf Excel 2kg + Dettol 750ml Refill + Vim Gel 500ml + Harpic 1L with 140 Extra PV bonus."
+              dealPrice="₹749"
+              dealOldPrice="₹990"
+              dealDiscount="24% OFF"
+              dealActionText="Shop Personal & Cleaning"
+              dealCategory="Beauty"
+            />
 
           </div>
 

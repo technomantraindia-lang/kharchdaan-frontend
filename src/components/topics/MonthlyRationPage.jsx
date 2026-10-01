@@ -2,8 +2,9 @@ import React from 'react';
 import { 
   Home, ChevronRight, Sparkles, Truck, ShieldCheck, 
   Coins, ArrowRight, ShoppingBag, CheckCircle2, Calendar, 
-  Layers, Percent, Package, HelpCircle, Award, Star, Clock, Home as HomeIcon
+  Layers, Percent, Package, HelpCircle, Award, Star
 } from 'lucide-react';
+import { FmcgTopicSidebar } from './FmcgTopicSidebar';
 
 export const MonthlyRationPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
   return (
@@ -146,9 +147,70 @@ export const MonthlyRationPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
                     <img src="/images/surf-excel.jpg" alt="Deluxe Joint Family Mega Pack" />
                     <div className="staple-card-content">
                       <h5>Mega Joint Family Pack (6+ Members)</h5>
-                      <span>20kg Atta, 10L Oil, 10kg Rice, Full Kitchen & Laundry Supplies + 600 PV</span>
+                      <span>20kg Atta, 10L Oil, 10kg Rice, Full Kitchen & Laundry + 600 PV</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Table Breakdown */}
+                <h3 className="topic-table-title">Family Size Ration Sizing & PV Multiplier Guide</h3>
+                <div className="topic-breakdown-table-wrap">
+                  <table className="topic-breakdown-table">
+                    <thead>
+                      <tr>
+                        <th>Family Type</th>
+                        <th>Recommended Items</th>
+                        <th>Monthly Cost</th>
+                        <th>Savings</th>
+                        <th>Monthly Matrix PV</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Couples / Small Family</strong></td>
+                        <td>Atta 5kg, Oil 2L, Dals, Rice, Tea</td>
+                        <td>₹1,199</td>
+                        <td><span className="badge-split">20% OFF</span></td>
+                        <td><strong className="text-orange">150 PV / mo</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Standard Family (4 Members)</strong></td>
+                        <td>Atta 10kg, Oil 5L, Basmati, Spices, Detergents</td>
+                        <td>₹1,999</td>
+                        <td><span className="badge-split">24% OFF</span></td>
+                        <td><strong className="text-orange">300 PV / mo</strong></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Joint Family (6+ Members)</strong></td>
+                        <td>Atta 20kg, Oil 10L, Bulk Grains, Cleaning Kit</td>
+                        <td>₹3,499</td>
+                        <td><span className="badge-split">28% OFF</span></td>
+                        <td><strong className="text-orange">600 PV / mo</strong></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pro Tip Box */}
+                <div className="topic-pro-tip-box">
+                  <Sparkles size={22} className="text-orange" />
+                  <div>
+                    <strong>Subscription Automation</strong>
+                    <p>Encourage your referred network members to enable monthly subscription delivery. This creates an unstoppable, compounding monthly passive paycheck for your family 365 days a year!</p>
+                  </div>
+                </div>
+
+                {/* Action CTA Row */}
+                <div className="topic-article-cta-row">
+                  <button className="btn-primary btn-large" onClick={() => onNavigate('products', 'Grocery')}>
+                    <ShoppingBag size={18} />
+                    <span>Build Monthly Ration Basket</span>
+                    <ArrowRight size={18} />
+                  </button>
+                  <button className="btn-secondary-outline btn-large" onClick={onOpenAuth}>
+                    <Sparkles size={18} />
+                    <span>Register Free Account</span>
+                  </button>
                 </div>
 
                 {/* FAQ Section */}
@@ -183,52 +245,18 @@ export const MonthlyRationPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
             </div>
 
             {/* Right Side Action Panel */}
-            <div className="topic-sidebar-card">
-              
-              <div className="sidebar-deal-box">
-                <div className="sidebar-deal-badge">
-                  <Sparkles size={13} />
-                  <span>SUBSCRIPTION BONANZA</span>
-                </div>
-                <h3>Monthly Auto-Delivery Hamper</h3>
-                <p>Lock in guaranteed monthly delivery with ₹450 flat discount and 250 bonus PV every month.</p>
-                
-                <div className="sidebar-price-row">
-                  <span className="price-current">₹1,799</span>
-                  <span className="price-old">₹2,350</span>
-                  <span className="price-discount">24% OFF</span>
-                </div>
-
-                <button 
-                  className="sidebar-action-btn primary"
-                  onClick={() => onNavigate('products', 'Grocery')}
-                >
-                  <ShoppingBag size={16} />
-                  <span>Build My Monthly Ration</span>
-                </button>
-              </div>
-
-              <div className="sidebar-perks-list">
-                <h4>Monthly Delivery Guarantees</h4>
-                <ul>
-                  <li><CheckCircle2 size={15} className="text-green" /> Free Doorstep Delivery Above ₹499</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Flexible Monthly Date Scheduler</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Skip, Pause, or Swap Anytime</li>
-                  <li><CheckCircle2 size={15} className="text-green" /> Guaranteed Fresh Factory Batches</li>
-                </ul>
-              </div>
-
-              <div className="sidebar-help-cta">
-                <p>Need custom bulk ration for an event or trust?</p>
-                <button 
-                  className="sidebar-help-link"
-                  onClick={() => onNavigate('contact')}
-                >
-                  Contact Bulk Dispatch Desk ➔
-                </button>
-              </div>
-
-            </div>
+            <FmcgTopicSidebar 
+              currentTopicId="monthly-ration-delivery"
+              onNavigate={onNavigate}
+              onOpenAuth={onOpenAuth}
+              dealTitle="Monthly Auto-Delivery Hamper"
+              dealDesc="Lock in guaranteed monthly delivery with ₹450 flat discount and 250 bonus PV every month."
+              dealPrice="₹1,799"
+              dealOldPrice="₹2,350"
+              dealDiscount="24% OFF"
+              dealActionText="Build Monthly Ration"
+              dealCategory="Grocery"
+            />
 
           </div>
 
