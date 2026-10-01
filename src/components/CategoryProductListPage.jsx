@@ -7,6 +7,12 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
+import { 
+  WheatStaplesSvg, 
+  FoodBeverageSvg, 
+  PersonalCareSvg, 
+  HealthWellnessSvg 
+} from './CategorySvgs';
 
 export const CATEGORY_CONFIG = {
   'grocery-staples': {
@@ -16,7 +22,7 @@ export const CATEGORY_CONFIG = {
     heroTitle: 'Fresh Grocery & Daily Kitchen Staples',
     heroSlogan: 'Aashirvaad Atta • Fortune Oil • Premium Rice & Pulses • Guaranteed Purity & PV Points',
     heroDesc: 'Shop your family’s mandatory monthly staples at wholesale-grade distributor rates. Every kilogram of flour, rice, and cooking oil yields genuine point volume (PV) for your 20-level downline earnings.',
-    badgeSymbol: '🌾',
+    Icon: WheatStaplesSvg,
     badgeText: '100% GENUINE FMCG STAPLES',
     featuredBrandList: ['All', 'Aashirvaad', 'Fortune', 'Daawat', 'Tata Consumer', 'Amul'],
     spotlightDeal: {
@@ -35,7 +41,7 @@ export const CATEGORY_CONFIG = {
     heroTitle: 'Packaged Food, Beverages & Family Snacks',
     heroSlogan: 'Tata Tea Gold • Cadbury Dairy Milk • Parle-G & Maggi • Nescafe Coffee • Real Juices',
     heroDesc: 'Turn every morning chai break and evening snack time into recurring cashback. Enjoy 100% original factory-sealed teas, chocolates, noodles, and biscuits with compounding PV rewards.',
-    badgeSymbol: '☕',
+    Icon: FoodBeverageSvg,
     badgeText: '100% ORIGINAL TASTE & REFRESHMENT',
     featuredBrandList: ['All', 'Tata Tea', 'Cadbury', 'Maggi', 'Nestle'],
     spotlightDeal: {
@@ -54,7 +60,7 @@ export const CATEGORY_CONFIG = {
     heroTitle: 'Personal Care, Hygiene & Household Cleaning',
     heroSlogan: 'Surf Excel Matic • Dettol Antiseptic • Vim Dishwash • Colgate & Oral Care • Harpic',
     heroDesc: 'Keep your home sparkling clean and your loved ones protected with India’s leading detergents, dishwash gels, floor disinfectants, and oral care products at unmatched value.',
-    badgeSymbol: '🧼',
+    Icon: PersonalCareSvg,
     badgeText: '100% HYGIENE & CLEANING PURITY',
     featuredBrandList: ['All', 'Surf Excel', 'Dettol', 'Vim', 'Colgate'],
     spotlightDeal: {
@@ -73,7 +79,7 @@ export const CATEGORY_CONFIG = {
     heroTitle: 'Health, Wellness & Authentic Ayurveda',
     heroSlogan: 'Dabur Chyawanprash • Pure Raw Honey • Organic Tulsi Green Tea • Ashwagandha & Herbs',
     heroDesc: 'Safeguard your family’s vitality with time-tested Vedic Ayurvedic essentials, certified raw forest honey, herbal immunity tonics, and daily nutrition generating highest point volume ratios.',
-    badgeSymbol: '🌿',
+    Icon: HealthWellnessSvg,
     badgeText: '100% AYURVEDIC PURITY & IMMUNITY',
     featuredBrandList: ['All', 'Dabur', 'Organic India', 'Dettol', 'Himalaya'],
     spotlightDeal: {
@@ -95,6 +101,7 @@ export const CategoryProductListPage = ({
 }) => {
   const { addToCart } = useCart();
   const config = CATEGORY_CONFIG[categorySlug] || CATEGORY_CONFIG['grocery-staples'];
+  const HeaderIcon = config.Icon;
 
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -181,7 +188,9 @@ export const CategoryProductListPage = ({
 
           <div className="topic-top-badge-row">
             <div className="topic-foundation-pill">
-              <span className="pill-om-symbol">{config.badgeSymbol}</span>
+              <span className="pill-om-symbol" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <HeaderIcon size={16} />
+              </span>
               <span>{config.badgeText}</span>
               <Sparkles size={13} className="text-orange" />
             </div>
@@ -228,7 +237,7 @@ export const CategoryProductListPage = ({
         </div>
       </section>
 
-      {/* 2. CATEGORY SWITCHER TABS */}
+      {/* 2. CATEGORY SWITCHER TABS WITH VECTOR SVGS */}
       <section className="cat-product-nav-strip">
         <div className="container">
           <div className="cat-nav-pills-row">
@@ -236,28 +245,28 @@ export const CategoryProductListPage = ({
               className={`cat-nav-pill ${categorySlug === 'grocery-staples' ? 'active' : ''}`}
               onClick={() => onNavigate('grocery-staples')}
             >
-              <span className="pill-ico">🌾</span>
+              <span className="pill-ico"><WheatStaplesSvg size={18} /></span>
               <span>Grocery & Staples</span>
             </button>
             <button 
               className={`cat-nav-pill ${categorySlug === 'food-beverages' ? 'active' : ''}`}
               onClick={() => onNavigate('food-beverages')}
             >
-              <span className="pill-ico">☕</span>
+              <span className="pill-ico"><FoodBeverageSvg size={18} /></span>
               <span>Food & Beverages</span>
             </button>
             <button 
               className={`cat-nav-pill ${categorySlug === 'personal-household-care' ? 'active' : ''}`}
               onClick={() => onNavigate('personal-household-care')}
             >
-              <span className="pill-ico">🧼</span>
+              <span className="pill-ico"><PersonalCareSvg size={18} /></span>
               <span>Personal & Household Care</span>
             </button>
             <button 
               className={`cat-nav-pill ${categorySlug === 'health-wellness' ? 'active' : ''}`}
               onClick={() => onNavigate('health-wellness')}
             >
-              <span className="pill-ico">🌿</span>
+              <span className="pill-ico"><HealthWellnessSvg size={18} /></span>
               <span>Health & Wellness</span>
             </button>
           </div>

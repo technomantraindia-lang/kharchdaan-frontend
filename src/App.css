@@ -12496,8 +12496,29 @@ button {
 }
 
 .cat-nav-pill .pill-ico {
-  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #EA580C;
+  line-height: 1;
 }
+
+.cat-nav-pill.active .pill-ico {
+  color: #FFFFFF;
+}
+
+.cat-nav-pill.active .pill-ico svg {
+  color: #FFFFFF;
+}
+
+.cat-nav-pill.active .pill-ico svg path[stroke="currentColor"] {
+  stroke: #FFFFFF;
+}
+
+.cat-nav-pill.active .pill-ico svg rect[stroke="currentColor"] {
+  stroke: #FFFFFF;
+}
+
 
 /* Category Toolbar (Brand Chips, Search & Sort) */
 .cat-catalog-toolbar {
