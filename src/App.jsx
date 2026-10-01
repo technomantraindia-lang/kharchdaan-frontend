@@ -36,6 +36,7 @@ import { AccountModal } from './components/AccountModal';
 import { CartDrawer } from './components/CartDrawer';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { IndianCornerFiligree } from './components/StepIllustrations';
+import { Preloader } from './components/Preloader';
 import { ALL_PRODUCTS } from './data/productsData';
 import './App.css';
 
@@ -77,6 +78,9 @@ function MainStore() {
 
   return (
     <div className="kharchdaan-page-wrapper">
+      {/* Ultra-Premium Clean KharchDaan Preloader */}
+      <Preloader />
+
       {/* Decorative Traditional Corner Filigrees */}
       <IndianCornerFiligree position="top-right" />
       <IndianCornerFiligree position="mid-right" />
