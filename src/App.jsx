@@ -24,6 +24,15 @@ import { FoundationSevaPage } from './components/topics/FoundationSevaPage';
 import { WomenEmpowermentPage } from './components/topics/WomenEmpowermentPage';
 import { KiranaModernizationPage } from './components/topics/KiranaModernizationPage';
 import { GovtEthicsPage } from './components/topics/GovtEthicsPage';
+import { GroceryStaplesPage } from './components/topics/GroceryStaplesPage';
+import { FoodBeveragesPage } from './components/topics/FoodBeveragesPage';
+import { PersonalCarePage } from './components/topics/PersonalCarePage';
+import { HealthWellnessPage } from './components/topics/HealthWellnessPage';
+import { KiranaNetworkPage } from './components/topics/KiranaNetworkPage';
+import { InstantCashbackWalletPage } from './components/topics/InstantCashbackWalletPage';
+import { GenuineBrandStockPage } from './components/topics/GenuineBrandStockPage';
+import { MonthlyRationPage } from './components/topics/MonthlyRationPage';
+import { FamilyGroceryHamperPage } from './components/topics/FamilyGroceryHamperPage';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
 import { AccountModal } from './components/AccountModal';
@@ -176,6 +185,60 @@ function MainStore() {
           onOpenAuth={() => setAuthModalOpen(true)}
           onShopClick={() => handleNavigation('products')}
           onSelectTopic={(topicId) => setSelectedTopic(topicId)}
+        />
+      ) : currentPage === 'grocery-staples' ? (
+        <GroceryStaplesPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products', 'Grocery')}
+        />
+      ) : currentPage === 'food-beverages' ? (
+        <FoodBeveragesPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products', 'Food')}
+        />
+      ) : currentPage === 'personal-household-care' || currentPage === 'personal-care' ? (
+        <PersonalCarePage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products', 'Beauty')}
+        />
+      ) : currentPage === 'health-wellness' ? (
+        <HealthWellnessPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products', 'Health')}
+        />
+      ) : currentPage === 'neighbourhood-kirana-network' || currentPage === 'kirana-network' ? (
+        <KiranaNetworkPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products')}
+        />
+      ) : currentPage === 'instant-cashback-wallet' ? (
+        <InstantCashbackWalletPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products')}
+        />
+      ) : currentPage === 'genuine-brand-stock' ? (
+        <GenuineBrandStockPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products')}
+        />
+      ) : currentPage === 'monthly-ration-delivery' || currentPage === 'monthly-ration' ? (
+        <MonthlyRationPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products', 'Grocery')}
+        />
+      ) : currentPage === 'family-grocery-hamper' ? (
+        <FamilyGroceryHamperPage
+          onNavigate={handleNavigation}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products', 'Grocery')}
         />
       ) : (
         <>

@@ -1,0 +1,267 @@
+import React from 'react';
+import { 
+  Home, ChevronRight, Sparkles, Truck, ShieldCheck, 
+  Coins, ArrowRight, ShoppingBag, CheckCircle2, Calendar, 
+  Layers, Percent, Package, HelpCircle, Award, Star, Clock, Home as HomeIcon
+} from 'lucide-react';
+
+export const MonthlyRationPage = ({ onNavigate, onOpenAuth, onShopClick }) => {
+  return (
+    <div className="topic-page-wrapper">
+      
+      {/* 1. HERO HEADER */}
+      <section className="topic-hero-showcase">
+        <div className="topic-hero-bg-glow" />
+        <div className="container">
+          
+          <div className="topic-breadcrumbs-row">
+            <button className="breadcrumb-link" onClick={() => onNavigate('home')}>
+              <Home size={13} />
+              <span>Home</span>
+            </button>
+            <ChevronRight size={13} className="breadcrumb-sep" />
+            <span className="breadcrumb-link" onClick={() => onNavigate('home')}>Ecosystem Services</span>
+            <ChevronRight size={13} className="breadcrumb-sep" />
+            <span className="breadcrumb-current">Monthly Ration Home Delivery</span>
+          </div>
+
+          <div className="topic-top-badge-row">
+            <div className="topic-foundation-pill">
+              <span className="pill-om-symbol">🚚</span>
+              <span>SCHEDULED RECURRING DOORSTEP DELIVERY</span>
+              <Sparkles size={13} className="text-orange" />
+            </div>
+          </div>
+
+          <div className="topic-hero-header-box">
+            <h1 className="topic-hero-title">
+              Monthly Family Ration & Scheduled Doorstep Delivery
+            </h1>
+
+            <div className="topic-slogan-badge-wrap">
+              <span className="slogan-quote-leaf">❧</span>
+              <span className="topic-hero-slogan">
+                Set It & Forget It • Custom Family Ration Planner • Free Doorstep Delivery Above ₹499 • Guaranteed On-Time
+              </span>
+              <span className="slogan-quote-leaf">❧</span>
+            </div>
+
+            <p className="topic-hero-description">
+              Never run out of kitchen essentials again. Configure your customized monthly ration basket—Atta, Rice, Cooking Oil, Dals, Spices, and Cleaners—and have it delivered directly to your doorstep on your chosen date every single month with automated PV earnings.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 2. MAIN CONTENT */}
+      <section className="topic-main-content-section">
+        <div className="container">
+          
+          <div className="topic-layout-grid">
+            
+            {/* Left Main Article */}
+            <div className="topic-article-main-card">
+              
+              {/* Primary Visual Banner */}
+              <div className="topic-featured-photo-wrapper">
+                <img 
+                  src="/images/hiw-step2-shopping.jpg" 
+                  alt="Monthly Ration Doorstep Delivery Service" 
+                  className="topic-main-photo-img"
+                />
+                <div className="topic-photo-gradient-overlay" />
+                <div className="topic-photo-badge">
+                  <Truck size={16} className="text-gold" />
+                  <span>On-Time Doorstep Delivery Across 150+ Cities</span>
+                </div>
+              </div>
+
+              <div className="topic-content-body">
+                
+                <h2 className="topic-section-subheading">Hassle-Free Monthly Kitchen Provisioning</h2>
+                <p className="topic-overview-text">
+                  Carrying 10kg bags of flour, 5L cans of oil, heavy detergents, and bulky grocery bags from crowded wholesale markets or supermarkets is exhausting and time-consuming.
+                </p>
+                <p className="topic-overview-text">
+                  With <strong>KharchDaan Monthly Ration Home Delivery</strong>, you streamline your entire household logistics. Choose your family's favorite brands, pick your preferred monthly delivery date (e.g. 1st or 5th of every month), and relax while our dedicated fulfillment fleet delivers tamper-sealed, fresh stock right to your kitchen with free delivery on orders above ₹499.
+                </p>
+
+                {/* 4 Feature Pillars Grid */}
+                <div className="topic-features-grid">
+                  <div className="topic-feature-item">
+                    <div className="topic-feat-icon-box blue">
+                      <Calendar size={22} />
+                    </div>
+                    <h4>Choose Your Delivery Date</h4>
+                    <p>Align grocery arrival with your monthly salary date (1st to 10th). Modify or pause deliveries anytime with a single tap.</p>
+                  </div>
+
+                  <div className="topic-feature-item">
+                    <div className="topic-feat-icon-box green">
+                      <Truck size={22} />
+                    </div>
+                    <h4>Free Priority Home Delivery</h4>
+                    <p>Enjoy 100% free doorstep delivery on all monthly ration baskets above ₹499 with slot notifications and live tracking.</p>
+                  </div>
+
+                  <div className="topic-feature-item">
+                    <div className="topic-feat-icon-box orange">
+                      <Percent size={22} />
+                    </div>
+                    <h4>Maximum Bundle Savings</h4>
+                    <p>Save up to 25% compared to local retail MRP on pre-curated family combos with extra bonus Point Volume (PV) multipliers.</p>
+                  </div>
+
+                  <div className="topic-feature-item">
+                    <div className="topic-feat-icon-box gold">
+                      <Coins size={22} />
+                    </div>
+                    <h4>Automated Matrix Commission</h4>
+                    <p>When your downline members subscribe to monthly ration deliveries, your 20-level monthly earnings become 100% predictable and recurring!</p>
+                  </div>
+                </div>
+
+                {/* Popular Ration Bundle Plans */}
+                <h3 className="topic-mid-title">Recommended Monthly Ration Packages</h3>
+                
+                <div className="topic-staples-showcase-grid">
+                  <div className="staple-card">
+                    <img src="/images/aashirvaad-atta.jpg" alt="Small Family Basket" />
+                    <div className="staple-card-content">
+                      <h5>Small Family Basket (2-3 Members)</h5>
+                      <span>5kg Aashirvaad Atta, 2L Fortune Oil, 3kg Rice & Dals + 150 PV</span>
+                    </div>
+                  </div>
+
+                  <div className="staple-card">
+                    <img src="/images/fortune-oil.jpg" alt="Standard Family Hamper" />
+                    <div className="staple-card-content">
+                      <h5>Standard Family Kit (4-5 Members)</h5>
+                      <span>10kg Atta, 5L Oil, 5kg Basmati Rice, Spices, Tea & Cleaners + 300 PV</span>
+                    </div>
+                  </div>
+
+                  <div className="staple-card">
+                    <img src="/images/surf-excel.jpg" alt="Deluxe Joint Family Mega Pack" />
+                    <div className="staple-card-content">
+                      <h5>Mega Joint Family Pack (6+ Members)</h5>
+                      <span>20kg Atta, 10L Oil, 10kg Rice, Full Kitchen & Laundry Supplies + 600 PV</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FAQ Section */}
+                <div className="topic-faq-section">
+                  <h3 className="topic-faq-heading">Frequently Asked Questions</h3>
+                  
+                  <div className="faq-accordion-box">
+                    <div className="faq-item">
+                      <div className="faq-question">
+                        <HelpCircle size={16} className="text-orange" />
+                        <strong>Can I customize the specific items inside my monthly ration hamper?</strong>
+                      </div>
+                      <p className="faq-answer">
+                        Yes, 100%! You can add, remove, or swap any brand or quantity of Atta, Rice, Oils, Spices, or personal care items whenever you want.
+                      </p>
+                    </div>
+
+                    <div className="faq-item">
+                      <div className="faq-question">
+                        <HelpCircle size={16} className="text-orange" />
+                        <strong>Is there any contract or mandatory cancellation fee?</strong>
+                      </div>
+                      <p className="faq-answer">
+                        Zero contracts! You can skip a month, reschedule, or cancel anytime directly inside your account settings with no penalties.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Right Side Action Panel */}
+            <div className="topic-sidebar-card">
+              
+              <div className="sidebar-deal-box">
+                <div className="sidebar-deal-badge">
+                  <Sparkles size={13} />
+                  <span>SUBSCRIPTION BONANZA</span>
+                </div>
+                <h3>Monthly Auto-Delivery Hamper</h3>
+                <p>Lock in guaranteed monthly delivery with ₹450 flat discount and 250 bonus PV every month.</p>
+                
+                <div className="sidebar-price-row">
+                  <span className="price-current">₹1,799</span>
+                  <span className="price-old">₹2,350</span>
+                  <span className="price-discount">24% OFF</span>
+                </div>
+
+                <button 
+                  className="sidebar-action-btn primary"
+                  onClick={() => onNavigate('products', 'Grocery')}
+                >
+                  <ShoppingBag size={16} />
+                  <span>Build My Monthly Ration</span>
+                </button>
+              </div>
+
+              <div className="sidebar-perks-list">
+                <h4>Monthly Delivery Guarantees</h4>
+                <ul>
+                  <li><CheckCircle2 size={15} className="text-green" /> Free Doorstep Delivery Above ₹499</li>
+                  <li><CheckCircle2 size={15} className="text-green" /> Flexible Monthly Date Scheduler</li>
+                  <li><CheckCircle2 size={15} className="text-green" /> Skip, Pause, or Swap Anytime</li>
+                  <li><CheckCircle2 size={15} className="text-green" /> Guaranteed Fresh Factory Batches</li>
+                </ul>
+              </div>
+
+              <div className="sidebar-help-cta">
+                <p>Need custom bulk ration for an event or trust?</p>
+                <button 
+                  className="sidebar-help-link"
+                  onClick={() => onNavigate('contact')}
+                >
+                  Contact Bulk Dispatch Desk ➔
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. BOTTOM CTA BANNER */}
+      <section className="topic-bottom-cta-banner">
+        <div className="container">
+          <div className="bottom-cta-card">
+            <div className="bottom-cta-content">
+              <h2>Automate Your Kitchen, Multiply Your Income</h2>
+              <p>Set up your monthly ration delivery once and enjoy regular savings and commissions effortlessly.</p>
+            </div>
+            <div className="bottom-cta-actions">
+              <button 
+                className="btn-cta-primary"
+                onClick={() => onNavigate('products', 'Grocery')}
+              >
+                <span>Build Monthly Ration</span>
+                <ArrowRight size={16} />
+              </button>
+              <button 
+                className="btn-cta-secondary"
+                onClick={onOpenAuth}
+              >
+                <span>Register Free Account</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+};

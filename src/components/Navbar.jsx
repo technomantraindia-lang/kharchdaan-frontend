@@ -214,7 +214,11 @@ export const Navbar = ({
     const dedicatedTopicPages = [
       'power-matrix', 'earning-depth', 'royalty-pool', 
       'instant-payouts', 'foundation-seva', 'women-empowerment', 
-      'kirana-merchant', 'govt-ethics', 'direct-selling-topic'
+      'kirana-merchant', 'govt-ethics', 'direct-selling-topic',
+      'grocery-staples', 'food-beverages', 'personal-household-care', 
+      'health-wellness', 'neighbourhood-kirana-network', 'kirana-network', 
+      'instant-cashback-wallet', 'genuine-brand-stock', 'monthly-ration-delivery', 
+      'family-grocery-hamper'
     ];
 
     if (dedicatedTopicPages.includes(target)) {
@@ -337,7 +341,12 @@ export const Navbar = ({
               onMouseLeave={handleMouseLeave}
             >
               <button 
-                className={`nav-link-btn with-arrow ${currentPage === 'products' || activeMegamenu === 'products' ? 'active' : ''}`}
+                className={`nav-link-btn with-arrow ${[
+                  'products', 'grocery-staples', 'food-beverages', 'personal-household-care', 
+                  'health-wellness', 'neighbourhood-kirana-network', 'kirana-network', 
+                  'instant-cashback-wallet', 'genuine-brand-stock', 'monthly-ration-delivery', 
+                  'family-grocery-hamper'
+                ].includes(currentPage) || activeMegamenu === 'products' ? 'active' : ''}`}
                 onClick={() => handleNavClick('products')}
               >
                 <span>Products & Services</span>
@@ -358,7 +367,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('products-store', 'Daily Needs')}
+                          onClick={() => handleNavClick('grocery-staples')}
                         >
                           <div className="megamenu-icon-circle orange">
                             <WheatStaplesSvg />
@@ -372,7 +381,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('products-store', 'Food')}
+                          onClick={() => handleNavClick('food-beverages')}
                         >
                           <div className="megamenu-icon-circle saffron">
                             <FoodBeverageSvg />
@@ -386,7 +395,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('products-store', 'Beauty')}
+                          onClick={() => handleNavClick('personal-household-care')}
                         >
                           <div className="megamenu-icon-circle pink">
                             <PersonalCareSvg />
@@ -400,7 +409,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('products-store', 'Health')}
+                          onClick={() => handleNavClick('health-wellness')}
                         >
                           <div className="megamenu-icon-circle green">
                             <HealthWellnessSvg />
@@ -424,7 +433,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('products-store')}
+                          onClick={() => handleNavClick('neighbourhood-kirana-network')}
                         >
                           <div className="megamenu-icon-circle green">
                             <KiranaStoreSvg />
@@ -438,7 +447,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('network-structure')}
+                          onClick={() => handleNavClick('instant-cashback-wallet')}
                         >
                           <div className="megamenu-icon-circle purple">
                             <CashbackWalletSvg />
@@ -452,7 +461,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('about')}
+                          onClick={() => handleNavClick('genuine-brand-stock')}
                         >
                           <div className="megamenu-icon-circle orange">
                             <GenuineBadgeSvg />
@@ -466,7 +475,7 @@ export const Navbar = ({
                       <li>
                         <button 
                           className="megamenu-link-btn"
-                          onClick={() => handleNavClick('products-store')}
+                          onClick={() => handleNavClick('monthly-ration-delivery')}
                         >
                           <div className="megamenu-icon-circle blue">
                             <DeliveryBoxSvg />
@@ -496,9 +505,9 @@ export const Navbar = ({
                     </div>
                     <button 
                       className="spotlight-action-btn"
-                      onClick={() => handleNavClick('products-store')}
+                      onClick={() => handleNavClick('family-grocery-hamper')}
                     >
-                      <span>Explore Daily Store</span>
+                      <span>Explore Hamper Details</span>
                       <ArrowRight size={14} />
                     </button>
                   </div>
