@@ -178,6 +178,44 @@ const GovtEthicsSvg = () => (
   </svg>
 );
 
+// 17. Top Bar Announcement Sacred Lotus / Floral Sparkle Vector SVG
+const TopBarLotusSvg = () => (
+  <svg 
+    width="18" 
+    height="18" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    className="top-bar-svg-icon"
+    aria-hidden="true"
+  >
+    {/* Center Sacred Petal */}
+    <path 
+      d="M12 3C12 3 14.5 7.5 14.5 11C14.5 13.5 13.4 15.5 12 15.5C10.6 15.5 9.5 13.5 9.5 11C9.5 7.5 12 3 12 3Z" 
+      fill="#FFFFFF" 
+    />
+    {/* Left Radiant Petal */}
+    <path 
+      d="M9.5 8C8 9.5 5 11.5 5 14C5 16 7 17.5 9 17C10.5 16.6 11.5 15.5 11.5 14C11.5 11.5 9.5 8 9.5 8Z" 
+      fill="#FEF08A" 
+      opacity="0.95" 
+    />
+    {/* Right Radiant Petal */}
+    <path 
+      d="M14.5 8C16 9.5 19 11.5 19 14C19 16 17 17.5 15 17C13.5 16.6 12.5 15.5 12.5 14C12.5 11.5 14.5 8 14.5 8Z" 
+      fill="#FEF08A" 
+      opacity="0.95" 
+    />
+    {/* Base Calyx Lotus Foundation */}
+    <path 
+      d="M7 17.5C10 20.2 14 20.2 17 17.5C15 19.2 9 19.2 7 17.5Z" 
+      fill="#FFFFFF" 
+    />
+    {/* Center Core Bindu Dot */}
+    <circle cx="12" cy="12.5" r="1.5" fill="#EA580C" />
+  </svg>
+);
+
 
 export const Navbar = ({ 
   onOpenAuth, 
@@ -290,7 +328,9 @@ export const Navbar = ({
       <div className="top-orange-bar">
         <div className="container top-bar-inner">
           <div className="top-bar-left">
-            <span className="top-flower-icon">🌸</span>
+            <span className="top-flower-icon">
+              <TopBarLotusSvg />
+            </span>
             <span>Welcome to KharchDaan.Com &nbsp;|&nbsp; Simple Shopping • Direct Selling System • 100% Cashback (as per rules) • Grow Together</span>
           </div>
           <div className="top-bar-right">
