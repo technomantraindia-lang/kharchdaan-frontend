@@ -24,10 +24,7 @@ import { FoundationSevaPage } from './components/topics/FoundationSevaPage';
 import { WomenEmpowermentPage } from './components/topics/WomenEmpowermentPage';
 import { KiranaModernizationPage } from './components/topics/KiranaModernizationPage';
 import { GovtEthicsPage } from './components/topics/GovtEthicsPage';
-import { GroceryStaplesPage } from './components/topics/GroceryStaplesPage';
-import { FoodBeveragesPage } from './components/topics/FoodBeveragesPage';
-import { PersonalCarePage } from './components/topics/PersonalCarePage';
-import { HealthWellnessPage } from './components/topics/HealthWellnessPage';
+import { CategoryProductListPage } from './components/CategoryProductListPage';
 import { KiranaNetworkPage } from './components/topics/KiranaNetworkPage';
 import { InstantCashbackWalletPage } from './components/topics/InstantCashbackWalletPage';
 import { GenuineBrandStockPage } from './components/topics/GenuineBrandStockPage';
@@ -187,28 +184,32 @@ function MainStore() {
           onSelectTopic={(topicId) => setSelectedTopic(topicId)}
         />
       ) : currentPage === 'grocery-staples' ? (
-        <GroceryStaplesPage
+        <CategoryProductListPage
+          categorySlug="grocery-staples"
           onNavigate={handleNavigation}
+          onProductClick={handleProductSelect}
           onOpenAuth={() => setAuthModalOpen(true)}
-          onShopClick={() => handleNavigation('products', 'Grocery')}
         />
       ) : currentPage === 'food-beverages' ? (
-        <FoodBeveragesPage
+        <CategoryProductListPage
+          categorySlug="food-beverages"
           onNavigate={handleNavigation}
+          onProductClick={handleProductSelect}
           onOpenAuth={() => setAuthModalOpen(true)}
-          onShopClick={() => handleNavigation('products', 'Food')}
         />
       ) : currentPage === 'personal-household-care' || currentPage === 'personal-care' ? (
-        <PersonalCarePage
+        <CategoryProductListPage
+          categorySlug="personal-household-care"
           onNavigate={handleNavigation}
+          onProductClick={handleProductSelect}
           onOpenAuth={() => setAuthModalOpen(true)}
-          onShopClick={() => handleNavigation('products', 'Beauty')}
         />
       ) : currentPage === 'health-wellness' ? (
-        <HealthWellnessPage
+        <CategoryProductListPage
+          categorySlug="health-wellness"
           onNavigate={handleNavigation}
+          onProductClick={handleProductSelect}
           onOpenAuth={() => setAuthModalOpen(true)}
-          onShopClick={() => handleNavigation('products', 'Health')}
         />
       ) : currentPage === 'neighbourhood-kirana-network' || currentPage === 'kirana-network' ? (
         <KiranaNetworkPage
