@@ -487,60 +487,7 @@ export const ContactUsPage = ({ onNavigateHome, onOpenAuth, onShopClick }) => {
         </div>
       </section>
 
-      {/* 4. BOTTOM LUXURY CONVERSION BANNER */}
-      <section className="contact-bottom-cta-strip">
-        <div className="container">
-          <div className="contact-cta-luxury-card">
-            <div className="cta-mandala-watermark left" aria-hidden="true">
-              <svg width="200" height="200" viewBox="0 0 100 100" fill="none" opacity="0.12">
-                <circle cx="50" cy="50" r="45" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="3 3" />
-                <circle cx="50" cy="50" r="30" stroke="#FFFFFF" strokeWidth="1.2" />
-                <path d="M50 5 L50 95 M5 50 L95 50 M18 18 L82 82 M18 82 L82 18" stroke="#FFFFFF" strokeWidth="1" />
-              </svg>
-            </div>
-            <div className="cta-mandala-watermark right" aria-hidden="true">
-              <svg width="200" height="200" viewBox="0 0 100 100" fill="none" opacity="0.12">
-                <circle cx="50" cy="50" r="45" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="3 3" />
-                <circle cx="50" cy="50" r="30" stroke="#FFFFFF" strokeWidth="1.2" />
-                <path d="M50 5 L50 95 M5 50 L95 50 M18 18 L82 82 M18 82 L82 18" stroke="#FFFFFF" strokeWidth="1" />
-              </svg>
-            </div>
-
-            <div className="contact-cta-content">
-              <div className="hiw-foundation-pill luxury-glass">
-                <span className="pill-om-symbol gold">ॐ</span>
-                <span>TERA TUJHKO ARPAN • 100% ETHICAL COMMERCE</span>
-              </div>
-
-              <h2 className="contact-cta-title">
-                Ready to Join 25,000+ Indian Families?
-              </h2>
-
-              <p className="contact-cta-desc">
-                Registration is 100% free with zero joining fees. Start saving on daily household groceries and earn recurring 20-level royalties today.
-              </p>
-
-              <div className="contact-cta-btns">
-                <button className="btn-cta-primary-white" onClick={onOpenAuth}>
-                  <Sparkles size={18} className="btn-sparkle-icon" />
-                  <span>Create Free Account in 30 Seconds</span>
-                  <ArrowRight size={18} className="btn-arrow-icon" />
-                </button>
-                <a 
-                  href="https://wa.me/917043421590?text=Hello%20KharchDaan%20Team,%20please%20guide%20me%20on%20joining" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="btn-cta-secondary-glass"
-                >
-                  <MessageSquare size={18} />
-                  <span>Chat on WhatsApp</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      {/* End Contact Page Content */}
     </div>
   );
 };
