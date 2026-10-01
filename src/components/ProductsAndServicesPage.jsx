@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Home, ChevronRight, ShoppingBag, Search, SlidersHorizontal, 
   Coins, Star, Check, ShoppingCart, Eye, Sparkles, Filter, 
@@ -23,15 +23,55 @@ export const ProductsAndServicesPage = ({
   const [priceRange, setPriceRange] = useState('all'); // 'all' | 'under-150' | '150-300' | '300-500' | 'above-500'
   const [addedItemMap, setAddedItemMap] = useState({});
 
+  // Sync state if initialCategory changes from outside navigation
+  useEffect(() => {
+    if (initialCategory) {
+      setSelectedCategory(initialCategory);
+      setSelectedBrand('All');
+      setPriceRange('all');
+      setSearchQuery('');
+    }
+  }, [initialCategory]);
+
   const categories = [
     { id: 'All', name: 'All Products', count: ALL_PRODUCTS.length },
     { id: 'Daily Needs', name: 'Grocery & Staples', count: ALL_PRODUCTS.filter(p => p.category === 'Daily Needs').length },
     { id: 'Food', name: 'Food & Beverages', count: ALL_PRODUCTS.filter(p => p.category === 'Food').length },
-    { id: 'Health', name: 'Health & Wellness', count: ALL_PRODUCTS.filter(p => p.category === 'Health').length },
-    { id: 'Home', name: 'Home & Cleaning', count: ALL_PRODUCTS.filter(p => p.category === 'Home').length }
+    { id: 'Home', name: 'Personal & Household Care', count: ALL_PRODUCTS.filter(p => p.category === 'Home').length },
+    { id: 'Health', name: 'Health & Wellness', count: ALL_PRODUCTS.filter(p => p.category === 'Health').length }
   ];
 
-  const brands = ['All', 'Aashirvaad', 'Fortune', 'Tata Tea', 'Surf Excel', 'Cadbury', 'Dettol', 'Daawat', 'Amul'];
+  const categoryInfoMap = {
+    'All': {
+      label: 'All Products',
+      title: 'Everyday Grocery Essentials with',
+      sub: "Purchase your family's favorite household brands at authentic MRP savings. Every purchase directly credits instant cashback to your wallet and generates recurring 20-level team royalty."
+    },
+    'Daily Needs': {
+      label: 'Grocery & Staples',
+      title: 'Everyday Grocery & Staples with',
+      sub: 'Purchase authentic Aashirvaad Atta, Fortune Sunflower & Mustard Oils, Daawat Basmati Rice & Tata Sampann Unpolished Dals at guaranteed MRP savings.'
+    },
+    'Food': {
+      label: 'Food & Beverages',
+      title: 'Food & Beverages Essentials with',
+      sub: 'Enjoy Tata Tea Premium blends, Cadbury Dairy Milk chocolates, Maggi 2-Minute Masala Noodles and snacks with 100% wallet cashback.'
+    },
+    'Home': {
+      label: 'Personal & Household Care',
+      title: 'Personal & Household Care with',
+      sub: 'Keep your home sparkling and family fresh with Surf Excel detergents, Vim Lemon Gel, Colgate MaxFresh Toothpaste & hygiene care.'
+    },
+    'Health': {
+      label: 'Health & Wellness',
+      title: 'Ayurvedic Health & Wellness with',
+      sub: 'Boost family vitality with Dabur Chyawanprash 2X Immunity, 100% Pure Raw Honey, Dettol Handwash and Organic Tulsi Green Tea.'
+    }
+  };
+
+  const currentInfo = categoryInfoMap[selectedCategory] || categoryInfoMap['All'];
+
+  const brands = ['All', 'Aashirvaad', 'Fortune', 'Tata Tea', 'Surf Excel', 'Cadbury', 'Dettol', 'Daawat', 'Amul', 'Maggi', 'Vim', 'Dabur', 'Colgate'];
 
   const handleAddToCart = (e, prod) => {
     e.stopPropagation();
@@ -115,7 +155,18 @@ export const ProductsAndServicesPage = ({
               <span>Home</span>
             </button>
             <ChevronRight size={13} className="breadcrumb-sep" />
-            <span className="breadcrumb-current">Products & Services</span>
+            <button 
+              className="breadcrumb-link" 
+              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); }}
+            >
+              <span>Products & Services</span>
+            </button>
+            {selectedCategory !== 'All' && (
+              <>
+                <ChevronRight size={13} className="breadcrumb-sep" />
+                <span className="breadcrumb-current">{currentInfo.label}</span>
+              </>
+            )}
           </div>
 
           <div className="products-hero-intro">
@@ -124,10 +175,10 @@ export const ProductsAndServicesPage = ({
               <span>100% GENUINE FMCG DIRECT COMMERCE MARKETPLACE</span>
             </div>
             <h1 className="products-page-title">
-              Everyday Grocery Essentials with <span className="text-orange-gradient">100% Wallet Cashback</span>
+              {currentInfo.title} <span className="text-orange-gradient">100% Wallet Cashback</span>
             </h1>
             <p className="products-page-sub">
-              Purchase your family's favorite household brands at authentic MRP savings. Every purchase directly credits instant cashback to your wallet and generates recurring 20-level team royalty.
+              {currentInfo.sub}
             </p>
 
             {/* 4 Trust Feature Badges */}

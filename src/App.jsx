@@ -188,31 +188,31 @@ function MainStore() {
           onSelectTopic={(topicId) => setSelectedTopic(topicId)}
         />
       ) : currentPage === 'grocery-staples' ? (
-        <CategoryProductListPage
-          categorySlug="grocery-staples"
-          onNavigate={handleNavigation}
+        <ProductsAndServicesPage
+          onNavigateHome={() => handleNavigation('home')}
           onProductClick={handleProductSelect}
+          initialCategory="Daily Needs"
           onOpenAuth={() => setAuthModalOpen(true)}
         />
       ) : currentPage === 'food-beverages' ? (
-        <CategoryProductListPage
-          categorySlug="food-beverages"
-          onNavigate={handleNavigation}
+        <ProductsAndServicesPage
+          onNavigateHome={() => handleNavigation('home')}
           onProductClick={handleProductSelect}
+          initialCategory="Food"
           onOpenAuth={() => setAuthModalOpen(true)}
         />
       ) : currentPage === 'personal-household-care' || currentPage === 'personal-care' ? (
-        <CategoryProductListPage
-          categorySlug="personal-household-care"
-          onNavigate={handleNavigation}
+        <ProductsAndServicesPage
+          onNavigateHome={() => handleNavigation('home')}
           onProductClick={handleProductSelect}
+          initialCategory="Home"
           onOpenAuth={() => setAuthModalOpen(true)}
         />
       ) : currentPage === 'health-wellness' ? (
-        <CategoryProductListPage
-          categorySlug="health-wellness"
-          onNavigate={handleNavigation}
+        <ProductsAndServicesPage
+          onNavigateHome={() => handleNavigation('home')}
           onProductClick={handleProductSelect}
+          initialCategory="Health"
           onOpenAuth={() => setAuthModalOpen(true)}
         />
       ) : currentPage === 'neighbourhood-kirana-network' || currentPage === 'kirana-network' ? (
