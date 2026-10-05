@@ -22,9 +22,10 @@ export const CartProvider = ({ children }) => {
       const itemKey = selectedVariation ? `${product.id}-${selectedVariation.id}` : `${product.id}`;
       const existing = prev.find((item) => item.cartKey === itemKey);
       
-      const price = selectedVariation?.price ?? product.display_price ?? product.price ?? 0;
-      const title = selectedVariation ? `${product.name} (${selectedVariation.sku || 'Variant'})` : product.name;
-      const image = product.image || product.image_url || (product.images && product.images[0]) || '';
+      const price = selectedVariation ? (selectedVariation.sale_price || selectedVariation.price) : (product.display_price ?? product.price ?? 0);
+      const varLabel = selectedVariation ? (selectedVariation.attribute_value || selectedVariation.attr_val || selectedVariation.sku || 'Variant') : null;
+      const title = varLabel ? `${product.name} (${varLabel})` : product.name;
+      const image = selectedVariation?.image || product.image || product.image_url || (product.images && product.images[0]) || '';
 
       if (existing) {
         return prev.map((item) =>

@@ -76,14 +76,20 @@ export const ProductDetailModal = ({ product, onClose }) => {
               <Sparkles size={18} className="cb-sparkle" />
               <div>
                 <strong>₹{cashbackAmount} Direct Cashback</strong>
-                <span className="cb-sub">Credited to your KharchDaan wallet instantly upon delivery</span>
+                <span className="cb-sub">Credited to your BachatGanga wallet instantly upon delivery</span>
               </div>
             </div>
 
             <div className="modal-pricing-box">
               <span className="modal-price">₹{price.toLocaleString('en-IN')}</span>
-              {product.price && product.sale_price && (
-                <span className="modal-price-old">₹{Number(product.price).toLocaleString('en-IN')}</span>
+              {selectedVariation ? (
+                selectedVariation.sale_price && selectedVariation.price && (
+                  <span className="modal-price-old">₹{Number(selectedVariation.price).toLocaleString('en-IN')}</span>
+                )
+              ) : (
+                product.price && product.sale_price && (
+                  <span className="modal-price-old">₹{Number(product.price).toLocaleString('en-IN')}</span>
+                )
               )}
               <span className="modal-tax-tag">Inclusive of all GST taxes</span>
             </div>
@@ -91,24 +97,33 @@ export const ProductDetailModal = ({ product, onClose }) => {
             {/* Variations / Attributes if available */}
             {product.variations?.length > 0 && (
               <div className="variations-selector">
-                <label className="variant-label">Select Option:</label>
+                <label className="variant-label">Select Option / Weight / Pack Size:</label>
                 <div className="variant-options">
-                  {product.variations.map((v) => (
-                    <button
-                      key={v.id}
-                      className={`variant-pill ${selectedVariation?.id === v.id ? 'active' : ''}`}
-                      onClick={() => setSelectedVariation(v)}
-                    >
-                      {v.sku || `Option #${v.id}`} {v.price ? `(₹${v.price})` : ''}
-                    </button>
-                  ))}
+                  {product.variations.map((v) => {
+                    const optionLabel = v.attribute_value || (v.attributes ? Object.values(v.attributes).join(', ') : (v.attr_val || v.sku || `Option #${v.id}`));
+                    const optionAttr = v.attribute_name || (v.attributes ? Object.keys(v.attributes).join(', ') : (v.attribute?.name || ''));
+                    const displayLabel = optionAttr ? `${optionAttr}: ${optionLabel}` : optionLabel;
+                    const vPrice = v.sale_price || v.price;
+
+                    return (
+                      <button
+                        key={v.id}
+                        type="button"
+                        className={`variant-pill ${selectedVariation?.id === v.id ? 'active' : ''}`}
+                        onClick={() => setSelectedVariation(v)}
+                      >
+                        <span className="font-semibold">{displayLabel}</span>
+                        {vPrice ? <span className="opacity-90 ml-1">(₹{Number(vPrice).toLocaleString('en-IN')})</span> : null}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {/* Description */}
             <div className="product-desc-box">
-              <p>{product.description || product.short_description || 'High quality certified genuine product backed by KharchDaan guarantee and fast door-step delivery.'}</p>
+              <p>{product.description || product.short_description || 'High quality certified genuine product backed by BachatGanga guarantee and fast door-step delivery.'}</p>
             </div>
 
             {/* Quantity & Add to Cart */}
