@@ -4144,102 +4144,519 @@ button {
   margin-top: 14px;
 }
 
-/* Account Modal */
+/* ==========================================================================
+   10. ACCOUNT & MEMBER PROFILE MODAL (Luxury Saffron Design & Polish)
+   ========================================================================== */
 .account-modal-container {
-  width: 520px;
-  padding: 30px 26px;
+  width: 540px;
+  max-width: 95vw;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: #FFFFFF;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(234, 88, 12, 0.1);
 }
 
 .account-header-card {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px;
-  background: #FFF7ED;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
   border: 1.5px solid #FED7AA;
-  border-radius: var(--radius-md);
-  margin-bottom: 20px;
+  border-radius: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.06);
 }
 
 .account-avatar-large {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: var(--primary-orange);
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35);
+  flex-shrink: 0;
 }
 
 .account-title-info {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .member-name-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .member-name-row h3 {
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
   color: #111827;
+  margin: 0;
+  text-transform: capitalize;
 }
 
 .member-badge-gold {
-  background: #FEF3C7;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
   color: #92400E;
   border: 1px solid #FCD34D;
   font-size: 11.5px;
-  font-weight: 600;
-  padding: 2px 8px;
+  font-weight: 700;
+  padding: 3px 9px;
   border-radius: var(--radius-pill);
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.15);
 }
 
 .account-email {
   font-size: 13.5px;
   color: #64748B;
+  font-weight: 500;
+  margin: 0;
+  word-break: break-all;
 }
 
+.account-phone {
+  font-size: 12px;
+  color: #94A3B8;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Wallet and Commission Grid */
 .account-wallet-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .wallet-card {
   background: #FFFFFF;
-  border: 1.5px solid #F1F5F9;
-  border-radius: var(--radius-md);
+  border: 1.5px solid #E2E8F0;
+  border-radius: 16px;
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s ease;
+}
+
+.wallet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.wallet-card-cashback {
+  border-color: #E2E8F0;
+}
+
+.wallet-card-cashback:hover {
+  border-color: #A7F3D0;
+}
+
+.wallet-card-network {
+  border-color: #E2E8F0;
+}
+
+.wallet-card-network:hover {
+  border-color: #FDE68A;
 }
 
 .wallet-card-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
+  gap: 8px;
+}
+
+.wallet-icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.emerald-icon {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+.gold-icon {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.wallet-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.wallet-balance {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 4px 0 2px 0;
+  letter-spacing: -0.5px;
+}
+
+.wallet-subtext {
+  font-size: 11.5px;
   color: #64748B;
+  line-height: 1.35;
   font-weight: 500;
 }
 
-.wallet-amount {
-  font-size: 22px;
+/* Referral & Affiliate Box */
+.referral-box {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1.5px solid #FDE68A;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.08);
+}
+
+.referral-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.referral-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+}
+
+.referral-text-content h4 {
+  font-size: 14px;
+  font-weight: 800;
+  color: #78350F;
+  margin: 0 0 2px 0;
+}
+
+.referral-text-content p {
+  font-size: 12px;
+  color: #92400E;
+  margin: 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.referral-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1.5px solid #FCD34D;
+  border-radius: 12px;
+  padding: 6px 8px 6px 12px;
+  margin-top: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.referral-url-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.ref-prefix {
+  font-size: 10px;
+  color: #B45309;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.ref-prefix strong {
+  font-weight: 800;
+  color: #92400E;
+}
+
+.referral-url-field input {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #334155;
+  font-weight: 600;
+  outline: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  text-overflow: ellipsis;
+}
+
+.btn-copy-ref {
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 9px;
+  padding: 8px 15px;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+  flex-shrink: 0;
+}
+
+.btn-copy-ref:hover {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35);
+}
+
+.btn-copy-ref.copied {
+  background: #059669;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+/* Orders Section */
+.account-orders-section {
+  margin-bottom: 18px;
+}
+
+.orders-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.heading-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heading-with-icon h4 {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1E293B;
+  margin: 0;
+}
+
+.orders-count-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #EA580C;
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.orders-loading-state {
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #64748B;
+}
+
+.orders-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #FED7AA;
+  border-top-color: #EA580C;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.no-orders-box {
+  background: #F8FAFC;
+  border: 1.5px dashed #CBD5E1;
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.no-orders-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #FFF7ED;
+  color: #EA580C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-orders-text h5 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #334155;
+  margin: 0;
+}
+
+.no-orders-text p {
+  font-size: 11.5px;
+  color: #64748B;
+  margin: 2px 0 0 0;
+  max-width: 320px;
+  line-height: 1.35;
+}
+
+.btn-start-shopping {
+  margin-top: 4px;
+  background: #FFF7ED;
+  color: #EA580C;
+  border: 1.5px solid #FED7AA;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-start-shopping:hover {
+  background: #EA580C;
+  color: #FFFFFF;
+  border-color: #EA580C;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+}
+
+.orders-table-wrapper {
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.orders-mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.orders-mini-table th {
+  background: #F8FAFC;
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 700;
+  color: #475569;
+  font-size: 11px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.orders-mini-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #F1F5F9;
+  color: #1E293B;
+}
+
+.order-id-cell {
+  font-weight: 700;
+  color: #EA580C;
+}
+
+.order-total-cell {
   font-weight: 700;
   color: #0F172A;
+}
+
+.order-status-pill {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.status-delivered,
+.status-completed {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.status-processing,
+.status-pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+/* Modal Footer & Sign Out */
+.account-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid #F1F5F9;
+}
+
+.btn-danger-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  background: #FFF1F2;
+  color: #E11D48;
+  border: 1.5px solid #FECDD3;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger-outline:hover {
+  background: #E11D48;
+  color: #FFFFFF;
+  border-color: #E11D48;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+}
+
+.account-footer-security {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
 }
 
 /* ==========================================================================

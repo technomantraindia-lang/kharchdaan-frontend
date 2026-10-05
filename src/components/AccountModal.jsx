@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Wallet, Share2, Package, LogOut, Check, Sparkles, Award } from 'lucide-react';
+import { X, Wallet, Share2, Package, LogOut, Check, Sparkles, Award, Copy, ShoppingBag, ShieldCheck, ArrowRight, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 
@@ -18,90 +18,153 @@ export const AccountModal = ({ isOpen, onClose }) => {
             setOrders(Array.isArray(res.data) ? res.data : []);
           }
         })
+        .catch(() => setOrders([]))
         .finally(() => setLoadingOrders(false));
     }
   }, [isOpen]);
 
   if (!isOpen || !user) return null;
 
-  const referralCode = `KD-${user.id || '99'}${user.name?.substring(0, 3).toUpperCase() || 'VIP'}`;
+  const referralCode = `BG-${user.id || '88'}${user.name ? user.name.replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase() : 'VIP'}`;
   const referralLink = `${window.location.origin}?ref=${referralCode}`;
 
   const copyReferral = () => {
-    navigator.clipboard.writeText(referralLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch (e) {
+      console.warn('Copy failed:', e);
+    }
+  };
+
+  const handleStartShopping = () => {
+    onClose();
+    const catalogEl = document.getElementById('products-section') || document.querySelector('.products-section');
+    if (catalogEl) {
+      catalogEl.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-container account-modal-container" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
-          <X size={20} />
+        <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
+          <X size={18} />
         </button>
 
-        {/* Member Header */}
+        {/* Member Profile Header Card */}
         <div className="account-header-card">
           <div className="account-avatar-large">
-            {user.name ? user.name[0].toUpperCase() : 'U'}
+            {user.name ? user.name.trim()[0].toUpperCase() : 'U'}
           </div>
           <div className="account-title-info">
             <div className="member-name-row">
-              <h3>{user.name}</h3>
-              <span className="member-badge-gold"><Award size={14} /> VIP Level 1</span>
+              <h3>{user.name || 'Valued Member'}</h3>
+              <span className="member-badge-gold">
+                <Award size={13} /> VIP Level 1
+              </span>
             </div>
             <p className="account-email">{user.email}</p>
+            {user.phone && <p className="account-phone">{user.phone}</p>}
           </div>
         </div>
 
-        {/* Stats / Wallet Row */}
+        {/* Cashback & Commission Stats Row */}
         <div className="account-wallet-grid">
-          <div className="wallet-card">
+          <div className="wallet-card wallet-card-cashback">
             <div className="wallet-card-header">
-              <Wallet size={18} className="text-emerald" />
-              <span>Cashback Wallet</span>
+              <div className="wallet-icon-wrap emerald-icon">
+                <Wallet size={17} />
+              </div>
+              <span className="wallet-title">Cashback Wallet</span>
             </div>
-            <div className="wallet-balance">₹750.00</div>
-            <div className="wallet-subtext">Ready for withdrawal / purchase discount</div>
+            <div className="wallet-balance">
+              ₹{Number(user.wallet_balance !== undefined ? user.wallet_balance : 750).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </div>
+            <div className="wallet-subtext">Ready for checkout discount & instant deduction</div>
           </div>
 
-          <div className="wallet-card">
+          <div className="wallet-card wallet-card-network">
             <div className="wallet-card-header">
-              <Sparkles size={18} className="text-gold" />
-              <span>Network Commission</span>
+              <div className="wallet-icon-wrap gold-icon">
+                <Sparkles size={17} />
+              </div>
+              <span className="wallet-title">Network Commission</span>
             </div>
-            <div className="wallet-balance">₹1,420.00</div>
+            <div className="wallet-balance">
+              ₹{Number(user.cashback_earned !== undefined ? user.cashback_earned : 1420).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </div>
             <div className="wallet-subtext">Earned from 8 active direct referrals</div>
           </div>
         </div>
 
-        {/* Referral Box */}
+        {/* Affiliate & Referral Invite Box */}
         <div className="referral-box">
           <div className="referral-header">
-            <Share2 size={18} className="text-gold" />
-            <div>
+            <div className="referral-icon-badge">
+              <Share2 size={16} />
+            </div>
+            <div className="referral-text-content">
               <h4>Your Affiliate & Network Invite Link</h4>
-              <p>Earn 5% on direct purchases made by everyone you invite.</p>
+              <p>Earn up to 5% instant commission on direct purchases made by everyone you invite.</p>
             </div>
           </div>
+          
           <div className="referral-input-group">
-            <input type="text" readOnly value={referralLink} />
-            <button className="btn-copy-ref" onClick={copyReferral}>
-              {copied ? <><Check size={16} /> Copied</> : 'Copy Link'}
+            <div className="referral-url-field">
+              <span className="ref-prefix">Code: <strong>{referralCode}</strong></span>
+              <input type="text" readOnly value={referralLink} title={referralLink} />
+            </div>
+            <button 
+              type="button" 
+              className={`btn-copy-ref ${copied ? 'copied' : ''}`} 
+              onClick={copyReferral}
+              aria-label="Copy invitation link"
+            >
+              {copied ? (
+                <>
+                  <Check size={15} />
+                  <span>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={15} />
+                  <span>Copy Link</span>
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {/* Recent Orders Section */}
         <div className="account-orders-section">
-          <h4>
-            <Package size={18} /> Recent Orders & Fulfillment
-          </h4>
+          <div className="orders-section-heading">
+            <div className="heading-with-icon">
+              <Package size={17} className="text-orange" />
+              <h4>Recent Orders & Fulfillment</h4>
+            </div>
+            {orders.length > 0 && <span className="orders-count-pill">{orders.length} orders</span>}
+          </div>
+
           {loadingOrders ? (
-            <p className="loading-text">Loading orders...</p>
+            <div className="orders-loading-state">
+              <div className="orders-spinner" />
+              <p>Fetching your order history...</p>
+            </div>
           ) : orders.length === 0 ? (
             <div className="no-orders-box">
-              <p>No past orders found in this session. Start shopping to build your purchase history!</p>
+              <div className="no-orders-icon-wrap">
+                <ShoppingBag size={26} />
+              </div>
+              <div className="no-orders-text">
+                <h5>No Orders Placed Yet</h5>
+                <p>Start shopping our daily essentials to earn instant cashback and build your purchase history!</p>
+              </div>
+              <button type="button" className="btn-start-shopping" onClick={handleStartShopping}>
+                <span>Explore Catalog</span>
+                <ArrowRight size={15} />
+              </button>
             </div>
           ) : (
             <div className="orders-table-wrapper">
@@ -117,10 +180,14 @@ export const AccountModal = ({ isOpen, onClose }) => {
                 <tbody>
                   {orders.map((ord) => (
                     <tr key={ord.id}>
-                      <td>#{ord.order_number || ord.id}</td>
-                      <td>{ord.created_at ? new Date(ord.created_at).toLocaleDateString() : 'Recent'}</td>
-                      <td><span className="order-status-pill">{ord.status || 'Processing'}</span></td>
-                      <td>₹{Number(ord.total_amount || 0).toLocaleString('en-IN')}</td>
+                      <td className="order-id-cell">#{ord.order_number || ord.id}</td>
+                      <td>{ord.created_at ? new Date(ord.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Recent'}</td>
+                      <td>
+                        <span className={`order-status-pill status-${(ord.status || 'processing').toLowerCase()}`}>
+                          {ord.status || 'Processing'}
+                        </span>
+                      </td>
+                      <td className="order-total-cell">₹{Number(ord.total_amount || 0).toLocaleString('en-IN')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -131,10 +198,19 @@ export const AccountModal = ({ isOpen, onClose }) => {
 
         {/* Modal Footer */}
         <div className="account-footer">
-          <button className="btn-danger-outline" onClick={() => { logout(); onClose(); }}>
+          <button 
+            type="button" 
+            className="btn-danger-outline" 
+            onClick={() => { logout(); onClose(); }}
+          >
             <LogOut size={16} />
             <span>Sign Out</span>
           </button>
+
+          <div className="account-footer-security">
+            <ShieldCheck size={14} className="text-emerald" />
+            <span>SSL Secured Session</span>
+          </div>
         </div>
       </div>
     </div>
