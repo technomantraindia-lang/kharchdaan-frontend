@@ -2981,12 +2981,14 @@ button {
   color: #10B981;
 }
 
-/* Download App Banner Card */
-.download-app-card-master {
-  background: linear-gradient(145deg, #FFF7ED 0%, #FFEDD5 50%, #FED7AA 100%);
+/* ==========================================================================
+   8. THE 100% DIRECT CASHBACK & MEMBER GROWTH HUB CARD
+   ========================================================================== */
+.cashback-growth-hub-card {
+  background: linear-gradient(145deg, #FFF7ED 0%, #FFEDD5 45%, #FED7AA 100%);
   border: 1.5px solid #FDBA74;
   border-radius: 24px;
-  padding: 24px 22px;
+  padding: 26px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2996,25 +2998,25 @@ button {
   transition: all 0.3s ease;
 }
 
-.download-app-card-master:hover {
+.cashback-growth-hub-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 36px rgba(234, 88, 12, 0.2);
 }
 
-.app-card-top-tag-row {
+.hub-card-top-tag-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.app-top-tag-pill {
+.hub-top-tag-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(6px);
   color: #FFFFFF;
   font-size: 11px;
@@ -3024,7 +3026,7 @@ button {
   letter-spacing: 0.5px;
 }
 
-.app-rating-pill {
+.hub-rating-pill {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -3038,448 +3040,182 @@ button {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.app-card-body-grid {
-  display: grid;
-  grid-template-columns: 215px 1fr;
-  gap: 24px;
-  align-items: center;
-}
-
-.app-mockup-wrapper-master {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: visible;
-}
-
-/* ==========================================================================
-   HD VECTOR PHONE MOCKUP COMPONENT
-   ========================================================================== */
-.phone-mockup-hd-container {
-  width: 200px;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  filter: drop-shadow(0 16px 32px rgba(234, 88, 12, 0.22));
-}
-
-.phone-device-bezel {
-  width: 100%;
-  background: #0F172A;
-  border-radius: 32px;
-  padding: 5.5px;
-  box-shadow: 
-    0 20px 40px -10px rgba(234, 88, 12, 0.3),
-    0 10px 20px rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-    inset 0 0 0 2px #334155;
-  position: relative;
-  overflow: hidden;
-}
-
-.phone-camera-punchhole {
-  position: absolute;
-  top: 9px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6.5px;
-  height: 6.5px;
-  background: #020617;
-  border: 1px solid #1E293B;
-  border-radius: 50%;
-  z-index: 25;
-}
-
-.phone-screen-glare {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 40%);
-  pointer-events: none;
-  z-index: 20;
-  border-radius: 28px;
-}
-
-.phone-screen-display {
-  background: #F8FAFC;
-  border-radius: 26px;
-  overflow: hidden;
-  position: relative;
+.hub-card-content-area {
   display: flex;
   flex-direction: column;
-  user-select: none;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  height: 380px;
+  gap: 12px;
 }
 
-/* Status Bar */
-.phone-status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 10px 2px 10px;
-  font-size: 7.5px;
-  font-weight: 700;
-  color: #FFFFFF;
-  background: #EA580C;
-  z-index: 10;
-  line-height: 1;
-}
-
-.status-left, .status-right {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-/* App Header */
-.phone-app-header {
-  background: linear-gradient(180deg, #EA580C 0%, #EA580C 75%, #F97316 100%);
-  padding: 3px 10px 14px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #FFFFFF;
-}
-
-.phone-header-brand {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10.5px;
-  font-weight: 900;
-  letter-spacing: 0.6px;
-}
-
-.brand-sep {
-  opacity: 0.6;
-  font-weight: 400;
-}
-
-.phone-header-moneybag .moneybag-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  background: rgba(255, 255, 255, 0.22);
-  padding: 1.5px 5px;
-  border-radius: 10px;
-  font-size: 8px;
-  font-weight: 800;
-}
-
-/* Balance Card */
-.phone-balance-card {
-  background: #FFFFFF;
-  border-radius: 12px;
-  margin: -9px 7px 5px 7px;
-  padding: 6px 8px 6px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-  border: 1px solid #FED7AA;
-  position: relative;
-  z-index: 5;
-}
-
-.balance-user-row {
-  margin-bottom: 2px;
-}
-
-.user-greeting {
-  font-size: 9px;
-  font-weight: 800;
-  color: #0F172A;
-}
-
-.balance-amount-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 5px;
-}
-
-.balance-label {
-  font-size: 7px;
-  color: #64748B;
-  font-weight: 600;
-}
-
-.balance-value {
-  display: flex;
-  align-items: baseline;
-  color: var(--primary-orange);
-  font-weight: 900;
-  font-size: 13.5px;
-  line-height: 1;
-}
-
-.val-rupee {
-  font-size: 10px;
-  margin-right: 1px;
-}
-
-.phone-search-bar {
-  background: #F1F5F9;
-  border-radius: 6px;
-  padding: 3px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 7px;
-  color: #94A3B8;
-  font-weight: 500;
-}
-
-.search-icon-orange {
-  color: var(--primary-orange);
-}
-
-/* Section Blocks */
-.phone-section-block {
-  margin: 0 7px 5px 7px;
-}
-
-.phone-sec-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3px;
-}
-
-.sec-title {
-  font-size: 7.8px;
-  font-weight: 800;
-  color: #0F172A;
-}
-
-.sec-link {
-  font-size: 6.5px;
-  color: var(--primary-orange);
-  font-weight: 700;
-}
-
-/* Hot Deals */
-.phone-deals-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 3.5px;
-}
-
-.deal-card {
-  border-radius: 6px;
-  padding: 3px 2px;
-  color: #FFFFFF;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.deal-pink {
-  background: linear-gradient(135deg, #EC4899, #BE185D);
-}
-
-.deal-orange {
-  background: linear-gradient(135deg, #F59E0B, #D97706);
-}
-
-.deal-navy {
-  background: linear-gradient(135deg, #1E293B, #0F172A);
-}
-
-.deal-logo-circle {
-  width: 13px;
-  height: 13px;
-  background: #FFFFFF;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 7px;
-  margin-bottom: 2px;
-}
-
-.deal-logo-circle.myntra { color: #EC4899; }
-.deal-logo-circle.amazon { color: #D97706; }
-.deal-logo-circle.ajio { color: #1E293B; font-size: 5px; }
-
-.deal-brand {
-  font-size: 6.5px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.deal-sub {
-  font-size: 5.8px;
-  opacity: 0.9;
-  line-height: 1;
-}
-
-.deal-off {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 3px;
-  padding: 0.5px 3px;
-  margin-top: 1.5px;
-  font-size: 5.5px;
-  font-weight: 700;
-}
-
-/* Featured Offers 6-Grid */
-.phone-categories-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
-}
-
-.cat-box {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 6px;
-  padding: 2.5px 2px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.cat-emoji {
-  font-size: 9px;
-  line-height: 1;
-  margin-bottom: 1px;
-}
-
-.cat-name {
-  font-size: 6.2px;
-  font-weight: 700;
-  color: #1E293B;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.cat-cb {
-  font-size: 5.2px;
-  color: #64748B;
-  font-weight: 600;
-}
-
-/* Bottom Nav */
-.phone-bottom-nav {
-  margin-top: auto;
-  background: #FFFFFF;
-  border-top: 1px solid #E2E8F0;
-  padding: 3px 2px 1px 2px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  font-size: 5.8px;
-  color: #64748B;
-  font-weight: 600;
-}
-
-.nav-item.active {
-  color: var(--primary-orange);
-  font-weight: 800;
-}
-
-.phone-home-indicator {
-  width: 40px;
-  height: 2.5px;
-  background: #CBD5E1;
-  border-radius: 3px;
-  margin: 1.5px auto 2px auto;
-}
-
-.app-card-details-master {
-  display: flex;
-  flex-direction: column;
-}
-
-.app-card-heading-master {
+.hub-card-heading {
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 900;
   color: #0F172A;
   line-height: 1.25;
-  margin-bottom: 8px;
-  letter-spacing: -0.015em;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-.app-card-heading-master .text-orange-gradient {
+.hub-card-heading .text-orange-gradient {
   color: var(--primary-orange);
 }
 
-.app-card-subtext-master {
-  font-size: 13.5px;
+.hub-card-description {
+  font-size: 13px;
   color: #475569;
   line-height: 1.5;
-  margin-bottom: 16px;
-  font-weight: 400;
+  margin: 0;
 }
 
-.app-store-badges-row-master {
+.hub-pillars-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.hub-pillar-item {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid #FED7AA;
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.hub-pillar-item:hover {
+  transform: translateY(-2px);
+  background: #FFFFFF;
+  border-color: #F97316;
+}
+
+.hub-pillar-icon-box {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #FFF7ED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hub-pillar-text strong {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.2;
+}
+
+.hub-pillar-text span {
+  display: block;
+  font-size: 10px;
+  color: #64748B;
+  line-height: 1.15;
+  margin-top: 1px;
+}
+
+.hub-savings-callout {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%);
+  border: 1.5px dashed #F59E0B;
+  border-radius: 14px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
 }
 
-.store-badge-btn-master {
-  display: inline-flex;
+.savings-callout-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #FEF3C7;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: #0F172A;
-  color: #FFFFFF;
-  padding: 7px 14px;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.store-badge-btn-master:hover {
-  background-color: #1E293B;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
-}
-
-.store-badge-text-block {
+.savings-callout-text {
   display: flex;
   flex-direction: column;
 }
 
-.store-tag-text {
-  font-size: 8.5px;
-  text-transform: uppercase;
-  color: #94A3B8;
-  line-height: 1;
-  font-weight: 600;
-}
-
-.store-name-text {
-  font-size: 13px;
+.savings-title {
+  font-size: 10.5px;
   font-weight: 700;
-  line-height: 1.15;
+  color: #92400E;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.app-security-note {
+.savings-value {
+  font-size: 14px;
+  font-weight: 900;
+  color: #B45309;
+}
+
+.hub-action-buttons-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.btn-hub-shop-now {
+  flex: 1.2;
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 10px 16px;
+  font-size: 12.5px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.25);
+  transition: all 0.25s ease;
+}
+
+.btn-hub-shop-now:hover {
+  background: linear-gradient(135deg, #C2410C 0%, #9A3412 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.35);
+}
+
+.btn-hub-join-free {
+  flex: 1;
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1.5px solid #CBD5E1;
+  border-radius: var(--radius-pill);
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-hub-join-free:hover {
+  border-color: #EA580C;
+  color: #EA580C;
+  background: #FFF7ED;
+}
+
+.hub-trust-footer-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10.5px;
   font-weight: 600;
-  color: #78350F;
-  flex-wrap: wrap;
+  color: #9A3412;
+  margin-top: 2px;
 }
 
 /* ==========================================================================

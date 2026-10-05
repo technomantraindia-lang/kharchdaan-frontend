@@ -1,8 +1,20 @@
 import React from 'react';
-import { ShieldCheck, ShoppingBag, Users, Coins, Sparkles, Star, Smartphone, CheckCircle2, ArrowUpRight } from 'lucide-react';
-import { KharchDaanPhoneMockup } from './KharchDaanPhoneMockup';
+import { 
+  ShieldCheck, 
+  ShoppingBag, 
+  Users, 
+  Coins, 
+  Sparkles, 
+  Star, 
+  CheckCircle2, 
+  ArrowUpRight, 
+  Layers, 
+  Zap, 
+  Scale, 
+  Gift 
+} from 'lucide-react';
 
-export const WhyChooseAndAppSection = () => {
+export const WhyChooseAndAppSection = ({ onShopClick, onOpenAuth }) => {
   const features = [
     {
       id: 1,
@@ -35,6 +47,29 @@ export const WhyChooseAndAppSection = () => {
       desc: 'Real-time rule-based cashback on your groceries plus 20-level downline earnings.',
       icon: <Coins size={26} className="why-icon-svg" />,
       highlight: 'Direct Cash in Wallet'
+    }
+  ];
+
+  const valuePillars = [
+    {
+      icon: <Coins size={18} className="text-orange-500" />,
+      title: '100% Direct Cashback',
+      subtitle: 'Instant wallet rewards on daily groceries'
+    },
+    {
+      icon: <Layers size={18} className="text-purple-500" />,
+      title: '20-Level Network PV',
+      subtitle: 'Passive community recurring royalty'
+    },
+    {
+      icon: <Zap size={18} className="text-amber-500" />,
+      title: 'Direct Bank Payouts',
+      subtitle: 'Automated weekly cycle transfers to UPI/Bank'
+    },
+    {
+      icon: <Scale size={18} className="text-emerald-500" />,
+      title: 'Govt Compliant 2021',
+      subtitle: 'Direct Selling Rules approved & GST invoiced'
     }
   ];
 
@@ -84,81 +119,81 @@ export const WhyChooseAndAppSection = () => {
             ))}
           </div>
 
-          {/* Right Column: Download App Showcase Banner */}
-          <div className="download-app-card-master">
-            {/* Top Floating App Tag */}
-            <div className="app-card-top-tag-row">
-              <span className="app-top-tag-pill">
-                <Smartphone size={12} />
-                <span>MOBILE APP ON ANDROID & IOS</span>
+          {/* Right Column: The 100% Direct Cashback & Member Growth Hub */}
+          <div className="cashback-growth-hub-card">
+            {/* Top Tag & Rating Pill */}
+            <div className="hub-card-top-tag-row">
+              <span className="hub-top-tag-pill">
+                <ShieldCheck size={13} />
+                <span>100% LEGAL DIRECT SELLING</span>
               </span>
-              <span className="app-rating-pill">
+              <span className="hub-rating-pill">
                 <Star size={13} fill="#F59E0B" color="#F59E0B" stroke="#F59E0B" />
-                <span>4.8 (10k+ Reviews)</span>
+                <span>4.9 (50k+ Happy Families)</span>
               </span>
             </div>
 
-            <div className="app-card-body-grid">
-              {/* Ultra-HD Vector Phone Mockup */}
-              <div className="app-mockup-wrapper-master">
-                <KharchDaanPhoneMockup />
+            {/* Main Value Proposition */}
+            <div className="hub-card-content-area">
+              <h3 className="hub-card-heading">
+                Turn Daily Grocery Bills Into <br />
+                <span className="text-orange-gradient">Guaranteed Family Wealth</span>
+              </h3>
+              
+              <p className="hub-card-description">
+                No registration fees, no investment risk. Purchase the FMCG staples your family uses every day and unlock 100% direct cashback alongside lifelong 20-level network royalty.
+              </p>
+
+              {/* 4 Value Pillars List */}
+              <div className="hub-pillars-list">
+                {valuePillars.map((p, idx) => (
+                  <div key={idx} className="hub-pillar-item">
+                    <div className="hub-pillar-icon-box">{p.icon}</div>
+                    <div className="hub-pillar-text">
+                      <strong>{p.title}</strong>
+                      <span>{p.subtitle}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              {/* App Details & Download Actions */}
-              <div className="app-card-details-master">
-                <h3 className="app-card-heading-master">
-                  Download The <br />
-                  <span className="text-orange-gradient">KharchDaan App</span>
-                </h3>
-                
-                <p className="app-card-subtext-master">
-                  Shop groceries, track your 20-level network tree, check real-time wallet cashback, and withdraw funds easily on the go.
-                </p>
-
-                {/* Store Badges */}
-                <div className="app-store-badges-row-master">
-                  <a 
-                    href="#playstore" 
-                    className="store-badge-btn-master" 
-                    onClick={(e) => e.preventDefault()}
-                    aria-label="Get it on Google Play"
-                  >
-                    <svg className="store-svg-icon" viewBox="0 0 24 24" width="22" height="22">
-                      <path fill="#4285F4" d="M3.6 1.8l10.8 10.2-3.1 3.1-7.7-13.3z"/>
-                      <path fill="#FBBC05" d="M17.5 14.9l-3.1-2.9 3.1-3.1 3.6 2.1c1 .6 1 1.5 0 2l-3.6 1.9z"/>
-                      <path fill="#34A853" d="M3.6 22.2l10.8-10.2 3.1 3.1-13.9 7.1z"/>
-                      <path fill="#EA4335" d="M3.6 1.8l13.9 7.1-3.1 3.1-10.8-10.2z"/>
-                    </svg>
-                    <div className="store-badge-text-block">
-                      <span className="store-tag-text">GET IT ON</span>
-                      <span className="store-name-text">Google Play</span>
-                    </div>
-                  </a>
-
-                  <a 
-                    href="#appstore" 
-                    className="store-badge-btn-master" 
-                    onClick={(e) => e.preventDefault()}
-                    aria-label="Download on App Store"
-                  >
-                    <svg className="store-svg-icon" viewBox="0 0 24 24" width="22" height="22" fill="#FFFFFF">
-                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.07 1.72-.94 2.74 1.01.08 2.03-.49 2.65-1.24z"/>
-                    </svg>
-                    <div className="store-badge-text-block">
-                      <span className="store-tag-text">Download on the</span>
-                      <span className="store-name-text">App Store</span>
-                    </div>
-                  </a>
+              {/* Monthly Savings Callout Box */}
+              <div className="hub-savings-callout">
+                <div className="savings-callout-icon">
+                  <Gift size={20} className="text-orange-600" />
                 </div>
-
-                {/* Instant Security Note */}
-                <div className="app-security-note">
-                  <span>✓ 100% Free Install</span>
-                  <span>•</span>
-                  <span>✓ Instant Wallet Sync</span>
-                  <span>•</span>
-                  <span>✓ Secure UPI Payouts</span>
+                <div className="savings-callout-text">
+                  <span className="savings-title">Estimated Monthly Family Benefit</span>
+                  <span className="savings-value">₹3,000 – ₹50,000+ / Month</span>
                 </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="hub-action-buttons-row">
+                <button 
+                  type="button" 
+                  className="btn-hub-shop-now"
+                  onClick={onShopClick}
+                >
+                  <span>Explore FMCG Store</span>
+                  <ArrowUpRight size={16} />
+                </button>
+                <button 
+                  type="button" 
+                  className="btn-hub-join-free"
+                  onClick={onOpenAuth}
+                >
+                  <span>Join Free Network</span>
+                </button>
+              </div>
+
+              {/* Footer Trust Assurances */}
+              <div className="hub-trust-footer-row">
+                <span>✓ Zero Joining Fee</span>
+                <span>•</span>
+                <span>✓ 100% GST Invoiced</span>
+                <span>•</span>
+                <span>✓ Direct Partner Depots</span>
               </div>
             </div>
           </div>

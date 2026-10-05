@@ -492,8 +492,11 @@ function MainStore() {
             onOpenDetailsModal={() => setAuthModalOpen(true)}
           />
 
-          {/* Why Choose KharchDaan.Com & Download App Section */}
-          <WhyChooseAndAppSection />
+          {/* Why Choose KharchDaan.Com & 100% Direct Cashback Hub */}
+          <WhyChooseAndAppSection 
+            onShopClick={() => handleNavigation('products')}
+            onOpenAuth={() => setAuthModalOpen(true)}
+          />
 
           {/* Our Partners Strip */}
           <OurPartnersStrip />
