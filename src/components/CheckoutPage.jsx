@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   ShieldCheck, Lock, CheckCircle2, ArrowRight, ArrowLeft, Truck, 
   CreditCard, Smartphone, Building, Banknote, Coins, MapPin, 
-  User, Phone, Mail, Clock, ShoppingBag, HeartHandshake, Check, AlertCircle
+  User, Phone, Mail, Clock, ShoppingBag, HeartHandshake, Check, AlertCircle,
+  HelpCircle, RefreshCw
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -88,7 +89,7 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
       itemsCount: totalItems,
       totalAmount: grandTotal,
       cashbackEarned: estimatedCashback,
-      deliverySlotText: deliverySlot === 'morning' ? 'Tomorrow Morning (7 AM - 11 AM)' : deliverySlot === 'afternoon' ? 'Tomorrow Afternoon (12 PM - 4 PM)' : 'Tomorrow Evening (5 PM - 9 PM)',
+      deliverySlotText: deliverySlot === 'morning' ? 'Tomorrow Morning (7:00 AM - 11:00 AM)' : deliverySlot === 'afternoon' ? 'Tomorrow Afternoon (12:00 PM - 4:00 PM)' : 'Tomorrow Evening (5:00 PM - 9:00 PM)',
       paymentMode: paymentMethod.toUpperCase(),
       shippingAddress: `${formData.addressLine1}, ${formData.addressLine2 ? formData.addressLine2 + ', ' : ''}${formData.landmark ? 'Near ' + formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`,
       customerName: formData.fullName,
@@ -104,110 +105,106 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
     }, 1200);
   };
 
-  // If cart is empty and order not placed yet, redirect or show message
+  // If cart is empty and order not placed yet, show empty bag state
   if (items.length === 0 && !orderSuccess) {
     return (
-      <div className="cart-page-wrapper">
-        <div className="container py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-orange-50 border border-orange-200 text-orange-600 flex items-center justify-center mx-auto mb-4">
-            <ShoppingBag size={36} />
+      <div className="co-page-wrapper">
+        <div className="co-container">
+          <div className="co-empty-card">
+            <div className="co-empty-icon-box">
+              <ShoppingBag size={40} />
+            </div>
+            <h2 className="co-empty-title">Your Cart is Empty</h2>
+            <p className="co-empty-desc">
+              You haven't added any products to your shopping bag yet. Explore our genuine Swadeshi grocery catalog and earn up to 100% direct cashback!
+            </p>
+            <div className="co-empty-actions">
+              <button onClick={onShopClick} className="co-btn-primary-pill">
+                <span>Browse Grocery Products</span>
+                <ArrowRight size={16} />
+              </button>
+              <button onClick={onNavigateHome} className="co-btn-secondary-pill">
+                <span>Return to Home</span>
+              </button>
+            </div>
           </div>
-          <h2 className="text-2xl font-black text-slate-900 mb-2">No Items to Checkout</h2>
-          <p className="text-slate-500 text-sm max-w-md mx-auto mb-6">
-            Your shopping bag is empty. Add your daily grocery and household essentials to proceed.
-          </p>
-          <button 
-            onClick={onShopClick}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-full shadow-lg shadow-orange-500/25 transition"
-          >
-            <span>Explore FMCG Catalog</span>
-            <ArrowRight size={16} />
-          </button>
         </div>
       </div>
     );
   }
 
-  // Order Success View
+  // Order Success Receipt View
   if (orderSuccess && createdOrder) {
     return (
-      <div className="checkout-success-wrapper py-12">
-        <div className="container max-w-3xl mx-auto">
-          <div className="bg-white rounded-3xl border border-slate-200/90 p-8 sm:p-12 shadow-xl text-center space-y-8">
+      <div className="co-page-wrapper">
+        <div className="co-container">
+          <div className="co-success-container">
             
-            {/* Success Icon */}
-            <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+            {/* Top Success Badge */}
+            <div className="co-success-icon-badge">
               <CheckCircle2 size={46} />
             </div>
 
-            {/* Header */}
-            <div>
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+            <div className="co-success-header">
+              <span className="co-success-pill-tag">
                 <Check size={12} /> Payment & Order Confirmed
               </span>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                Order Placed Successfully!
-              </h1>
-              <p className="text-slate-500 text-sm mt-2 max-w-lg mx-auto">
-                Thank you for your order, <strong>{createdOrder.customerName}</strong>! Your order has been registered into the direct Swadeshi fulfillment hub.
+              <h1 className="co-success-main-title">Order Placed Successfully!</h1>
+              <p className="co-success-sub-text">
+                Thank you, <strong>{createdOrder.customerName}</strong>! Your order has been registered into the direct BachatGanga priority fulfillment queue.
               </p>
             </div>
 
-            {/* Order Card Summary */}
-            <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-6 text-left space-y-4 text-xs sm:text-sm">
-              <div className="flex justify-between items-center pb-3 border-b border-slate-200">
-                <span className="text-slate-500 font-medium">Order Reference ID:</span>
-                <span className="font-mono font-black text-slate-900 text-base">{createdOrder.orderNumber}</span>
+            {/* Structured Receipt Box */}
+            <div className="co-receipt-card">
+              <div className="co-receipt-row border-b">
+                <span className="co-rec-label">Order Reference ID</span>
+                <span className="co-rec-val-highlight">{createdOrder.orderNumber}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Total Paid:</span>
-                <span className="font-mono font-extrabold text-orange-600 text-base">₹{createdOrder.totalAmount.toLocaleString('en-IN')}</span>
+              <div className="co-receipt-row">
+                <span className="co-rec-label">Total Amount Paid</span>
+                <span className="co-rec-price-highlight">₹{createdOrder.totalAmount.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500 font-medium">Cashback Earned:</span>
-                <span className="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+              <div className="co-receipt-row">
+                <span className="co-rec-label">Direct Cashback Credited</span>
+                <span className="co-rec-cashback-badge">
                   + ₹{createdOrder.cashbackEarned} to Swadeshi Wallet
                 </span>
               </div>
-              <div className="flex justify-between items-start">
-                <span className="text-slate-500 font-medium">Delivery Slot:</span>
-                <span className="font-semibold text-slate-800 text-right">{createdOrder.deliverySlotText}</span>
+              <div className="co-receipt-row">
+                <span className="co-rec-label">Scheduled Delivery Slot</span>
+                <span className="co-rec-val">{createdOrder.deliverySlotText}</span>
               </div>
-              <div className="flex justify-between items-start">
-                <span className="text-slate-500 font-medium">Delivery Address:</span>
-                <span className="font-medium text-slate-800 text-right max-w-xs">{createdOrder.shippingAddress}</span>
+              <div className="co-receipt-row">
+                <span className="co-rec-label">Doorstep Delivery Address</span>
+                <span className="co-rec-val text-right">{createdOrder.shippingAddress}</span>
               </div>
             </div>
 
-            {/* Trust Perks */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-              <div className="p-3 bg-orange-50/60 border border-orange-200/80 rounded-xl flex items-center gap-2.5">
-                <Truck size={18} className="text-orange-600 flex-shrink-0" />
-                <span className="text-xs font-semibold text-orange-950">Express Doorstep Delivery</span>
+            {/* Trust Highlights */}
+            <div className="co-success-perks-grid">
+              <div className="co-perk-item">
+                <Truck size={18} className="text-orange" />
+                <span>Express Doorstep Delivery</span>
               </div>
-              <div className="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl flex items-center gap-2.5">
-                <Coins size={18} className="text-emerald-600 flex-shrink-0" />
-                <span className="text-xs font-semibold text-emerald-950">Direct Cashback Guaranteed</span>
+              <div className="co-perk-item">
+                <Coins size={18} className="text-green" />
+                <span>Direct Cashback Guaranteed</span>
               </div>
-              <div className="p-3 bg-blue-50/60 border border-blue-200/80 rounded-xl flex items-center gap-2.5">
-                <ShieldCheck size={18} className="text-blue-600 flex-shrink-0" />
-                <span className="text-xs font-semibold text-blue-950">100% Genuine Direct Supply</span>
+              <div className="co-perk-item">
+                <ShieldCheck size={18} className="text-blue" />
+                <span>100% Genuine Brand Stock</span>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex flex-wrap justify-center gap-3 pt-2">
-              <button 
-                onClick={onShopClick}
-                className="px-6 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold text-sm rounded-full shadow-lg shadow-orange-500/25 transition"
-              >
-                Continue Shopping
+            <div className="co-success-actions">
+              <button onClick={onShopClick} className="co-btn-primary-pill">
+                <span>Continue Shopping</span>
+                <ArrowRight size={16} />
               </button>
-              <button 
-                onClick={onNavigateHome}
-                className="px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm rounded-full transition"
-              >
-                Return to Home
+              <button onClick={onNavigateHome} className="co-btn-secondary-pill">
+                <span>Back to Home</span>
               </button>
             </div>
 
@@ -218,170 +215,169 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
   }
 
   return (
-    <div className="checkout-page-wrapper">
-      <div className="container py-8">
+    <div className="co-page-wrapper">
+      <div className="co-container">
         
         {/* Breadcrumbs */}
-        <div className="page-breadcrumbs mb-6">
-          <button onClick={onNavigateHome} className="breadcrumb-link">Home</button>
-          <span className="breadcrumb-separator">/</span>
-          <button onClick={onNavigateCart} className="breadcrumb-link">Shopping Cart</button>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-current">Secure Checkout</span>
+        <div className="co-breadcrumbs">
+          <button onClick={onNavigateHome} className="co-breadcrumb-link">Home</button>
+          <span className="co-breadcrumb-sep">/</span>
+          <button onClick={onNavigateCart} className="co-breadcrumb-link">Shopping Cart</button>
+          <span className="co-breadcrumb-sep">/</span>
+          <span className="co-breadcrumb-active">Secure Checkout</span>
         </div>
 
-        {/* Page Header */}
-        <div className="checkout-page-header mb-8">
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-200 text-orange-600 flex items-center justify-center flex-shrink-0 shadow-xs">
+        {/* Page Hero Header */}
+        <div className="co-header-block">
+          <div className="co-title-row">
+            <div className="co-lock-badge-icon">
               <Lock size={22} />
             </div>
-            <span>Secure Order Checkout</span>
-          </h1>
-          <p className="text-slate-500 text-sm mt-1.5">
-            Complete your delivery details, select your preferred time slot & complete payment.
-          </p>
+            <div>
+              <h1 className="co-main-title">Secure Order Checkout</h1>
+              <p className="co-subtitle">
+                Complete your delivery details, select your preferred time slot & complete payment.
+              </p>
+            </div>
+          </div>
         </div>
 
         {formError && (
-          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs font-semibold flex items-center gap-2.5 shadow-xs">
-            <AlertCircle size={18} className="text-rose-600 flex-shrink-0" />
+          <div className="co-error-banner">
+            <AlertCircle size={18} />
             <span>{formError}</span>
           </div>
         )}
 
-        <form onSubmit={handlePlaceOrder}>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <form onSubmit={handlePlaceOrder} className="co-checkout-form">
+          <div className="co-layout-grid">
             
-            {/* Left Column: Form Steps (8 Cols) */}
-            <div className="lg:col-span-8 space-y-6">
+            {/* Left 3-Step Checkout Column */}
+            <div className="co-main-column">
               
               {/* Step 1: Customer Contact & Delivery Address */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-orange-600 text-white font-bold text-xs flex items-center justify-center">
-                      1
-                    </div>
-                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                      Delivery Address & Contact
-                    </h2>
+              <div className="co-card-block">
+                <div className="co-step-header">
+                  <div className="co-step-title-group">
+                    <div className="co-step-num">1</div>
+                    <h2 className="co-step-heading">Delivery Address & Contact</h2>
                   </div>
                   {!isAuthenticated && (
                     <button 
                       type="button" 
                       onClick={onOpenAuth}
-                      className="text-xs font-bold text-orange-600 hover:underline"
+                      className="co-login-link-btn"
                     >
-                      Already have an account? Login
+                      Already a member? Login
                     </button>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">Full Name *</label>
-                    <div className="relative">
-                      <User size={14} className="absolute left-3 top-3 text-slate-400" />
+                <div className="co-form-grid">
+                  <div className="co-field-group">
+                    <label className="co-label">Full Name *</label>
+                    <div className="co-input-wrap">
+                      <User size={15} className="co-input-icon" />
                       <input 
                         type="text" 
                         name="fullName" 
                         value={formData.fullName} 
                         onChange={handleInputChange} 
                         placeholder="e.g. Ramesh Patel" 
-                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                        className="co-input"
                         required
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">Phone Number (10 Digits) *</label>
-                    <div className="relative">
-                      <Phone size={14} className="absolute left-3 top-3 text-slate-400" />
+                  <div className="co-field-group">
+                    <label className="co-label">Phone Number (10 Digits) *</label>
+                    <div className="co-input-wrap">
+                      <Phone size={15} className="co-input-icon" />
                       <input 
                         type="tel" 
                         name="phone" 
                         value={formData.phone} 
                         onChange={handleInputChange} 
                         placeholder="e.g. 9876543210" 
-                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium font-mono"
+                        className="co-input font-mono"
                         required
+                        maxLength={10}
                       />
                     </div>
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <label className="block font-semibold text-slate-700 mb-1.5">Email Address (For Invoices & Cashback Notifications)</label>
-                    <div className="relative">
-                      <Mail size={14} className="absolute left-3 top-3 text-slate-400" />
+                  <div className="co-field-group co-field-full">
+                    <label className="co-label">Email Address (For Invoices & Cashback Notifications)</label>
+                    <div className="co-input-wrap">
+                      <Mail size={15} className="co-input-icon" />
                       <input 
                         type="email" 
                         name="email" 
                         value={formData.email} 
                         onChange={handleInputChange} 
                         placeholder="e.g. ramesh@example.com" 
-                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                        className="co-input"
                       />
                     </div>
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <label className="block font-semibold text-slate-700 mb-1.5">Flat / House No. / Building / Floor *</label>
+                  <div className="co-field-group co-field-full">
+                    <label className="co-label">Flat / House No. / Building / Floor *</label>
                     <input 
                       type="text" 
                       name="addressLine1" 
                       value={formData.addressLine1} 
                       onChange={handleInputChange} 
                       placeholder="e.g. Flat 402, Gokul Heights, SG Highway" 
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                      className="co-input co-input-no-icon"
                       required
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">Area / Street / Colony</label>
+                  <div className="co-field-group">
+                    <label className="co-label">Area / Street / Colony</label>
                     <input 
                       type="text" 
                       name="addressLine2" 
                       value={formData.addressLine2} 
                       onChange={handleInputChange} 
                       placeholder="e.g. Bodakdev / Satellite" 
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                      className="co-input co-input-no-icon"
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">Landmark (Optional)</label>
+                  <div className="co-field-group">
+                    <label className="co-label">Landmark (Optional)</label>
                     <input 
                       type="text" 
                       name="landmark" 
                       value={formData.landmark} 
                       onChange={handleInputChange} 
                       placeholder="e.g. Near ISKCON Temple" 
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                      className="co-input co-input-no-icon"
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">City *</label>
+                  <div className="co-field-group">
+                    <label className="co-label">City *</label>
                     <input 
                       type="text" 
                       name="city" 
                       value={formData.city} 
                       onChange={handleInputChange} 
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                      className="co-input co-input-no-icon"
                       required
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">State *</label>
+                  <div className="co-field-group">
+                    <label className="co-label">State *</label>
                     <select 
                       name="state" 
                       value={formData.state} 
                       onChange={handleInputChange} 
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-medium"
+                      className="co-select co-input-no-icon"
                     >
                       <option value="Gujarat">Gujarat</option>
                       <option value="Maharashtra">Maharashtra</option>
@@ -394,33 +390,29 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">Pincode *</label>
+                  <div className="co-field-group">
+                    <label className="co-label">Pincode *</label>
                     <input 
                       type="text" 
                       name="pincode" 
                       value={formData.pincode} 
                       onChange={handleInputChange} 
                       placeholder="380001" 
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-orange-500 font-mono font-bold"
+                      className="co-input co-input-no-icon font-mono font-bold"
                       required
                       maxLength={6}
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-semibold text-slate-700 mb-1.5">Address Type</label>
-                    <div className="flex gap-2">
+                  <div className="co-field-group">
+                    <label className="co-label">Address Type</label>
+                    <div className="co-address-type-selector">
                       {['home', 'work', 'other'].map((type) => (
                         <button
                           key={type}
                           type="button"
                           onClick={() => setFormData(prev => ({ ...prev, addressType: type }))}
-                          className={`flex-1 py-2 px-3 rounded-xl border text-xs font-semibold uppercase tracking-wider transition ${
-                            formData.addressType === type 
-                              ? 'bg-orange-50 border-orange-500 text-orange-700 font-bold' 
-                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                          }`}
+                          className={`co-addr-type-btn ${formData.addressType === type ? 'active' : ''}`}
                         >
                           {type}
                         </button>
@@ -431,271 +423,283 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                 </div>
               </div>
 
-              {/* Step 2: Delivery Slot Selection */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-4">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                  <div className="w-7 h-7 rounded-full bg-orange-600 text-white font-bold text-xs flex items-center justify-center">
-                    2
+              {/* Step 2: Preferred Delivery Slot */}
+              <div className="co-card-block">
+                <div className="co-step-header">
+                  <div className="co-step-title-group">
+                    <div className="co-step-num">2</div>
+                    <h2 className="co-step-heading">Select Preferred Delivery Slot</h2>
                   </div>
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                    Select Preferred Delivery Slot
-                  </h2>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="co-slots-grid">
                   {[
                     { id: 'morning', title: 'Morning Slot', time: '7:00 AM - 11:00 AM', badge: 'Popular' },
                     { id: 'afternoon', title: 'Afternoon Slot', time: '12:00 PM - 4:00 PM', badge: 'Standard' },
                     { id: 'evening', title: 'Evening Slot', time: '5:00 PM - 9:00 PM', badge: 'Convenient' }
                   ].map(slot => (
-                    <label 
+                    <div 
                       key={slot.id}
-                      className={`p-4 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between ${
-                        deliverySlot === slot.id 
-                          ? 'bg-orange-50/70 border-orange-500 shadow-sm' 
-                          : 'bg-slate-50 border-slate-200 hover:border-slate-300'
-                      }`}
+                      onClick={() => setDeliverySlot(slot.id)}
+                      className={`co-slot-card ${deliverySlot === slot.id ? 'active' : ''}`}
                     >
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="co-slot-top">
                         <input 
                           type="radio" 
                           name="deliverySlot" 
                           value={slot.id} 
                           checked={deliverySlot === slot.id} 
-                          onChange={(e) => setDeliverySlot(e.target.value)}
-                          className="accent-orange-600"
+                          onChange={() => setDeliverySlot(slot.id)}
+                          className="co-radio-circle"
                         />
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-600">
-                          {slot.badge}
-                        </span>
+                        <span className="co-slot-badge">{slot.badge}</span>
                       </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900">{slot.title}</div>
-                        <div className="text-[11px] text-slate-500 font-medium mt-0.5">{slot.time}</div>
+                      <div className="co-slot-info">
+                        <div className="co-slot-title">{slot.title}</div>
+                        <div className="co-slot-time">{slot.time}</div>
                       </div>
-                    </label>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Step 3: Payment Method Selection */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-4">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                  <div className="w-7 h-7 rounded-full bg-orange-600 text-white font-bold text-xs flex items-center justify-center">
-                    3
+              {/* Step 3: Payment Method Selector */}
+              <div className="co-card-block">
+                <div className="co-step-header">
+                  <div className="co-step-title-group">
+                    <div className="co-step-num">3</div>
+                    <h2 className="co-step-heading">Select Payment Method</h2>
                   </div>
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                    Select Payment Method
-                  </h2>
                 </div>
 
-                <div className="space-y-3">
+                <div className="co-payments-list">
                   
                   {/* UPI Option */}
-                  <label className={`p-4 rounded-2xl border-2 cursor-pointer transition block ${paymentMethod === 'upi' ? 'bg-orange-50/70 border-orange-500 shadow-xs' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                  <div 
+                    onClick={() => setPaymentMethod('upi')}
+                    className={`co-payment-option ${paymentMethod === 'upi' ? 'active' : ''}`}
+                  >
+                    <div className="co-payment-main-row">
+                      <div className="co-payment-left">
                         <input 
                           type="radio" 
                           name="paymentMethod" 
                           value="upi" 
                           checked={paymentMethod === 'upi'} 
-                          onChange={(e) => setPaymentMethod(e.target.value)}
-                          className="accent-orange-600"
+                          onChange={() => setPaymentMethod('upi')}
+                          className="co-radio-circle"
                         />
-                        <div className="w-9 h-9 rounded-xl bg-orange-600 text-white flex items-center justify-center flex-shrink-0">
-                          <Smartphone size={18} />
+                        <div className="co-payment-icon-box icon-upi">
+                          <Smartphone size={20} />
                         </div>
                         <div>
-                          <div className="text-xs sm:text-sm font-bold text-slate-900">UPI (GPay / PhonePe / Paytm / BHIM)</div>
-                          <div className="text-[11px] text-slate-500">Fast 1-click payment with instant cashback credit</div>
+                          <div className="co-payment-title">UPI (GPay / PhonePe / Paytm / BHIM)</div>
+                          <div className="co-payment-desc">Fast 1-click payment with instant cashback credit</div>
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                        Recommended
-                      </span>
+                      <span className="co-rec-badge">Recommended</span>
                     </div>
 
                     {paymentMethod === 'upi' && (
-                      <div className="mt-3 pt-3 border-t border-orange-200/80">
+                      <div className="co-upi-expand-box" onClick={(e) => e.stopPropagation()}>
                         <input 
                           type="text" 
                           placeholder="Enter your UPI ID (e.g. yourname@okhdfcbank or 9876543210@paytm)" 
                           value={upiId}
                           onChange={(e) => setUpiId(e.target.value)}
-                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono outline-none focus:border-orange-500"
+                          className="co-upi-input"
                         />
                       </div>
                     )}
-                  </label>
+                  </div>
 
                   {/* Cards Option */}
-                  <label className={`p-4 rounded-2xl border-2 cursor-pointer transition block ${paymentMethod === 'cards' ? 'bg-orange-50/70 border-orange-500 shadow-xs' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
-                    <div className="flex items-center gap-3">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="cards" 
-                        checked={paymentMethod === 'cards'} 
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="accent-orange-600"
-                      />
-                      <div className="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center flex-shrink-0">
-                        <CreditCard size={18} />
-                      </div>
-                      <div>
-                        <div className="text-xs sm:text-sm font-bold text-slate-900">Credit / Debit Card</div>
-                        <div className="text-[11px] text-slate-500">Visa, MasterCard, RuPay & Maestro</div>
+                  <div 
+                    onClick={() => setPaymentMethod('cards')}
+                    className={`co-payment-option ${paymentMethod === 'cards' ? 'active' : ''}`}
+                  >
+                    <div className="co-payment-main-row">
+                      <div className="co-payment-left">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="cards" 
+                          checked={paymentMethod === 'cards'} 
+                          onChange={() => setPaymentMethod('cards')}
+                          className="co-radio-circle"
+                        />
+                        <div className="co-payment-icon-box icon-cards">
+                          <CreditCard size={20} />
+                        </div>
+                        <div>
+                          <div className="co-payment-title">Credit / Debit Cards</div>
+                          <div className="co-payment-desc">Visa, MasterCard, RuPay & Maestro with zero surcharge</div>
+                        </div>
                       </div>
                     </div>
-                  </label>
+                  </div>
 
                   {/* Net Banking */}
-                  <label className={`p-4 rounded-2xl border-2 cursor-pointer transition block ${paymentMethod === 'netbanking' ? 'bg-orange-50/70 border-orange-500 shadow-xs' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
-                    <div className="flex items-center gap-3">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="netbanking" 
-                        checked={paymentMethod === 'netbanking'} 
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="accent-orange-600"
-                      />
-                      <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
-                        <Building size={18} />
-                      </div>
-                      <div>
-                        <div className="text-xs sm:text-sm font-bold text-slate-900">Net Banking</div>
-                        <div className="text-[11px] text-slate-500">SBI, HDFC, ICICI, Axis, Kotak, PNB & 50+ Banks</div>
+                  <div 
+                    onClick={() => setPaymentMethod('netbanking')}
+                    className={`co-payment-option ${paymentMethod === 'netbanking' ? 'active' : ''}`}
+                  >
+                    <div className="co-payment-main-row">
+                      <div className="co-payment-left">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="netbanking" 
+                          checked={paymentMethod === 'netbanking'} 
+                          onChange={() => setPaymentMethod('netbanking')}
+                          className="co-radio-circle"
+                        />
+                        <div className="co-payment-icon-box icon-netbanking">
+                          <Building size={20} />
+                        </div>
+                        <div>
+                          <div className="co-payment-title">Net Banking</div>
+                          <div className="co-payment-desc">SBI, HDFC, ICICI, Axis, Kotak, PNB & 50+ Banks</div>
+                        </div>
                       </div>
                     </div>
-                  </label>
+                  </div>
 
                   {/* Cash on Delivery */}
-                  <label className={`p-4 rounded-2xl border-2 cursor-pointer transition block ${paymentMethod === 'cod' ? 'bg-orange-50/70 border-orange-500 shadow-xs' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
-                    <div className="flex items-center gap-3">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="cod" 
-                        checked={paymentMethod === 'cod'} 
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="accent-orange-600"
-                      />
-                      <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
-                        <Banknote size={18} />
-                      </div>
-                      <div>
-                        <div className="text-xs sm:text-sm font-bold text-slate-900">Cash on Delivery (Pay at Doorstep)</div>
-                        <div className="text-[11px] text-slate-500">Pay via cash or UPI scan when your parcel arrives</div>
+                  <div 
+                    onClick={() => setPaymentMethod('cod')}
+                    className={`co-payment-option ${paymentMethod === 'cod' ? 'active' : ''}`}
+                  >
+                    <div className="co-payment-main-row">
+                      <div className="co-payment-left">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="cod" 
+                          checked={paymentMethod === 'cod'} 
+                          onChange={() => setPaymentMethod('cod')}
+                          className="co-radio-circle"
+                        />
+                        <div className="co-payment-icon-box icon-cod">
+                          <Banknote size={20} />
+                        </div>
+                        <div>
+                          <div className="co-payment-title">Cash on Delivery (Pay at Doorstep)</div>
+                          <div className="co-payment-desc">Pay via cash or UPI QR scan when your parcel arrives</div>
+                        </div>
                       </div>
                     </div>
-                  </label>
+                  </div>
 
                 </div>
               </div>
 
             </div>
 
-            {/* Right Column: Order Review & Submit (4 Cols) */}
-            <div className="lg:col-span-4 space-y-5">
-              
-              {/* Mini Items Preview Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Order Items ({totalItems})
+            {/* Right Sticky Order Summary Column */}
+            <div className="co-sidebar-column">
+              <div className="co-sidebar-wrap">
+                
+                {/* Mini Items Preview Card */}
+                <div className="co-items-card">
+                  <div className="co-items-header">
+                    <h3 className="co-items-header-title">
+                      Order Items ({totalItems})
+                    </h3>
+                    <button 
+                      type="button" 
+                      onClick={onNavigateCart}
+                      className="co-edit-cart-link"
+                    >
+                      Edit Cart
+                    </button>
+                  </div>
+
+                  <div className="co-items-scroll-list">
+                    {items.map(item => {
+                      const itemImg = getItemImage(item);
+                      return (
+                        <div key={item.cartKey} className="co-item-mini-row">
+                          <img 
+                            src={itemImg} 
+                            alt={item.name} 
+                            className="co-item-mini-thumb"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&auto=format&fit=crop&q=80';
+                            }}
+                          />
+                          <div className="co-item-mini-info">
+                            <div className="co-item-mini-name" title={item.name}>{item.name}</div>
+                            <div className="co-item-mini-meta">Qty: {item.quantity} × ₹{item.price}</div>
+                          </div>
+                          <div className="co-item-mini-price">
+                            ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Price Calculation Card */}
+                <div className="co-summary-card">
+                  <h3 className="co-summary-header">
+                    Final Payable Amount
                   </h3>
-                  <button 
-                    type="button" 
-                    onClick={onNavigateCart}
-                    className="text-xs font-bold text-orange-600 hover:underline"
-                  >
-                    Edit Cart
-                  </button>
-                </div>
 
-                <div className="max-h-56 overflow-y-auto space-y-2.5 pr-1 divide-y divide-slate-100">
-                  {items.map(item => (
-                    <div key={item.cartKey} className="pt-2.5 first:pt-0 flex items-center gap-3">
-                      <img 
-                        src={getItemImage(item)} 
-                        alt={item.name} 
-                        className="w-11 h-11 rounded-lg border border-slate-200 object-contain p-1 bg-slate-50 flex-shrink-0"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&auto=format&fit=crop&q=80';
-                        }}
-                      />
-                      <div className="min-w-0 flex-1 text-xs">
-                        <div className="font-semibold text-slate-900 truncate" title={item.name}>{item.name}</div>
-                        <div className="text-[11px] text-slate-400">Qty: {item.quantity} × ₹{item.price}</div>
-                      </div>
-                      <div className="font-bold text-slate-900 text-xs font-mono">
-                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                  <div className="co-summary-rows">
+                    <div className="co-sum-row">
+                      <span>Items Subtotal</span>
+                      <span className="co-sum-val">₹{subtotal.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div className="co-cashback-highlight-row">
+                      <span className="co-cashback-left">
+                        <Coins size={14} />
+                        <span>Wallet Cashback Credit</span>
+                      </span>
+                      <span className="co-cashback-val">+ ₹{estimatedCashback.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div className="co-sum-row">
+                      <span>Delivery Partner Fee</span>
+                      <div className="co-delivery-badge-group">
+                        <span className="co-strikethrough-fee">₹40</span>
+                        <span className="co-free-pill">FREE</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Price Calculation Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider pb-3 border-b border-slate-100">
-                  Final Payable Amount
-                </h3>
+                    <div className="co-sum-row">
+                      <div className="co-platform-label-group">
+                        <span>Platform & Convenience Fee</span>
+                        <span className="co-platform-pill">₹{platformFee}</span>
+                      </div>
+                      <span className="co-sum-val">₹{platformFee.toLocaleString('en-IN')}</span>
+                    </div>
 
-                <div className="space-y-2.5 text-xs">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Items Subtotal</span>
-                    <span className="font-bold text-slate-900 font-mono">₹{subtotal.toLocaleString('en-IN')}</span>
-                  </div>
+                    <div className="co-sum-divider" />
 
-                  <div className="flex justify-between text-emerald-700 font-semibold bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
-                    <span className="flex items-center gap-1">
-                      <Coins size={13} />
-                      <span>Wallet Cashback Credit</span>
-                    </span>
-                    <span className="font-bold font-mono">+ ₹{estimatedCashback.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  <div className="flex justify-between text-slate-600">
-                    <span>Delivery Partner Fee</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="line-through text-slate-400 font-normal">₹40</span>
-                      <span className="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">FREE</span>
+                    <div className="co-total-row">
+                      <div>
+                        <span className="co-total-label">Grand Total</span>
+                        <div className="co-total-sub">All Taxes & Delivery Included</div>
+                      </div>
+                      <span className="co-total-amount">
+                        ₹{grandTotal.toLocaleString('en-IN')}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex justify-between text-slate-600 items-center">
-                    <div className="flex items-center gap-1.5">
-                      <span>Platform & Convenience Fee</span>
-                      <span className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded font-semibold">₹{platformFee}</span>
-                    </div>
-                    <span className="font-bold text-slate-900 font-mono">₹{platformFee.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
-                    <div>
-                      <span className="text-sm font-black text-slate-900">Grand Total</span>
-                      <div className="text-[10px] text-slate-400">All Taxes & Delivery Included</div>
-                    </div>
-                    <span className="text-2xl font-black text-orange-600 font-mono">
-                      ₹{grandTotal.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="pt-2">
+                  {/* Submit CTA Button */}
                   <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-extrabold text-sm rounded-xl shadow-lg shadow-orange-500/25 transition-all transform hover:-translate-y-0.5 disabled:opacity-75 cursor-pointer"
+                    className="co-btn-place-order"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="co-spinner"></div>
                         <span>Processing Your Order...</span>
                       </>
                     ) : (
@@ -706,21 +710,21 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                       </>
                     )}
                   </button>
-                </div>
 
-                <div className="pt-2 border-t border-slate-100 flex flex-col gap-1.5 text-[11px] text-slate-500">
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck size={13} className="text-emerald-600" />
-                    <span>256-Bit SSL Bank Grade Encryption</span>
+                  <div className="co-security-badges">
+                    <div className="co-sec-item">
+                      <ShieldCheck size={14} className="text-emerald" />
+                      <span>256-Bit SSL Bank Grade Encryption</span>
+                    </div>
+                    <div className="co-sec-item">
+                      <HeartHandshake size={14} className="text-orange" />
+                      <span>Swadeshi Direct Producer Network Guarantee</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <HeartHandshake size={13} className="text-orange-500" />
-                    <span>Swadeshi Direct Producer Network Guarantee</span>
-                  </div>
+
                 </div>
 
               </div>
-
             </div>
 
           </div>

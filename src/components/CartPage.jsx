@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ShoppingBag, Trash2, Plus, Minus, ArrowRight, ShieldCheck, 
   Coins, Tag, CheckCircle2, Truck, ArrowLeft, RefreshCw, Sparkles, 
-  Info, Lock, MapPin, HeartHandshake, Check
+  Info, Lock, MapPin, HeartHandshake, Check, AlertCircle
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -27,7 +27,7 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
   const [couponError, setCouponError] = useState('');
   const [pincode, setPincode] = useState('380001');
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
-  const [pincodeStatus, setPincodeStatus] = useState('Express 24-Hour Delivery Available');
+  const [pincodeStatus, setPincodeStatus] = useState('Verified: Express 24-Hour Delivery to Pincode 380001');
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
@@ -59,7 +59,6 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
     }, 400);
   };
 
-  // Smart image fallback
   const getItemImage = (item) => {
     if (item.image && !item.image.includes('default-product.svg')) {
       return item.image;
@@ -75,122 +74,102 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
   const finalPayable = Math.max(0, grandTotal - discountAmount);
 
   return (
-    <div className="cart-page-wrapper">
-      <div className="container py-8">
+    <div className="co-page-wrapper">
+      <div className="co-container">
         
         {/* Breadcrumbs */}
-        <div className="page-breadcrumbs mb-6">
-          <button onClick={onNavigateHome} className="breadcrumb-link">Home</button>
-          <span className="breadcrumb-separator">/</span>
-          <button onClick={onShopClick} className="breadcrumb-link">Products</button>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-current">Shopping Cart</span>
+        <div className="co-breadcrumbs">
+          <button onClick={onNavigateHome} className="co-breadcrumb-link">Home</button>
+          <span className="co-breadcrumb-sep">/</span>
+          <button onClick={onShopClick} className="co-breadcrumb-link">Products</button>
+          <span className="co-breadcrumb-sep">/</span>
+          <span className="co-breadcrumb-active">Shopping Cart</span>
         </div>
 
         {/* Page Header */}
-        <div className="cart-page-header mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="cp-header-row">
+          <div className="cp-title-group">
+            <div className="cp-icon-box">
+              <ShoppingBag size={24} />
+            </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-200 text-orange-600 flex items-center justify-center flex-shrink-0 shadow-xs">
-                  <ShoppingBag size={24} />
-                </div>
-                <span>Your Shopping Cart</span>
-              </h1>
-              <p className="text-slate-500 text-sm mt-1.5">
+              <h1 className="co-main-title">Your Shopping Cart</h1>
+              <p className="co-subtitle">
                 Review your essentials, apply community discount vouchers, and enjoy direct doorstep delivery.
               </p>
             </div>
-            {items.length > 0 && (
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={clearCart}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition"
-                >
-                  <Trash2 size={14} />
-                  <span>Clear All Items</span>
-                </button>
-              </div>
-            )}
           </div>
+          {items.length > 0 && (
+            <button onClick={clearCart} className="cp-btn-clear-all" title="Clear all items">
+              <Trash2 size={14} />
+              <span>Clear Cart</span>
+            </button>
+          )}
         </div>
 
         {items.length === 0 ? (
           /* Empty Cart State */
-          <div className="cart-page-empty bg-white rounded-3xl border border-slate-200/80 p-12 text-center shadow-xs max-w-2xl mx-auto my-8">
-            <div className="w-24 h-24 rounded-full bg-orange-50 border-2 border-dashed border-orange-200 text-orange-600 flex items-center justify-center mx-auto mb-6 shadow-inner">
-              <ShoppingBag size={48} />
+          <div className="co-empty-card">
+            <div className="co-empty-icon-box">
+              <ShoppingBag size={44} />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Your Cart is Currently Empty</h2>
-            <p className="text-slate-500 text-sm max-w-md mx-auto mb-8 leading-relaxed">
+            <h2 className="co-empty-title">Your Cart is Currently Empty</h2>
+            <p className="co-empty-desc">
               Explore our direct-from-producer grocery staples, desi spices, dairy fats & personal care essentials with up to 100% cashback rewards!
             </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <button 
-                onClick={onShopClick} 
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold text-sm rounded-full shadow-lg shadow-orange-500/25 transition-all"
-              >
+            <div className="co-empty-actions">
+              <button onClick={onShopClick} className="co-btn-primary-pill">
                 <span>Browse Products & Services</span>
                 <ArrowRight size={16} />
               </button>
-              <button 
-                onClick={onNavigateHome} 
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-full transition"
-              >
-                <ArrowLeft size={16} />
+              <button onClick={onNavigateHome} className="co-btn-secondary-pill">
                 <span>Return to Home</span>
               </button>
             </div>
           </div>
         ) : (
           /* Active Cart Grid (8 Cols Items + 4 Cols Order Summary) */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="co-layout-grid">
             
-            {/* Left Column: Items Table & Delivery (8 Cols) */}
-            <div className="lg:col-span-8 space-y-6">
+            {/* Left Column: Items List & Delivery (8 Cols) */}
+            <div className="co-main-column">
               
               {/* Cashback Highlight Banner */}
-              <div className="bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-1.5 border-orange-200/90 rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-xs">
-                <div className="w-11 h-11 rounded-xl bg-orange-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-orange-600/30">
+              <div className="cp-cashback-banner">
+                <div className="cp-cb-icon-wrap">
                   <Coins size={22} />
                 </div>
-                <div className="flex-1">
-                  <div className="text-xs sm:text-sm font-bold text-orange-950 flex flex-wrap items-center gap-2">
+                <div className="cp-cb-text-wrap">
+                  <div className="cp-cb-headline">
                     <span>You are earning estimated <strong>₹{estimatedCashback} Direct Cashback</strong> on this order!</span>
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900 border border-amber-300">
-                      "तेरा तुझको अर्पण"
-                    </span>
+                    <span className="cp-cb-pill">"तेरा तुझको अर्पण"</span>
                   </div>
-                  <p className="text-xs text-orange-800/80 mt-0.5 font-medium">
-                    100% Guaranteed Swadeshi Member Rewards credited upon order delivery.
+                  <p className="cp-cb-sub">
+                    100% Guaranteed Swadeshi Member Rewards credited directly to your wallet upon order delivery.
                   </p>
                 </div>
               </div>
 
-              {/* Items Card List */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Cart Items ({totalItems})
-                  </span>
-                  <span className="text-xs text-slate-400 font-medium">
-                    Price & Quantities
-                  </span>
+              {/* Items Table Card */}
+              <div className="co-card-block no-padding">
+                <div className="cp-items-table-header">
+                  <span className="cp-table-col-title">Cart Items ({totalItems})</span>
+                  <span className="cp-table-col-meta">Price & Quantities</span>
                 </div>
 
-                <div className="divide-y divide-slate-100">
+                <div className="cp-items-list-body">
                   {items.map((item) => {
                     const itemImg = getItemImage(item);
                     return (
-                      <div key={item.cartKey} className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/40 transition">
+                      <div key={item.cartKey} className="cp-item-row">
                         
                         {/* Item Details Left */}
-                        <div className="flex items-center gap-4 min-w-0 flex-1">
-                          <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-xl bg-slate-50 border border-slate-200/80 p-2 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div className="cp-item-main-details">
+                          <div className="cp-item-thumb-box">
                             <img 
                               src={itemImg} 
                               alt={item.name} 
-                              className="max-h-full max-w-full object-contain"
+                              className="cp-item-thumb-img"
                               onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&auto=format&fit=crop&q=80';
@@ -198,15 +177,15 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
                             />
                           </div>
 
-                          <div className="min-w-0 flex-1">
-                            <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug truncate" title={item.name}>
+                          <div className="cp-item-info-col">
+                            <h3 className="cp-item-name" title={item.name}>
                               {item.name}
                             </h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs font-bold text-orange-600 font-mono">₹{item.price.toLocaleString('en-IN')}</span>
-                              <span className="text-[11px] text-slate-400">per unit</span>
+                            <div className="cp-item-price-tag">
+                              <span className="cp-item-unit-price">₹{item.price.toLocaleString('en-IN')}</span>
+                              <span className="cp-item-unit-label">per unit</span>
                             </div>
-                            <div className="text-[11px] text-emerald-600 font-medium flex items-center gap-1 mt-1">
+                            <div className="cp-item-stock-badge">
                               <CheckCircle2 size={12} />
                               <span>In Stock • Ready for Doorstep Dispatch</span>
                             </div>
@@ -214,23 +193,23 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
                         </div>
 
                         {/* Controls & Price Right */}
-                        <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        <div className="cp-item-controls-col">
                           
                           {/* Quantity Pill */}
-                          <div className="inline-flex items-center bg-slate-50 border border-slate-200 rounded-full p-1 gap-2">
+                          <div className="cp-qty-pill">
                             <button 
                               onClick={() => updateQuantity(item.cartKey, -1)}
-                              className="w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-orange-50 hover:border-orange-500 hover:text-orange-600 flex items-center justify-center transition"
+                              className="cp-qty-btn"
                               aria-label="Decrease quantity"
                             >
                               <Minus size={12} />
                             </button>
-                            <span className="font-bold text-slate-900 text-sm px-1 min-w-[20px] text-center font-mono">
+                            <span className="cp-qty-number">
                               {item.quantity}
                             </span>
                             <button 
                               onClick={() => updateQuantity(item.cartKey, 1)}
-                              className="w-7 h-7 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-orange-50 hover:border-orange-500 hover:text-orange-600 flex items-center justify-center transition"
+                              className="cp-qty-btn"
                               aria-label="Increase quantity"
                             >
                               <Plus size={12} />
@@ -238,21 +217,23 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
                           </div>
 
                           {/* Line Total */}
-                          <div className="text-right min-w-[80px]">
-                            <div className="font-black text-slate-900 text-base font-mono">
+                          <div className="cp-line-total-box">
+                            <div className="cp-line-total-val">
                               ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                             </div>
-                            <span className="text-[10px] text-slate-400">item total</span>
+                            <span className="cp-line-total-sub">item total</span>
                           </div>
 
                           {/* Delete Item */}
                           <button 
                             onClick={() => removeItem(item.cartKey)}
-                            className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 flex items-center justify-center transition"
-                            title="Remove from cart"
+                            className="cp-btn-delete-item"
+                            title="Remove item"
+                            aria-label="Remove item"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={15} />
                           </button>
+
                         </div>
 
                       </div>
@@ -260,207 +241,184 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
                   })}
                 </div>
 
-                {/* Bottom Actions inside List */}
-                <div className="p-4 sm:p-5 bg-slate-50/60 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <button 
-                    onClick={onShopClick} 
-                    className="inline-flex items-center gap-2 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline"
-                  >
-                    <ArrowLeft size={14} />
-                    <span>Continue Shopping FMCG Essentials</span>
+                {/* Table Footer */}
+                <div className="cp-table-footer-bar">
+                  <button onClick={onShopClick} className="cp-btn-continue-shopping">
+                    <ArrowLeft size={15} />
+                    <span>Continue Shopping FMCG Catalog</span>
                   </button>
-                  <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                    <ShieldCheck size={14} className="text-emerald-600" />
-                    <span>100% Genuine Direct Supply Guarantee</span>
+                  <div className="cp-table-footer-meta">
+                    <span>{totalItems} items selected</span>
                   </div>
                 </div>
+
               </div>
 
-              {/* Delivery Pincode & Delivery Slot Strip */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center flex-shrink-0">
-                    <Truck size={20} />
+              {/* Delivery Pincode Verification Card */}
+              <div className="co-card-block">
+                <div className="cp-pincode-card-header">
+                  <div className="cp-pincode-icon-wrap">
+                    <MapPin size={18} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                      Doorstep Delivery Check
-                    </h4>
-                    <p className="text-xs text-emerald-700 font-semibold mt-0.5">
-                      {pincodeStatus}
-                    </p>
+                    <h3 className="co-step-heading">Check Doorstep Express Delivery</h3>
+                    <p className="cp-pincode-sub">Verify delivery timelines for your exact residential pincode.</p>
                   </div>
                 </div>
 
-                <form onSubmit={handlePincodeCheck} className="flex items-center gap-2 w-full sm:w-auto">
-                  <div className="relative flex-1 sm:w-36">
-                    <MapPin size={13} className="absolute left-2.5 top-2.5 text-slate-400" />
-                    <input 
-                      type="text" 
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                      placeholder="Pincode"
-                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 outline-none focus:bg-white focus:border-orange-500"
-                    />
-                  </div>
-                  <button 
-                    type="submit" 
-                    className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition"
-                    disabled={isCheckingPincode}
-                  >
-                    {isCheckingPincode ? 'Checking...' : 'Check'}
+                <form onSubmit={handlePincodeCheck} className="cp-pincode-form">
+                  <input 
+                    type="text" 
+                    value={pincode} 
+                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="Enter 6-digit Pincode"
+                    className="cp-pincode-input"
+                    maxLength={6}
+                  />
+                  <button type="submit" disabled={isCheckingPincode} className="cp-btn-check-pincode">
+                    {isCheckingPincode ? 'Checking...' : 'Check Availability'}
                   </button>
                 </form>
+
+                {pincodeStatus && (
+                  <div className="cp-pincode-status-badge">
+                    <CheckCircle2 size={14} className="text-green" />
+                    <span>{pincodeStatus}</span>
+                  </div>
+                )}
               </div>
 
             </div>
 
-            {/* Right Column: Order Summary & Checkout (4 Cols) */}
-            <div className="lg:col-span-4 space-y-5">
-              
-              {/* Promo Coupon Box */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
-                <div className="flex items-center gap-2 mb-3">
-                  <Tag size={16} className="text-orange-600" />
-                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Coupons & Vouchers
-                  </h3>
-                </div>
-
-                {appliedCoupon ? (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
-                        <Check size={14} className="text-emerald-600" />
-                        <span>Coupon '{appliedCoupon.code}' Applied!</span>
-                      </div>
-                      <div className="text-[11px] text-emerald-600 mt-0.5">
-                        You saved ₹{appliedCoupon.discount} on this order
-                      </div>
-                    </div>
-                    <button 
-                      onClick={handleRemoveCoupon}
-                      className="text-xs font-bold text-rose-600 hover:underline"
-                    >
-                      Remove
-                    </button>
+            {/* Right Column: Order Summary (4 Cols) */}
+            <div className="co-sidebar-column">
+              <div className="co-sidebar-wrap">
+                
+                {/* Coupon Box Card */}
+                <div className="co-card-block">
+                  <div className="cp-coupon-header">
+                    <Tag size={16} className="text-orange" />
+                    <span className="cp-coupon-title">Apply Community Coupon</span>
                   </div>
-                ) : (
-                  <form onSubmit={handleApplyCoupon} className="space-y-2">
-                    <div className="flex gap-2">
-                      <input 
-                        type="text" 
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="e.g. SWADESHI50"
-                        className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 uppercase outline-none focus:bg-white focus:border-orange-500"
-                      />
-                      <button 
-                        type="submit"
-                        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
-                      >
-                        Apply
+
+                  {appliedCoupon ? (
+                    <div className="cp-coupon-applied-box">
+                      <div>
+                        <span className="cp-coupon-applied-code">{appliedCoupon.code}</span>
+                        <div className="cp-coupon-applied-msg">₹{appliedCoupon.discount} Discount Applied!</div>
+                      </div>
+                      <button onClick={handleRemoveCoupon} className="cp-coupon-remove-btn">
+                        Remove
                       </button>
                     </div>
-                    {couponError && (
-                      <p className="text-[11px] text-rose-600 font-semibold">{couponError}</p>
-                    )}
-                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 pt-1">
-                      <span>Try code:</span>
-                      <button type="button" onClick={() => setCouponCode('SWADESHI50')} className="font-mono font-bold text-orange-600 hover:underline">SWADESHI50</button>
-                    </div>
-                  </form>
-                )}
-              </div>
+                  ) : (
+                    <form onSubmit={handleApplyCoupon} className="cp-coupon-form">
+                      <input 
+                        type="text" 
+                        value={couponCode} 
+                        onChange={(e) => setCouponCode(e.target.value)} 
+                        placeholder="e.g. SWADESHI50" 
+                        className="cp-coupon-input"
+                      />
+                      <button type="submit" className="cp-coupon-submit-btn">
+                        Apply
+                      </button>
+                    </form>
+                  )}
 
-              {/* Order Breakdown Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider pb-3 border-b border-slate-100">
-                  Bill Summary
-                </h3>
-
-                <div className="space-y-2.5 text-xs">
-                  {/* Items Subtotal */}
-                  <div className="flex justify-between text-slate-600">
-                    <span>Items Total ({totalItems})</span>
-                    <span className="font-bold text-slate-900 font-mono">₹{subtotal.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  {/* Estimated Cashback */}
-                  <div className="flex justify-between text-emerald-700 font-semibold bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
-                    <span className="flex items-center gap-1">
-                      <Coins size={13} />
-                      <span>Estimated Cashback</span>
-                    </span>
-                    <span className="font-bold font-mono">+ ₹{estimatedCashback.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  {/* Delivery Fee */}
-                  <div className="flex justify-between text-slate-600">
-                    <span>Delivery Partner Fee</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="line-through text-slate-400 font-normal">₹40</span>
-                      <span className="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">FREE</span>
-                    </div>
-                  </div>
-
-                  {/* Platform & Convenience Fee */}
-                  <div className="flex justify-between text-slate-600 items-center">
-                    <div className="flex items-center gap-1.5">
-                      <span>Platform & Convenience Fee</span>
-                      <span className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded font-semibold" title="Nominal fee for 24x7 direct swadeshi supply chain & priority fulfillment">
-                        ₹{platformFee}
-                      </span>
-                    </div>
-                    <span className="font-bold text-slate-900 font-mono">₹{platformFee.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  {/* Coupon Discount if applied */}
-                  {appliedCoupon && (
-                    <div className="flex justify-between text-emerald-600 font-bold">
-                      <span>Voucher Discount</span>
-                      <span className="font-mono">- ₹{discountAmount.toLocaleString('en-IN')}</span>
+                  {couponError && (
+                    <div className="cp-coupon-error-msg">
+                      <AlertCircle size={13} />
+                      <span>{couponError}</span>
                     </div>
                   )}
 
-                  {/* Divider */}
-                  <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
-                    <div>
-                      <span className="text-sm font-black text-slate-900">Grand Total (To Pay)</span>
-                      <div className="text-[10px] text-slate-400">Inclusive of all taxes & delivery</div>
-                    </div>
-                    <span className="text-2xl font-black text-orange-600 font-mono">
-                      ₹{finalPayable.toLocaleString('en-IN')}
+                  <div className="cp-coupon-hint-pills">
+                    <span onClick={() => setCouponCode('SWADESHI50')} className="cp-hint-pill">
+                      Use code <strong>SWADESHI50</strong> for extra savings
                     </span>
                   </div>
                 </div>
 
-                {/* Checkout CTA */}
-                <div className="pt-2">
-                  <button 
-                    onClick={onNavigateCheckout}
-                    className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-extrabold text-sm rounded-xl shadow-lg shadow-orange-500/25 transition-all transform hover:-translate-y-0.5"
-                  >
-                    <Lock size={16} />
-                    <span>Proceed to Checkout • ₹{finalPayable.toLocaleString('en-IN')}</span>
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
+                {/* Price Breakdown Card */}
+                <div className="co-summary-card">
+                  <h3 className="co-summary-header">
+                    Order Price Breakdown
+                  </h3>
 
-                {/* Trust Footer */}
-                <div className="pt-2 border-t border-slate-100 flex flex-col gap-1.5 text-[11px] text-slate-500">
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck size={13} className="text-emerald-600" />
-                    <span>256-Bit SSL Encrypted Safe Checkout</span>
+                  <div className="co-summary-rows">
+                    <div className="co-sum-row">
+                      <span>Cart Subtotal ({totalItems} items)</span>
+                      <span className="co-sum-val">₹{subtotal.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div className="co-cashback-highlight-row">
+                      <span className="co-cashback-left">
+                        <Coins size={14} />
+                        <span>Estimated Cashback</span>
+                      </span>
+                      <span className="co-cashback-val">+ ₹{estimatedCashback.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    {appliedCoupon && (
+                      <div className="co-sum-row cp-coupon-discount-row">
+                        <span>Coupon Voucher ({appliedCoupon.code})</span>
+                        <span className="cp-discount-val">- ₹{appliedCoupon.discount}</span>
+                      </div>
+                    )}
+
+                    <div className="co-sum-row">
+                      <span>Doorstep Delivery Fee</span>
+                      <div className="co-delivery-badge-group">
+                        <span className="co-strikethrough-fee">₹40</span>
+                        <span className="co-free-pill">FREE</span>
+                      </div>
+                    </div>
+
+                    <div className="co-sum-row">
+                      <div className="co-platform-label-group">
+                        <span>Platform & Convenience Fee</span>
+                        <span className="co-platform-pill">₹{platformFee}</span>
+                      </div>
+                      <span className="co-sum-val">₹{platformFee.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div className="co-sum-divider" />
+
+                    <div className="co-total-row">
+                      <div>
+                        <span className="co-total-label">Grand Total</span>
+                        <div className="co-total-sub">All Taxes Included</div>
+                      </div>
+                      <span className="co-total-amount">
+                        ₹{finalPayable.toLocaleString('en-IN')}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <HeartHandshake size={13} className="text-orange-500" />
-                    <span>Swadeshi Direct Producer Network Guarantee</span>
+
+                  {/* Proceed to Checkout CTA */}
+                  <button 
+                    onClick={onNavigateCheckout} 
+                    className="co-btn-place-order"
+                  >
+                    <span>Proceed to Checkout • ₹{finalPayable.toLocaleString('en-IN')}</span>
+                    <ArrowRight size={17} />
+                  </button>
+
+                  <div className="co-security-badges">
+                    <div className="co-sec-item">
+                      <ShieldCheck size={14} className="text-emerald" />
+                      <span>256-Bit SSL Encrypted Checkout</span>
+                    </div>
+                    <div className="co-sec-item">
+                      <HeartHandshake size={14} className="text-orange" />
+                      <span>100% Genuine Swadeshi Sourcing Guarantee</span>
+                    </div>
                   </div>
+
                 </div>
 
               </div>
-
             </div>
 
           </div>
