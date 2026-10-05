@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Mail, User, Phone, Sparkles, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X, Lock, Mail, User, Phone, Sparkles, AlertCircle, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const AuthModal = ({ isOpen, onClose }) => {
@@ -20,6 +20,11 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError('');
+  };
+
+  const handleTabSwitch = (newTab) => {
+    setTab(newTab);
     setError('');
   };
 
@@ -28,21 +33,45 @@ export const AuthModal = ({ isOpen, onClose }) => {
     setError('');
     setSubmitting(true);
 
+    const cleanEmail = formData.email.trim();
+    const cleanPassword = formData.password.trim();
+
     try {
       if (tab === 'login') {
-        await login(formData.email, formData.password);
-        onClose();
-      } else {
-        if (formData.password !== formData.password_confirmation) {
-          setError('Passwords do not match.');
+        if (!cleanEmail || !cleanPassword) {
+          setError('Please enter both your email address and password.');
           setSubmitting(false);
           return;
         }
-        await register(formData);
+        await login(cleanEmail, cleanPassword);
+        onClose();
+      } else {
+        if (!formData.name?.trim()) {
+          setError('Please enter your full name.');
+          setSubmitting(false);
+          return;
+        }
+        if (formData.password.length < 6) {
+          setError('Password must be at least 6 characters long.');
+          setSubmitting(false);
+          return;
+        }
+        if (formData.password !== formData.password_confirmation) {
+          setError('Passwords do not match. Please verify.');
+          setSubmitting(false);
+          return;
+        }
+        await register({
+          ...formData,
+          name: formData.name.trim(),
+          email: cleanEmail,
+          password: cleanPassword
+        });
         onClose();
       }
     } catch (err) {
-      setError(err.message || 'Authentication failed. Please check credentials.');
+      console.error('Auth error:', err);
+      setError(err.message || 'Authentication failed. Please verify your credentials and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -59,7 +88,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
           <div className="auth-logo-badge">
             <Sparkles size={24} className="text-orange" />
           </div>
-          <h2>{tab === 'login' ? 'Welcome Back to KharchDaan' : 'Join KharchDaan Rewards'}</h2>
+          <h2>{tab === 'login' ? 'Welcome Back to BachatGanga' : 'Join BachatGanga Rewards'}</h2>
           <p>
             {tab === 'login' 
               ? 'Sign in to access your wallet, cashback, and order status.' 
@@ -72,27 +101,27 @@ export const AuthModal = ({ isOpen, onClose }) => {
           <button
             type="button"
             className={`auth-tab-btn ${tab === 'login' ? 'active' : ''}`}
-            onClick={() => { setTab('login'); setError(''); }}
+            onClick={() => handleTabSwitch('login')}
           >
             Sign In
           </button>
           <button
             type="button"
             className={`auth-tab-btn ${tab === 'register' ? 'active' : ''}`}
-            onClick={() => { setTab('register'); setError(''); }}
+            onClick={() => handleTabSwitch('register')}
           >
             Create Account
           </button>
         </div>
 
         {error && (
-          <div className="auth-error-banner">
-            <AlertCircle size={16} />
+          <div className="auth-error-banner" role="alert">
+            <AlertCircle size={16} className="shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
           {tab === 'register' && (
             <div className="form-group">
               <label htmlFor="auth-name">Full Name</label>
@@ -121,7 +150,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 type="email"
                 name="email"
                 required
-                placeholder="name@example.com"
+                placeholder="pyash5231@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
                 autoComplete="email"
@@ -184,16 +213,25 @@ export const AuthModal = ({ isOpen, onClose }) => {
           )}
 
           <button type="submit" className="btn-auth-submit" disabled={submitting}>
-            <span>{submitting ? 'Authenticating...' : tab === 'login' ? 'Sign In to Account' : 'Create Member Account'}</span>
-            <ArrowRight size={17} />
+            {submitting ? (
+              <>
+                <Loader2 size={17} className="spin-animate" />
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              <>
+                <span>{tab === 'login' ? 'Sign In to Account' : 'Create Member Account'}</span>
+                <ArrowRight size={17} />
+              </>
+            )}
           </button>
         </form>
 
         <div className="auth-footer-note">
           {tab === 'login' ? (
-            <p>Don't have an account? <span className="link-action" onClick={() => setTab('register')}>Register now</span></p>
+            <p>Don't have an account? <span className="link-action" onClick={() => handleTabSwitch('register')}>Register now</span></p>
           ) : (
-            <p>Already have an account? <span className="link-action" onClick={() => setTab('login')}>Log in</span></p>
+            <p>Already have an account? <span className="link-action" onClick={() => handleTabSwitch('login')}>Log in</span></p>
           )}
         </div>
 

@@ -4109,6 +4109,10 @@ button {
   transform: none;
 }
 
+.spin-animate {
+  animation: spin 0.8s linear infinite;
+}
+
 .auth-footer-note {
   margin-top: 16px;
   text-align: center;
