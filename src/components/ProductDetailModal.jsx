@@ -13,7 +13,8 @@ export const ProductDetailModal = ({ product, onClose }) => {
   const images = product.images?.length > 0 ? product.images : [product.image_url || '/images/default-product.svg'];
   const price = Number(selectedVariation?.price ?? product.display_price ?? product.price ?? 0);
   const cashbackAmount = Math.max(10, Math.round(price * 0.08));
-  const isInStock = product.stock_status === 'in_stock' || (product.available_stock > 0);
+  // Sourced directly on-demand from verified FMCG vendors as per requirement
+  const isInStock = true;
 
   const handleAddToCart = () => {
     addToCart(product, quantity, selectedVariation);
@@ -124,7 +125,7 @@ export const ProductDetailModal = ({ product, onClose }) => {
                 <button
                   className="qty-btn"
                   onClick={() => setQuantity(quantity + 1)}
-                  disabled={quantity >= (product.available_stock || 10)}
+                  disabled={quantity >= 50}
                 >
                   +
                 </button>
@@ -132,11 +133,10 @@ export const ProductDetailModal = ({ product, onClose }) => {
 
               <button
                 className="btn-primary btn-modal-cart"
-                disabled={!isInStock}
                 onClick={handleAddToCart}
               >
                 <ShoppingBag size={18} />
-                <span>{isInStock ? `Add ${quantity} to Cart • ₹${(price * quantity).toLocaleString('en-IN')}` : 'Out of Stock'}</span>
+                <span>Add {quantity} to Cart • ₹{(price * quantity).toLocaleString('en-IN')}</span>
               </button>
             </div>
 

@@ -58,7 +58,8 @@ export const ProductCard = ({ product, onQuickView }) => {
   const pvPoints = Math.max(10, Math.round(price * 0.25));
 
   const imageUrl = getProductImageUrl(product);
-  const isInStock = product.stock_status === 'in_stock' || (product.available_stock > 0);
+  // Sourced directly on-demand from verified FMCG partner vendors as per order requirement
+  const isInStock = true;
 
   return (
     <div className="product-card">
@@ -118,22 +119,17 @@ export const ProductCard = ({ product, onQuickView }) => {
             )}
           </div>
           <div className="stock-indicator">
-            {isInStock ? (
-              <span className="stock-tag in-stock"><CheckCircle size={13} /> In Stock</span>
-            ) : (
-              <span className="stock-tag out-of-stock"><AlertCircle size={13} /> Sold Out</span>
-            )}
+            <span className="stock-tag in-stock"><CheckCircle size={13} /> In Stock</span>
           </div>
         </div>
 
         <div className="product-actions">
           <button
             className="btn-add-cart"
-            disabled={!isInStock}
             onClick={() => addToCart({ ...product, image_url: imageUrl }, 1)}
           >
             <ShoppingCart size={16} />
-            <span>{isInStock ? 'Add to Cart' : 'Out of Stock'}</span>
+            <span>Add to Cart</span>
           </button>
         </div>
       </div>
