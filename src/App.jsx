@@ -40,39 +40,257 @@ import { Preloader } from './components/Preloader';
 import { ALL_PRODUCTS } from './data/productsData';
 import './App.css';
 
+// Helper to generate clean URL slug
+const toSlug = (text) => {
+  return String(text || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
+// Helper to find a product by ID, slug, or name
+const findProduct = (identifier) => {
+  if (!identifier) return null;
+  const target = String(identifier).trim().toLowerCase();
+  
+  // 1. Direct ID match
+  let found = ALL_PRODUCTS.find(p => p.id && p.id.toLowerCase() === target);
+  if (found) return found;
+
+  // 2. Exact slug match
+  found = ALL_PRODUCTS.find(p => toSlug(p.name) === target || toSlug(p.id) === target);
+  if (found) return found;
+
+  // 3. Partial slug match
+  found = ALL_PRODUCTS.find(p => target.includes(toSlug(p.name)) || toSlug(p.name).includes(target));
+  if (found) return found;
+
+  // 4. Name contains target
+  found = ALL_PRODUCTS.find(p => (p.name || '').toLowerCase().includes(target));
+  return found || null;
+};
+
+// Mapping of route slugs to valid page identifiers
+const PAGE_SLUG_MAP = {
+  'about': 'about',
+  'about-us': 'about',
+  'how-it-works': 'how-it-works',
+  'contact': 'contact',
+  'contact-us': 'contact',
+  'products': 'products',
+  'store': 'products',
+  'shop': 'products',
+  'power-matrix': 'power-matrix',
+  'earning-depth': 'earning-depth',
+  'royalty-pool': 'royalty-pool',
+  'instant-payouts': 'instant-payouts',
+  'foundation-seva': 'foundation-seva',
+  'women-empowerment': 'women-empowerment',
+  'kirana-merchant': 'kirana-merchant',
+  'govt-ethics': 'govt-ethics',
+  'direct-selling-topic': 'direct-selling-topic',
+  'grocery-staples': 'grocery-staples',
+  'food-beverages': 'food-beverages',
+  'personal-household-care': 'personal-household-care',
+  'personal-care': 'personal-care',
+  'health-wellness': 'health-wellness',
+  'neighbourhood-kirana-network': 'neighbourhood-kirana-network',
+  'kirana-network': 'kirana-network',
+  'instant-cashback-wallet': 'instant-cashback-wallet',
+  'genuine-brand-stock': 'genuine-brand-stock',
+  'monthly-ration-delivery': 'monthly-ration-delivery',
+  'monthly-ration': 'monthly-ration',
+  'family-grocery-hamper': 'family-grocery-hamper'
+};
+
+const parseRouteFromLocation = () => {
+  try {
+    const rawPath = (window.location.pathname || '').replace(/^\/|\/$/g, '');
+    const searchParams = new URLSearchParams(window.location.search || '');
+    const hash = (window.location.hash || '').replace(/^#\/?/, '');
+    const hashParams = hash.includes('?') ? new URLSearchParams(hash.split('?')[1]) : new URLSearchParams();
+    const cleanHash = hash.split('?')[0].replace(/^\/|\/$/g, '');
+
+    // 1. Check for product in query params (e.g. ?product=prod-oil-mustard)
+    const productParam = searchParams.get('product') || 
+                         searchParams.get('productId') || 
+                         searchParams.get('id') ||
+                         hashParams.get('product') ||
+                         hashParams.get('id');
+
+    if (productParam) {
+      const prod = findProduct(productParam);
+      if (prod) {
+        return { page: 'product-detail', product: prod, category: prod.category || 'All', topic: 'matrix-system' };
+      }
+    }
+
+    // Check path /product/:id or /p/:id
+    const productPathMatch = rawPath.match(/^(?:product|p)\/(.+)$/i) || cleanHash.match(/^(?:product|p)\/(.+)$/i);
+    if (productPathMatch) {
+      const prod = findProduct(productPathMatch[1]);
+      if (prod) {
+        return { page: 'product-detail', product: prod, category: prod.category || 'All', topic: 'matrix-system' };
+      }
+    }
+
+    // 2. Check for category param
+    const categoryParam = searchParams.get('category') || searchParams.get('cat') || hashParams.get('category');
+    if (categoryParam) {
+      return { page: 'products', product: ALL_PRODUCTS[0], category: decodeURIComponent(categoryParam), topic: 'matrix-system' };
+    }
+
+    // 3. Check for topic param
+    const topicParam = searchParams.get('topic') || hashParams.get('topic');
+    if (topicParam) {
+      return { page: 'direct-selling-topic', product: ALL_PRODUCTS[0], category: 'All', topic: topicParam };
+    }
+
+    // 4. Check known page slug in path or hash
+    const targetSlug = rawPath || cleanHash;
+    if (targetSlug && PAGE_SLUG_MAP[targetSlug.toLowerCase()]) {
+      return { page: PAGE_SLUG_MAP[targetSlug.toLowerCase()], product: ALL_PRODUCTS[0], category: 'All', topic: 'matrix-system' };
+    }
+
+    // 5. Fallback to localStorage / sessionStorage persistence
+    const savedPage = sessionStorage.getItem('kharchdaan_current_page') || localStorage.getItem('kharchdaan_current_page');
+    const savedProductId = sessionStorage.getItem('kharchdaan_product_id') || localStorage.getItem('kharchdaan_product_id');
+    const savedCategory = sessionStorage.getItem('kharchdaan_category') || localStorage.getItem('kharchdaan_category');
+    const savedTopic = sessionStorage.getItem('kharchdaan_topic') || localStorage.getItem('kharchdaan_topic');
+
+    if (savedPage && (savedPage === 'product-detail' || PAGE_SLUG_MAP[savedPage])) {
+      if (savedPage === 'product-detail' && savedProductId) {
+        const prod = findProduct(savedProductId) || ALL_PRODUCTS[0];
+        return { page: 'product-detail', product: prod, category: savedCategory || prod.category || 'All', topic: savedTopic || 'matrix-system' };
+      }
+      return { 
+        page: savedPage, 
+        product: (savedProductId ? findProduct(savedProductId) : null) || ALL_PRODUCTS[0], 
+        category: savedCategory || 'All', 
+        topic: savedTopic || 'matrix-system' 
+      };
+    }
+  } catch (e) {
+    console.error('Error parsing route:', e);
+  }
+
+  return { page: 'home', product: ALL_PRODUCTS[0], category: 'All', topic: 'matrix-system' };
+};
+
+const getRouteUrl = (page, extra = null, product = null) => {
+  if (page === 'home') return '/';
+  if (page === 'product-detail') {
+    const prod = product || (typeof extra === 'object' ? extra : findProduct(extra));
+    if (prod) {
+      return `/product/${prod.id || toSlug(prod.name)}`;
+    }
+    return '/products';
+  }
+  if (page === 'products') {
+    const cat = typeof extra === 'string' && extra !== 'All' ? extra : null;
+    return cat ? `/products?category=${encodeURIComponent(cat)}` : '/products';
+  }
+  if (page === 'direct-selling-topic') {
+    return `/direct-selling?topic=${encodeURIComponent(extra || 'matrix-system')}`;
+  }
+  return `/${page}`;
+};
+
 function MainStore() {
-  const [currentPage, setCurrentPage] = useState('home'); 
+  const initialRoute = parseRouteFromLocation();
+  const [currentPage, setCurrentPage] = useState(initialRoute.page); 
   const [searchTerm, setSearchTerm] = useState('');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(ALL_PRODUCTS[0]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedTopic, setSelectedTopic] = useState('matrix-system');
+  const [selectedProduct, setSelectedProduct] = useState(initialRoute.product);
+  const [selectedCategory, setSelectedCategory] = useState(initialRoute.category);
+  const [selectedTopic, setSelectedTopic] = useState(initialRoute.topic);
 
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  // Sync state to URL and localStorage
+  const syncRouteAndStorage = (page, extra = null, product = null, push = true) => {
+    const url = getRouteUrl(page, extra, product);
+    try {
+      if (push) {
+        window.history.pushState({ page, extra, productId: product?.id }, '', url);
+      } else {
+        window.history.replaceState({ page, extra, productId: product?.id }, '', url);
+      }
+    } catch {
+      // Graceful fallback if window.history has restricted origin
     }
+
+    try {
+      localStorage.setItem('kharchdaan_current_page', page);
+      sessionStorage.setItem('kharchdaan_current_page', page);
+      if (product?.id) {
+        localStorage.setItem('kharchdaan_product_id', product.id);
+        sessionStorage.setItem('kharchdaan_product_id', product.id);
+      }
+      if (page === 'products' && extra) {
+        localStorage.setItem('kharchdaan_category', extra);
+        sessionStorage.setItem('kharchdaan_category', extra);
+      }
+      if (page === 'direct-selling-topic' && extra) {
+        localStorage.setItem('kharchdaan_topic', extra);
+        sessionStorage.setItem('kharchdaan_topic', extra);
+      }
+    } catch {}
   };
 
+  // Listen to browser Back / Forward buttons and URL changes
+  useEffect(() => {
+    // Initial sync on mount to guarantee URL matches restored page
+    syncRouteAndStorage(initialRoute.page, initialRoute.category, initialRoute.product, false);
+
+    const handlePopState = () => {
+      const route = parseRouteFromLocation();
+      setCurrentPage(route.page);
+      setSelectedProduct(route.product);
+      setSelectedCategory(route.category);
+      setSelectedTopic(route.topic);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
+  }, []);
+
   const handleCategorySelect = (categoryId) => {
-    setSelectedCategory(categoryId || 'All');
+    const cat = categoryId || 'All';
+    setSelectedCategory(cat);
     setCurrentPage('products');
+    syncRouteAndStorage('products', cat, null, true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleProductSelect = (product) => {
     setSelectedProduct(product);
     setCurrentPage('product-detail');
+    syncRouteAndStorage('product-detail', null, product, true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavigation = (page, extra = null) => {
-    if (page === 'products' && extra) setSelectedCategory(extra);
-    if (page === 'direct-selling-topic') setSelectedTopic(extra || 'matrix-system');
-    setCurrentPage(page);
+    if (page === 'products') {
+      const cat = extra || 'All';
+      setSelectedCategory(cat);
+      setCurrentPage('products');
+      syncRouteAndStorage('products', cat, null, true);
+    } else if (page === 'direct-selling-topic') {
+      const topic = extra || 'matrix-system';
+      setSelectedTopic(topic);
+      setCurrentPage('direct-selling-topic');
+      syncRouteAndStorage('direct-selling-topic', topic, null, true);
+    } else {
+      setCurrentPage(page);
+      syncRouteAndStorage(page, extra, null, true);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
