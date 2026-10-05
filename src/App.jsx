@@ -35,6 +35,8 @@ import { AuthModal } from './components/AuthModal';
 import { AccountModal } from './components/AccountModal';
 import { CartDrawer } from './components/CartDrawer';
 import { ProductDetailModal } from './components/ProductDetailModal';
+import { CartPage } from './components/CartPage';
+import { CheckoutPage } from './components/CheckoutPage';
 import { IndianCornerFiligree } from './components/StepIllustrations';
 import { Preloader } from './components/Preloader';
 import { ALL_PRODUCTS } from './data/productsData';
@@ -101,7 +103,13 @@ const PAGE_SLUG_MAP = {
   'genuine-brand-stock': 'genuine-brand-stock',
   'monthly-ration-delivery': 'monthly-ration-delivery',
   'monthly-ration': 'monthly-ration',
-  'family-grocery-hamper': 'family-grocery-hamper'
+  'family-grocery-hamper': 'family-grocery-hamper',
+  'cart': 'cart',
+  'shopping-cart': 'cart',
+  'bag': 'cart',
+  'checkout': 'checkout',
+  'order-checkout': 'checkout',
+  'order-success': 'checkout'
 };
 
 const parseRouteFromLocation = () => {
@@ -463,6 +471,20 @@ function MainStore() {
           onOpenAuth={() => setAuthModalOpen(true)}
           onShopClick={() => handleNavigation('products', 'Grocery')}
         />
+      ) : currentPage === 'cart' ? (
+        <CartPage
+          onNavigateHome={() => handleNavigation('home')}
+          onNavigateCheckout={() => handleNavigation('checkout')}
+          onShopClick={() => handleNavigation('products')}
+          onOpenAuth={() => setAuthModalOpen(true)}
+        />
+      ) : currentPage === 'checkout' ? (
+        <CheckoutPage
+          onNavigateHome={() => handleNavigation('home')}
+          onNavigateCart={() => handleNavigation('cart')}
+          onShopClick={() => handleNavigation('products')}
+          onOpenAuth={() => setAuthModalOpen(true)}
+        />
       ) : (
         <>
           {/* Hero Section */}
@@ -525,7 +547,10 @@ function MainStore() {
         onClose={() => setAccountModalOpen(false)}
       />
 
-      <CartDrawer onOpenAuth={() => setAuthModalOpen(true)} />
+      <CartDrawer 
+        onOpenAuth={() => setAuthModalOpen(true)} 
+        onNavigate={handleNavigation}
+      />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
-export const CartDrawer = ({ onOpenAuth }) => {
+export const CartDrawer = ({ onOpenAuth, onNavigate }) => {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, subtotal, platformFee, grandTotal, estimatedCashback, totalItems } = useCart();
   const { isAuthenticated } = useAuth();
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
@@ -12,19 +12,18 @@ export const CartDrawer = ({ onOpenAuth }) => {
 
   if (!isCartOpen) return null;
 
-  const handleCheckout = () => {
-    if (!isAuthenticated) {
-      setIsCartOpen(false);
-      onOpenAuth();
-      return;
+  const handleProceedToCheckout = () => {
+    setIsCartOpen(false);
+    if (onNavigate) {
+      onNavigate('checkout');
     }
+  };
 
-    setIsCheckingOut(true);
-    setTimeout(() => {
-      setIsCheckingOut(false);
-      setCheckoutSuccess(true);
-      clearCart();
-    }, 1200);
+  const handleViewFullCart = () => {
+    setIsCartOpen(false);
+    if (onNavigate) {
+      onNavigate('cart');
+    }
   };
 
   // Smart image lookup for fallback
@@ -202,14 +201,22 @@ export const CartDrawer = ({ onOpenAuth }) => {
               </div>
             </div>
 
-            <button
-              className="btn-checkout"
-              onClick={handleCheckout}
-              disabled={isCheckingOut}
-            >
-              <span>{isCheckingOut ? 'Securing Your Order...' : `Proceed to Pay • ₹${grandTotal.toLocaleString('en-IN')}`}</span>
-              <ArrowRight size={17} />
-            </button>
+            <div className="cart-drawer-action-group">
+              <button
+                className="btn-checkout"
+                onClick={handleProceedToCheckout}
+              >
+                <span>Proceed to Checkout • ₹{grandTotal.toLocaleString('en-IN')}</span>
+                <ArrowRight size={17} />
+              </button>
+
+              <button
+                className="btn-view-cart-link"
+                onClick={handleViewFullCart}
+              >
+                <span>View Full Cart & Apply Coupons</span>
+              </button>
+            </div>
 
             <div className="checkout-security-note">
               <ShieldCheck size={14} className="text-emerald" />
