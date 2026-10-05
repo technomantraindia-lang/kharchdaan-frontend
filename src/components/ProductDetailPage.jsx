@@ -102,23 +102,26 @@ export const ProductDetailPage = ({
           {/* LEFT: Product Packshot Gallery */}
           <div className="pdp-gallery-column">
             <div className="pdp-main-image-card">
-              {/* Cashback Overlay Ribbon */}
-              <div className="pdp-cashback-badge">
-                <Coins size={13} className="coin-icon" />
-                <span>100% Direct Cashback Eligible</span>
+              {/* Top Badges Row */}
+              <div className="pdp-image-badges-row">
+                <div className="pdp-cashback-badge">
+                  <Coins size={13} className="coin-icon" />
+                  <span>100% Direct Cashback</span>
+                </div>
+
+                <div className="pdp-verified-seal">
+                  <ShieldCheck size={14} />
+                  <span>100% Genuine FMCG</span>
+                </div>
               </div>
 
-              {/* Verified FMCG Seal */}
-              <div className="pdp-verified-seal">
-                <ShieldCheck size={14} />
-                <span>100% Genuine FMCG</span>
+              <div className="pdp-hero-image-wrap">
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  className="pdp-hero-image"
+                />
               </div>
-
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className="pdp-hero-image"
-              />
             </div>
 
             {/* Pincode Delivery Estimator Box */}
