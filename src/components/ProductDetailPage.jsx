@@ -106,7 +106,7 @@ export const ProductDetailPage = ({
               <div className="pdp-image-badges-row">
                 <div className="pdp-cashback-badge">
                   <Coins size={13} className="coin-icon" />
-                  <span>100% Direct Cashback</span>
+                  <span>Up to 100% Direct Cashback</span>
                 </div>
 
                 <div className="pdp-verified-seal">

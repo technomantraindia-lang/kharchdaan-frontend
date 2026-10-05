@@ -32,7 +32,7 @@ export const MlmPerks = ({ onJoinClick }) => {
             <span>The KharchDaan Advantage</span>
           </div>
           <h2 className="section-title">
-            How Our 100% Cashback & 1:3 Referral Model Works
+            How Our Up to 100% Cashback & 1:3 Referral Model Works
           </h2>
           <p className="section-description" style={{ maxWidth: '650px', margin: '0 auto' }}>
             Traditional retailers keep all middleman margins. KharchDaan returns profits directly back to consumers as cashback and recurring network royalties!

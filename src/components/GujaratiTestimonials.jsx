@@ -25,7 +25,7 @@ export const GujaratiTestimonials = () => {
       stars: 5,
       role: 'Platinum Partner',
       earned: '₹52,000',
-      quote: '“Rajkot special strong Hing, roasted Khakhra box, and the complete Kashi Puja kit are all supreme quality. The prices are better than the open market and the 100% cashback combined with network royalties has turned our household expenses into a real asset.”'
+      quote: '“Rajkot special strong Hing, roasted Khakhra box, and the complete Kashi Puja kit are all supreme quality. The prices are better than the open market and the up to 100% cashback combined with network royalties has turned our household expenses into a real asset.”'
     }
   ];
 

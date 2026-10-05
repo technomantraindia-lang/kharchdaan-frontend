@@ -331,7 +331,7 @@ export const Navbar = ({
             <span className="top-flower-icon">
               <TopBarLotusSvg />
             </span>
-            <span>Welcome to KharchDaan.Com &nbsp;|&nbsp; Simple Shopping • Direct Selling System • 100% Cashback (as per rules) • Grow Together</span>
+            <span>Welcome to KharchDaan.Com &nbsp;|&nbsp; Simple Shopping • Direct Selling System • Up to 100% Cashback (as per rules) • Grow Together</span>
           </div>
           <div className="top-bar-right">
             <a href="tel:7043421590" className="top-contact-link">

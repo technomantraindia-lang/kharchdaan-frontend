@@ -193,7 +193,7 @@ export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, on
                 {/* Cashback Badge on top */}
                 <div className="product-cashback-badge">
                   <Coins size={12} className="coin-icon" />
-                  <span>100% Cashback</span>
+                  <span>Up to 100% Cashback</span>
                 </div>
 
                 {/* Product Image Stage */}

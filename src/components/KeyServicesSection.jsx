@@ -15,7 +15,7 @@ export const KeyServicesSection = ({ onRegisterClick }) => {
     },
     {
       icon: <Coins size={24} />,
-      title: '100% Cashback',
+      title: 'Up to 100% Cashback',
       desc: 'Get eligible cashback on your purchases.'
     },
     {

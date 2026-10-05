@@ -24,7 +24,7 @@ export const HeroBanner = ({ onJoinClick, onShopClick }) => {
       trustBadge: "100% Verified Community Savings",
       features: [
         { icon: <ShoppingCart size={22} />, title: "Wide Range", subtitle: "of Products & Services" },
-        { icon: <Coins size={22} />, title: "100% Cashback", subtitle: "(as per applicable rules)" },
+        { icon: <Coins size={22} />, title: "Up to 100% Cashback", subtitle: "(as per applicable rules)" },
         { icon: <Users size={22} />, title: "Build Your", subtitle: "Network" },
         { icon: <TrendingUp size={22} />, title: "Grow Together", subtitle: "with Community" }
       ],

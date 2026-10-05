@@ -22,7 +22,7 @@ const testimonialsData = [
     id: 3,
     tag: "Verified Shopper",
     rating: 5,
-    text: "Getting 100% cashback benefits on daily groceries like Fortune Oil and Aashirvaad Atta is real savings every month.",
+    text: "Getting up to 100% cashback benefits on daily groceries like Fortune Oil and Aashirvaad Atta is real savings every month.",
     author: "Anita Verma • Homemaker",
     sub: "Active Community Member, Jaipur"
   }

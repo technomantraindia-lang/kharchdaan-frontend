@@ -53,7 +53,7 @@ export const WhyChooseAndAppSection = ({ onShopClick, onOpenAuth }) => {
   const valuePillars = [
     {
       icon: <Coins size={18} className="text-orange-500" />,
-      title: '100% Direct Cashback',
+      title: 'Up to 100% Direct Cashback',
       subtitle: 'Instant wallet rewards on daily groceries'
     },
     {
@@ -141,7 +141,7 @@ export const WhyChooseAndAppSection = ({ onShopClick, onOpenAuth }) => {
               </h3>
               
               <p className="hub-card-description">
-                No registration fees, no investment risk. Purchase the FMCG staples your family uses every day and unlock 100% direct cashback alongside lifelong 20-level network royalty.
+                No registration fees, no investment risk. Purchase the FMCG staples your family uses every day and unlock up to 100% direct cashback alongside lifelong 20-level network royalty.
               </p>
 
               {/* 4 Value Pillars List */}
