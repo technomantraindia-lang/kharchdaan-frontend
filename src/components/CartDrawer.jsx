@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, ArrowRight, Sparkles, ShieldCheck, ShoppingBag, Coins, CheckCircle2 } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ArrowRight, Sparkles, ShieldCheck, ShoppingBag, Coins, CheckCircle2, Info } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const CartDrawer = ({ onOpenAuth }) => {
-  const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, subtotal, estimatedCashback, totalItems } = useCart();
+  const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, subtotal, platformFee, grandTotal, estimatedCashback, totalItems } = useCart();
   const { isAuthenticated } = useAuth();
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -67,7 +67,7 @@ export const CartDrawer = ({ onOpenAuth }) => {
             </div>
             <div className="cb-notice-text">
               <span>You will earn <strong>₹{estimatedCashback} Direct Cashback</strong> on this order!</span>
-              <span className="cb-sub-guarantee">✨ 100% Guaranteed Swadeshi Member Cashback</span>
+              <span className="cb-sub-guarantee">✨ Up to 100% Cashback Opportunity ("तेरा तुझको अर्पण")</span>
             </div>
           </div>
         )}
@@ -80,10 +80,11 @@ export const CartDrawer = ({ onOpenAuth }) => {
                 <CheckCircle2 size={42} />
               </div>
               <h3>Order Placed Successfully!</h3>
-              <p>Your order has been recorded into the KharchDaan priority fulfillment queue. ₹{estimatedCashback} cashback is being credited to your wallet.</p>
+              <p>Your order has been recorded into the BachatGanga priority fulfillment queue. ₹{estimatedCashback} cashback is being credited to your wallet.</p>
               <div className="success-perks-box">
                 <span>✓ Free doorstep express delivery</span>
-                <span>✓ 20-level compensation points distributed</span>
+                <span>✓ Direct Swadeshi producer guarantee</span>
+                <span>✓ 20-level community compensation points credited</span>
               </div>
               <button className="btn-continue-shopping" onClick={() => { setCheckoutSuccess(false); setIsCartOpen(false); }}>
                 Continue Shopping
@@ -179,12 +180,25 @@ export const CartDrawer = ({ onOpenAuth }) => {
               </div>
               <div className="breakdown-row">
                 <span className="row-label">Delivery Fee</span>
-                <span className="text-free">FREE</span>
+                <div className="delivery-fee-badge-wrap">
+                  <span className="strikethrough-fee">₹40</span>
+                  <span className="text-free">FREE</span>
+                </div>
+              </div>
+              <div className="breakdown-row platform-fee-row">
+                <div className="platform-fee-label-group">
+                  <span className="row-label">Platform & Convenience Fee</span>
+                  <span className="platform-fee-pill" title="Nominal fee for 24x7 swadeshi supply chain & priority fulfillment">
+                    <Info size={11} />
+                    <span>₹{platformFee}</span>
+                  </span>
+                </div>
+                <span className="row-val font-semibold">₹{platformFee.toLocaleString('en-IN')}</span>
               </div>
               <div className="breakdown-divider" />
               <div className="breakdown-row total-row">
-                <span className="row-label">Grand Total</span>
-                <span className="total-val">₹{subtotal.toLocaleString('en-IN')}</span>
+                <span className="row-label">Grand Total (To Pay)</span>
+                <span className="total-val">₹{grandTotal.toLocaleString('en-IN')}</span>
               </div>
             </div>
 
@@ -193,7 +207,7 @@ export const CartDrawer = ({ onOpenAuth }) => {
               onClick={handleCheckout}
               disabled={isCheckingOut}
             >
-              <span>{isCheckingOut ? 'Securing Your Order...' : 'Proceed to Checkout'}</span>
+              <span>{isCheckingOut ? 'Securing Your Order...' : `Proceed to Pay • ₹${grandTotal.toLocaleString('en-IN')}`}</span>
               <ArrowRight size={17} />
             </button>
 

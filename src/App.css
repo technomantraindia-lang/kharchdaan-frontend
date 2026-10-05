@@ -4669,6 +4669,43 @@ button {
   border-radius: var(--radius-pill);
 }
 
+.delivery-fee-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.strikethrough-fee {
+  font-size: 11px;
+  color: #94A3B8;
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+.platform-fee-row {
+  background: #FFFDF9;
+}
+
+.platform-fee-label-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.platform-fee-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  color: #EA580C;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  cursor: help;
+}
+
 .breakdown-divider {
   height: 1px;
   border-top: 1px dashed #E2E8F0;

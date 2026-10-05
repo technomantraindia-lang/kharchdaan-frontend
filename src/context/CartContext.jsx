@@ -77,6 +77,8 @@ export const CartProvider = ({ children }) => {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const platformFee = items.length > 0 ? 5 : 0; // Nominal platform / convenience fee (₹5)
+  const grandTotal = subtotal + platformFee;
   const estimatedCashback = Math.round(subtotal * 0.05); // 5% cashback reward estimate
 
   return (
@@ -89,6 +91,8 @@ export const CartProvider = ({ children }) => {
         clearCart,
         totalItems,
         subtotal,
+        platformFee,
+        grandTotal,
         estimatedCashback,
         isCartOpen,
         setIsCartOpen
