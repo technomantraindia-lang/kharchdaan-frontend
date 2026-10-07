@@ -18,6 +18,8 @@ export const getSmartProductImage = (item) => {
   const name = String(item?.name || '').toLowerCase();
   const cat = String(typeof item?.category === 'object' ? (item?.category?.name || '') : (item?.category || '')).toLowerCase();
 
+  if (name.includes('wellness') || (name.includes('health') && !name.includes('tea'))) return '/images/health-wellness-ayurveda.jpg';
+  if (name.includes('starter') || name.includes('hamper') || name.includes('package') || name.includes('kit')) return '/images/family-grocery-hamper.jpg';
   if (name.includes('besan')) return '/images/besan.jpg';
   if (name.includes('atta') || name.includes('wheat') || name.includes('flour') || name.includes('suji') || name.includes('maida')) return '/images/aashirvaad-atta.jpg';
   if (name.includes('mustard') || (name.includes('oil') && !name.includes('sunflower'))) return '/images/fortune-oil.jpg';
@@ -34,13 +36,14 @@ export const getSmartProductImage = (item) => {
   if (name.includes('chyawanprash') || name.includes('awaleha')) return '/images/dabur-chyawanprash.jpg';
   if (name.includes('honey') || name.includes('tulsi') || name.includes('green tea') || name.includes('ayurved')) return '/images/health-wellness-ayurveda.jpg';
   if (name.includes('handwash') || name.includes('dettol') || name.includes('soap')) return '/images/dettol-handwash.jpg';
-  if (name.includes('hamper') || name.includes('starter') || name.includes('wellness') || name.includes('kit') || name.includes('package')) return '/images/family-grocery-hamper.jpg';
   
-  if (cat.includes('food') || cat.includes('beverage')) return '/images/tata-tea.jpg';
+  if (cat.includes('beverage') || cat.includes('drink')) return '/images/tata-tea.jpg';
+  if (cat.includes('food')) return '/images/tata-tea.jpg';
   if (cat.includes('home') || cat.includes('personal') || cat.includes('cleaning')) return '/images/surf-excel.jpg';
   if (cat.includes('health') || cat.includes('wellness')) return '/images/health-wellness-ayurveda.jpg';
+  if (cat.includes('grocery') || cat.includes('staple')) return '/images/family-grocery-hamper.jpg';
 
-  return '/images/aashirvaad-atta.jpg';
+  return '/images/family-grocery-hamper.jpg';
 };
 
 // Normalize a single product item from backend or local data
@@ -56,7 +59,7 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
   );
 
   const rawBrand = item.brand_name || (typeof item.brand === 'object' ? item.brand?.name : item.brand) || fallback?.brand || 'KharchDaan';
-  const rawCat = item.category_name || (typeof item.category === 'object' ? item.category?.name : item.category) || fallback?.category || 'Daily Needs';
+  const rawCat = item.category_name || (typeof item.category === 'object' ? item.category?.name : item.category) || fallback?.category || 'Grocery';
   const rawSubCat = item.subCategory || item.sub_category || (typeof item.sub_category === 'object' ? item.sub_category?.name : null) || fallback?.subCategory || null;
 
   const price = Number(item.price ?? fallback?.price ?? 0);
@@ -66,7 +69,7 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
   const discount = item.discount || (mrp > price ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : (fallback?.discount || '15% OFF'));
 
   let rawImage = item.image || item.image_url || fallback?.image;
-  if (!rawImage || rawImage === '/images/default-product.svg' || rawImage === 'null') {
+  if (!rawImage || typeof rawImage !== 'string' || rawImage.includes('default-product.svg') || rawImage === 'null') {
     rawImage = getSmartProductImage(item);
   }
   if (typeof rawImage === 'string' && rawImage.startsWith('http://127.0.0.1:8000/media/images/')) {
@@ -75,7 +78,12 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
   const image = rawImage;
 
   const images = Array.isArray(item.images) && item.images.length > 0 
-    ? item.images.map(img => typeof img === 'string' && img.startsWith('http://127.0.0.1:8000/media/images/') ? img.replace('http://127.0.0.1:8000/media', '') : img)
+    ? item.images.map(img => {
+        if (!img || typeof img !== 'string' || img.includes('default-product.svg') || img === 'null') {
+          return image;
+        }
+        return img.startsWith('http://127.0.0.1:8000/media/images/') ? img.replace('http://127.0.0.1:8000/media', '') : img;
+      })
     : [image];
 
   const variants = Array.isArray(item.variants) && item.variants.length > 0
@@ -127,10 +135,8 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
 };
 
 export const ProductsProvider = ({ children }) => {
-  // Initialize with fallback catalog for instant paint
-  const [products, setProducts] = useState(() => {
-    return ALL_PRODUCTS.map(p => normalizeProduct(p));
-  });
+  // Start with empty state so live backend products are purely loaded
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [backendError, setBackendError] = useState(null);
@@ -140,24 +146,10 @@ export const ProductsProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await api.getProducts({ per_page: 100 });
-      if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
-        // Normalize backend items
+      if (res && res.success && Array.isArray(res.data)) {
+        // Normalize backend items strictly from the live database
         const backendNormalized = res.data.map(item => normalizeProduct(item, ALL_PRODUCTS));
-
-        // Combine: Backend items first, then fallback items not present in backend
-        const combined = [...backendNormalized];
-        ALL_PRODUCTS.forEach(fallbackItem => {
-          const exists = combined.some(
-            b => b.name?.toLowerCase().trim() === fallbackItem.name?.toLowerCase().trim() ||
-                 b.slug === fallbackItem.id ||
-                 b.id === fallbackItem.id
-          );
-          if (!exists) {
-            combined.push(normalizeProduct(fallbackItem));
-          }
-        });
-
-        setProducts(combined);
+        setProducts(backendNormalized);
         setIsBackendConnected(true);
         setBackendError(null);
         setLastFetchedAt(new Date());
@@ -165,11 +157,15 @@ export const ProductsProvider = ({ children }) => {
       } else {
         setIsBackendConnected(false);
         setBackendError('Backend returned empty or invalid response.');
+        // Fall back to offline catalog only if no products are loaded
+        setProducts(prev => (prev.length === 0 ? ALL_PRODUCTS.map(p => normalizeProduct(p)) : prev));
       }
     } catch (err) {
       console.warn('[KharchDaan API] Products fetch error, fallback active:', err.message);
       setIsBackendConnected(false);
       setBackendError(err.message);
+      // Fall back to offline catalog only if no products are loaded
+      setProducts(prev => (prev.length === 0 ? ALL_PRODUCTS.map(p => normalizeProduct(p)) : prev));
     } finally {
       setLoading(false);
     }
@@ -184,36 +180,59 @@ export const ProductsProvider = ({ children }) => {
     if (!identifier) return null;
     const target = String(identifier).trim().toLowerCase();
 
+    const searchPool = products.length > 0 ? products : ALL_PRODUCTS;
+
     // 1. Direct ID match
-    let found = products.find(p => p.id && String(p.id).toLowerCase() === target);
+    let found = searchPool.find(p => p.id && String(p.id).toLowerCase() === target);
     if (found) return found;
 
     // 2. Exact slug match
-    found = products.find(p => p.slug === target || toSlug(p.name) === target || toSlug(p.id) === target);
+    found = searchPool.find(p => p.slug === target || toSlug(p.name) === target || toSlug(p.id) === target);
     if (found) return found;
 
     // 3. SKU match
-    found = products.find(p => p.sku && p.sku.toLowerCase() === target);
+    found = searchPool.find(p => p.sku && p.sku.toLowerCase() === target);
     if (found) return found;
 
     // 4. Partial slug match
-    found = products.find(p => target.includes(p.slug) || (p.slug && p.slug.includes(target)));
+    found = searchPool.find(p => target.includes(p.slug) || (p.slug && p.slug.includes(target)));
     if (found) return found;
 
     // 5. Name contains target
-    found = products.find(p => (p.name || '').toLowerCase().includes(target));
+    found = searchPool.find(p => (p.name || '').toLowerCase().includes(target));
     return found || null;
   }, [products]);
 
-  // Dynamic category list with accurate counts
+  // Dynamic category list with accurate counts based strictly on active catalog
   const categoriesWithCounts = useMemo(() => {
+    const CATEGORY_DISPLAY_MAP = {
+      'Grocery': 'Grocery & Staples',
+      'Daily Needs': 'Grocery & Staples',
+      'Beverages': 'Beverages & Drinks',
+      'Food': 'Food & Beverages',
+      'Home': 'Personal & Household Care',
+      'Health': 'Health & Wellness',
+      'Snacks': 'Snacks & Packaged Food'
+    };
+
+    const countMap = {};
+    products.forEach(p => {
+      const cat = p.category || 'Other';
+      countMap[cat] = (countMap[cat] || 0) + 1;
+    });
+
     const list = [
-      { id: 'All', name: 'All Products', count: products.length },
-      { id: 'Daily Needs', name: 'Grocery & Staples', count: products.filter(p => p.category === 'Daily Needs').length },
-      { id: 'Food', name: 'Food & Beverages', count: products.filter(p => p.category === 'Food').length },
-      { id: 'Home', name: 'Personal & Household Care', count: products.filter(p => p.category === 'Home').length },
-      { id: 'Health', name: 'Health & Wellness', count: products.filter(p => p.category === 'Health').length }
+      { id: 'All', name: 'All Products', count: products.length }
     ];
+
+    Object.entries(countMap).forEach(([catKey, count]) => {
+      list.push({
+        id: catKey,
+        name: CATEGORY_DISPLAY_MAP[catKey] || catKey,
+        count
+      });
+    });
+
     return list;
   }, [products]);
 

@@ -133,7 +133,14 @@ export const CategoryProductListPage = ({
   const categoryProducts = useMemo(() => {
     return sourceList.filter(prod => {
       // Must match active category
-      if (prod.category !== config.id) {
+      const pCat = (prod.category || '').toLowerCase();
+      const cId = (config.id || '').toLowerCase();
+      const matchesCategory = pCat === cId || 
+        (cId === 'daily needs' && (pCat === 'grocery' || pCat.includes('grocery') || pCat.includes('staple'))) ||
+        (cId === 'food' && (pCat === 'beverages' || pCat.includes('beverage') || pCat.includes('drink'))) ||
+        (cId === 'home' && (pCat.includes('home') || pCat.includes('personal') || pCat.includes('cleaning'))) ||
+        (cId === 'health' && (pCat.includes('health') || pCat.includes('wellness') || pCat.includes('ayurved')));
+      if (!matchesCategory) {
         return false;
       }
       // Brand filter

@@ -18,8 +18,8 @@ export const ProductsAndServicesPage = ({
   onOpenAuth 
 }) => {
   const { addToCart } = useCart();
-  const { products, isBackendConnected } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const { products, isBackendConnected, loading } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : (isBackendConnected ? [] : ALL_PRODUCTS);
   const [activeTab, setActiveTab] = useState(initialCategory === 'Services' ? 'services' : 'products'); // 'products' | 'services'
   const [selectedCategory, setSelectedCategory] = useState(initialCategory === 'Services' ? 'All' : initialCategory);
   const [selectedBrand, setSelectedBrand] = useState('All');
@@ -63,19 +63,54 @@ export const ProductsAndServicesPage = ({
     if (onSearchChange) onSearchChange('');
   };
 
-  const categories = [
-    { id: 'All', name: 'All Products', count: sourceList.length },
-    { id: 'Daily Needs', name: 'Grocery & Staples', count: sourceList.filter(p => p.category === 'Daily Needs').length },
-    { id: 'Food', name: 'Food & Beverages', count: sourceList.filter(p => p.category === 'Food').length },
-    { id: 'Home', name: 'Personal & Household Care', count: sourceList.filter(p => p.category === 'Home').length },
-    { id: 'Health', name: 'Health & Wellness', count: sourceList.filter(p => p.category === 'Health').length }
-  ];
+  const CATEGORY_DISPLAY_MAP = {
+    'Grocery': 'Grocery & Staples',
+    'Daily Needs': 'Grocery & Staples',
+    'Beverages': 'Beverages & Drinks',
+    'Food': 'Food & Beverages',
+    'Home': 'Personal & Household Care',
+    'Health': 'Health & Wellness',
+    'Snacks': 'Snacks & Packaged Food'
+  };
+
+  // Dynamic categories with accurate counts from loaded backend catalog
+  const categories = useMemo(() => {
+    const countMap = {};
+    sourceList.forEach(p => {
+      const cat = p.category || 'Other';
+      countMap[cat] = (countMap[cat] || 0) + 1;
+    });
+
+    const list = [
+      { id: 'All', name: 'All Products', count: sourceList.length }
+    ];
+
+    Object.entries(countMap).forEach(([catKey, count]) => {
+      list.push({
+        id: catKey,
+        name: CATEGORY_DISPLAY_MAP[catKey] || catKey,
+        count
+      });
+    });
+
+    return list;
+  }, [sourceList]);
 
   const categoryInfoMap = {
     'All': {
       label: 'All Products',
       title: 'Everyday Grocery Essentials with',
       sub: "Purchase your family's favorite household brands at authentic MRP savings. Every purchase directly credits instant cashback to your wallet and generates recurring 20-level team royalty."
+    },
+    'Grocery': {
+      label: 'Grocery & Staples',
+      title: 'Everyday Grocery & Staples with',
+      sub: 'Purchase authentic household grocery packages and staples at guaranteed MRP savings with direct wallet cashback.'
+    },
+    'Beverages': {
+      label: 'Beverages & Drinks',
+      title: 'Beverages & Daily Refreshments with',
+      sub: 'Enjoy premium beverage packs, tea blends, and wellness refreshments with instant cashback credited directly to your wallet.'
     },
     'Daily Needs': {
       label: 'Grocery & Staples',
@@ -99,11 +134,29 @@ export const ProductsAndServicesPage = ({
     }
   };
 
-  const currentInfo = categoryInfoMap[selectedCategory] || categoryInfoMap['All'];
+  const currentInfo = categoryInfoMap[selectedCategory] || {
+    label: selectedCategory,
+    title: `${CATEGORY_DISPLAY_MAP[selectedCategory] || selectedCategory} with`,
+    sub: "Purchase 100% genuine products with instant wallet cashback and 20-level team royalty."
+  };
 
-  const brands = ['All', 'Aashirvaad', 'Fortune', 'Tata Tea', 'Surf Excel', 'Cadbury', 'Dettol', 'Daawat', 'Amul', 'Maggi', 'Vim', 'Dabur', 'Colgate'];
+  // Dynamic brand list from active catalog
+  const brands = useMemo(() => {
+    const set = new Set();
+    sourceList.forEach(p => {
+      if (p.brand && p.brand !== 'All') set.add(p.brand);
+    });
+    return ['All', ...Array.from(set)];
+  }, [sourceList]);
 
-  const quickSearchTags = ['Aashirvaad Atta', 'Fortune Oil', 'Tata Tea', 'Surf Excel', 'Cadbury Silk', 'Amul Ghee', 'Dabur Honey', 'Dettol'];
+  // Dynamic search suggestion tags from active catalog
+  const quickSearchTags = useMemo(() => {
+    const tags = [];
+    sourceList.slice(0, 6).forEach(p => {
+      if (p.name) tags.push(p.name.length > 20 ? p.name.slice(0, 20) + '...' : p.name);
+    });
+    return tags.length > 0 ? tags : ['Starter Package', 'Wellness Pack'];
+  }, [sourceList]);
 
   const handleAddToCart = (e, prod) => {
     e.stopPropagation();
@@ -137,8 +190,12 @@ export const ProductsAndServicesPage = ({
   const filteredProducts = useMemo(() => {
     return sourceList.filter(prod => {
       // Category filter
-      if (selectedCategory !== 'All' && prod.category !== selectedCategory) {
-        return false;
+      if (selectedCategory !== 'All') {
+        const prodCat = (prod.category || '').toLowerCase();
+        const selCat = selectedCategory.toLowerCase();
+        const matchesCat = prodCat === selCat || 
+          (CATEGORY_DISPLAY_MAP[prod.category] && CATEGORY_DISPLAY_MAP[prod.category].toLowerCase() === selCat);
+        if (!matchesCat) return false;
       }
       // Brand filter
       if (selectedBrand !== 'All' && prod.brand !== selectedBrand) {
@@ -153,8 +210,8 @@ export const ProductsAndServicesPage = ({
       // Search query filter matching multiple attributes
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const matchesName = prod.name.toLowerCase().includes(q);
-        const matchesBrand = prod.brand.toLowerCase().includes(q);
+        const matchesName = (prod.name || '').toLowerCase().includes(q);
+        const matchesBrand = (prod.brand || '').toLowerCase().includes(q);
         const matchesCategory = (prod.category || '').toLowerCase().includes(q);
         const matchesSubCategory = (prod.subCategory || '').toLowerCase().includes(q);
         const matchesDesc = (prod.shortDescription || '').toLowerCase().includes(q) || (prod.description || '').toLowerCase().includes(q);
@@ -171,7 +228,7 @@ export const ProductsAndServicesPage = ({
       if (sortBy === 'cashback') return b.cashbackAmount - a.cashbackAmount;
       return 0; // 'featured'
     });
-  }, [selectedCategory, selectedBrand, priceRange, searchQuery, sortBy]);
+  }, [sourceList, selectedCategory, selectedBrand, priceRange, searchQuery, sortBy]);
 
   const clearAllFilters = () => {
     setSelectedCategory('All');

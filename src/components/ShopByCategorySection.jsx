@@ -11,9 +11,9 @@ export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) =>
   const categories = [
     {
       id: 'grocery',
-      filterKey: 'Daily Needs',
+      filterKey: 'Grocery',
       name: 'Grocery &\nStaples',
-      itemCount: sourceList.filter(p => p.category === 'Daily Needs').length,
+      itemCount: sourceList.filter(p => p.category === 'Daily Needs' || p.category === 'Grocery').length,
       color: '#FEF3C7',
       borderColor: '#FDE68A',
       icon: (
@@ -28,9 +28,9 @@ export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) =>
     },
     {
       id: 'food',
-      filterKey: 'Food',
+      filterKey: 'Beverages',
       name: 'Food &\nBeverages',
-      itemCount: sourceList.filter(p => p.category === 'Food').length,
+      itemCount: sourceList.filter(p => p.category === 'Food' || p.category === 'Beverages').length,
       color: '#FFEDD5',
       borderColor: '#FED7AA',
       icon: (
@@ -47,7 +47,7 @@ export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) =>
       id: 'home',
       filterKey: 'Home',
       name: 'Personal &\nHome Care',
-      itemCount: sourceList.filter(p => p.category === 'Home').length,
+      itemCount: sourceList.filter(p => p.category === 'Home' || p.category === 'Personal Care').length,
       color: '#EDE9FE',
       borderColor: '#DDD6FE',
       icon: (
@@ -62,7 +62,7 @@ export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) =>
       id: 'health',
       filterKey: 'Health',
       name: 'Health &\nWellness',
-      itemCount: sourceList.filter(p => p.category === 'Health').length,
+      itemCount: sourceList.filter(p => p.category === 'Health' || p.category === 'Wellness').length,
       color: '#DCFCE7',
       borderColor: '#BBF7D0',
       icon: (
