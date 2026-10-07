@@ -6,7 +6,7 @@ import {
   Package, Store, Award, X
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useProducts } from '../context/ProductsContext';
+import { useProducts, getSmartProductImage } from '../context/ProductsContext';
 import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
 
 export const ProductsAndServicesPage = ({ 
@@ -519,56 +519,65 @@ export const ProductsAndServicesPage = ({
                         {/* Product Image Box */}
                         <div className="catalog-image-box">
                           <img 
-                            src={prod.image} 
-                            alt={prod.name}
-                            className="catalog-prod-img"
-                            onError={(e) => { e.target.src = '/images/kharchdaan-logo.png'; }}
+                            src={prod.image || getSmartProductImage(prod)} 
+                            alt={prod.name} 
+                            className="catalog-img"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getSmartProductImage(prod);
+                            }}
                           />
-                          <span className="card-brand-badge">{prod.brand}</span>
+                          <div className="quick-view-hover-btn">
+                            <Eye size={13} />
+                            <span>View Details</span>
+                          </div>
                         </div>
 
-                        {/* Product Details */}
-                        <div className="catalog-card-details">
-                          <div className="card-rating-strip">
-                            <div className="stars-wrap">
-                              <Star size={12} fill="#F59E0B" color="#F59E0B" />
-                              <span className="rating-val">{prod.rating}</span>
-                            </div>
-                            <span className="reviews-count">({prod.reviews} reviews)</span>
+                        {/* Card Info Body */}
+                        <div className="catalog-card-body">
+                          <div className="catalog-meta-row">
+                            <span className="catalog-brand-tag">{prod.brand}</span>
+                            <span className="catalog-weight-tag">{prod.weight}</span>
                           </div>
 
-                          <h3 className="catalog-product-title" title={prod.name}>
+                          <h3 className="catalog-product-name" title={prod.name}>
                             {prod.name}
                           </h3>
 
-                          <span className="catalog-weight-badge">{prod.weight}</span>
-
-                          {/* Pricing & Cashback Info */}
-                          <div className="catalog-price-row">
-                            <div className="price-stack">
-                              <div className="price-main-line">
-                                <span className="price-current">₹{prod.price}</span>
-                                <span className="price-mrp">MRP ₹{prod.mrp}</span>
-                              </div>
-                              <span className="price-discount-tag">{prod.discount}</span>
+                          {/* Star Rating Row */}
+                          <div className="catalog-rating-row">
+                            <div className="rating-stars-badge">
+                              <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                              <span className="rating-num">{prod.rating}</span>
                             </div>
+                            <span className="rating-reviews">({prod.reviews} reviews)</span>
                           </div>
 
-                          {/* Direct Cashback Callout */}
-                          <div className="card-cashback-info-box">
-                            <Sparkles size={13} className="text-orange" />
-                            <span>₹{prod.cashbackAmount} Instant Cashback in Wallet</span>
+                          {/* Pricing Box */}
+                          <div className="catalog-pricing-row">
+                            <div className="catalog-current-price">
+                              <span className="curr">₹</span>
+                              <span className="val">{prod.price}</span>
+                            </div>
+                            {prod.mrp && (
+                              <span className="catalog-mrp-strike">MRP ₹{prod.mrp}</span>
+                            )}
+                            {prod.discount && (
+                              <span className="catalog-discount-tag">{prod.discount}</span>
+                            )}
                           </div>
 
-                          {/* Card Action Button */}
-                          <button 
+                          {/* Add to Cart Button */}
+                          <button
                             className={`btn-catalog-add-cart ${addedItemMap[prod.id] ? 'is-added' : ''}`}
                             onClick={(e) => handleAddToCart(e, prod)}
+                            aria-label={`Add ${prod.name} to Cart`}
                           >
                             {addedItemMap[prod.id] ? (
                               <>
-                                <Check size={14} />
-                                <span>Added to Cart!</span>
+                                <Check size={15} />
+                                <span>Added to Cart</span>
                               </>
                             ) : (
                               <>

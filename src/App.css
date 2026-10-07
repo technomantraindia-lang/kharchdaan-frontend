@@ -16291,6 +16291,72 @@ button {
   object-fit: contain !important;
 }
 
+/* ==========================================================================
+   CATALOG PAGE CARDS GRID & IMAGE CONTAINMENT RULES
+   ========================================================================== */
+.products-main-layout-grid {
+  display: grid !important;
+  grid-template-columns: 260px 1fr !important;
+  gap: 28px !important;
+  align-items: flex-start !important;
+}
+
+.products-page-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+@media (max-width: 1200px) {
+  .products-page-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .products-main-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .products-page-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.catalog-product-card {
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.catalog-image-box {
+  position: relative !important;
+  width: 100% !important;
+  height: 220px !important;
+  max-height: 220px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  background: radial-gradient(circle at center, #FFFFFF 0%, #FAF8F5 100%) !important;
+  border: 1px solid #F1F5F9 !important;
+  border-radius: 16px !important;
+  padding: 10px !important;
+  margin-bottom: 14px !important;
+}
+
+.catalog-img,
+.catalog-prod-img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 90% !important;
+  max-height: 90% !important;
+  object-fit: contain !important;
+}
+
 
 
 
