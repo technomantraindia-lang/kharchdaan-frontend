@@ -68,12 +68,26 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
 
   const discount = item.discount || (mrp > price ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : (fallback?.discount || '15% OFF'));
 
-  let rawImage = item.image || item.image_url || fallback?.image;
+  let rawImage = item.image_url || item.image || fallback?.image;
+
+  if (typeof rawImage === 'string') {
+    // If it's a relative path stored by Laravel disk (e.g. "products/xyz.png")
+    if (rawImage.startsWith('products/') || rawImage.startsWith('banners/') || rawImage.startsWith('categories/')) {
+      const apiBase = import.meta.env.VITE_API_URL || 'https://kharchdaan-backend.onrender.com/api';
+      const host = apiBase.replace(/\/api.*$/, '');
+      rawImage = `${host}/media/${rawImage}`;
+    } else if (rawImage.startsWith('/media/')) {
+      const apiBase = import.meta.env.VITE_API_URL || 'https://kharchdaan-backend.onrender.com/api';
+      const host = apiBase.replace(/\/api.*$/, '');
+      rawImage = `${host}${rawImage}`;
+    }
+  }
+
   if (!rawImage || typeof rawImage !== 'string' || rawImage.includes('default-product.svg') || rawImage === 'null') {
     rawImage = getSmartProductImage(item);
   }
-  if (typeof rawImage === 'string' && rawImage.startsWith('http://127.0.0.1:8000/media/images/')) {
-    rawImage = rawImage.replace('http://127.0.0.1:8000/media', '');
+  if (typeof rawImage === 'string' && /https?:\/\/[^/]+\/media\/images\//.test(rawImage)) {
+    rawImage = rawImage.replace(/^https?:\/\/[^/]+\/media\/images\//, '/images/');
   }
   const image = rawImage;
 
@@ -82,7 +96,15 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
         if (!img || typeof img !== 'string' || img.includes('default-product.svg') || img === 'null') {
           return image;
         }
-        return img.startsWith('http://127.0.0.1:8000/media/images/') ? img.replace('http://127.0.0.1:8000/media', '') : img;
+        if (img.startsWith('products/') || img.startsWith('banners/') || img.startsWith('categories/')) {
+          const apiBase = import.meta.env.VITE_API_URL || 'https://kharchdaan-backend.onrender.com/api';
+          const host = apiBase.replace(/\/api.*$/, '');
+          return `${host}/media/${img}`;
+        }
+        if (/https?:\/\/[^/]+\/media\/images\//.test(img)) {
+          return img.replace(/^https?:\/\/[^/]+\/media\/images\//, '/images/');
+        }
+        return img;
       })
     : [image];
 

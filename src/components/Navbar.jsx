@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { useProducts } from '../context/ProductsContext';
+import { useProducts, getSmartProductImage } from '../context/ProductsContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 /* ==========================================================================
@@ -482,7 +482,10 @@ export const Navbar = ({
                         src={prod.image} 
                         alt={prod.name} 
                         className="suggestion-thumb"
-                        onError={(e) => { e.target.src = '/images/kharchdaan-logo.png'; }}
+                        onError={(e) => { 
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = getSmartProductImage(prod); 
+                        }}
                       />
                       <div className="suggestion-info">
                         <span className="suggestion-name">{prod.name}</span>

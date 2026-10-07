@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, ShoppingCart, Check, Coins, Eye } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useProducts } from '../context/ProductsContext';
+import { useProducts, getSmartProductImage } from '../context/ProductsContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, onCategoryFilterChange }) => {
@@ -111,11 +111,14 @@ export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, on
                 {/* Product Image Stage */}
                 <div className="product-image-stage">
                   <img
-                    src={prod.image}
+                    src={prod.image || getSmartProductImage(prod)}
                     alt={prod.name}
                     className="product-packshot-img"
                     loading="lazy"
-                    onError={(e) => { e.target.src = '/images/kharchdaan-logo.png'; }}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getSmartProductImage(prod);
+                    }}
                   />
                   {/* Quick View Hover Pill */}
                   <div className="quick-view-overlay-pill">
