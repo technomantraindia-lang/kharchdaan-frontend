@@ -213,33 +213,6 @@ export const Navbar = ({
             <span>Welcome to KharchDaan.Com &nbsp;|&nbsp; 100% Genuine Brands • Direct Selling System • Up to 100% Cashback (as per rules) • Grow Together</span>
           </div>
           <div className="top-bar-right">
-            <span 
-              className="top-backend-pill" 
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '11px',
-                fontWeight: 600,
-                background: isBackendConnected ? 'rgba(34, 197, 94, 0.25)' : 'rgba(255, 255, 255, 0.18)',
-                color: '#ffffff',
-                padding: '2px 9px',
-                borderRadius: '12px',
-                border: isBackendConnected ? '1px solid rgba(134, 239, 172, 0.45)' : '1px solid rgba(255, 255, 255, 0.25)',
-                marginRight: '8px'
-              }}
-              title={isBackendConnected ? `Backend API live: ${products.length} products loaded` : 'Using resilient offline catalog'}
-            >
-              <span style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: isBackendConnected ? '#4ade80' : '#facc15',
-                boxShadow: isBackendConnected ? '0 0 6px #4ade80' : 'none',
-                display: 'inline-block'
-              }}></span>
-              <span>{isBackendConnected ? `Backend Live (${products.length} Products)` : 'Store Ready'}</span>
-            </span>
             <a href="tel:7043421590" className="top-contact-link">
               <Phone size={13} />
               <span>+91 70434 21590</span>

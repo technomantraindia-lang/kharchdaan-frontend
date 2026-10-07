@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7ED"/>
+      <stop offset="100%" stop-color="#FFEDD5"/>
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B00"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="32" fill="url(#bg)"/>
+  <circle cx="200" cy="180" r="90" fill="#FFFFFF" opacity="0.8"/>
+  <!-- Shopping Bag / Packshot Icon -->
+  <path d="M140 160 C140 120 160 100 200 100 C240 100 260 120 260 160 L275 270 C276 278 270 285 262 285 L138 285 C130 285 124 278 125 270 Z" fill="url(#brandGrad)" filter="drop-shadow(0px 8px 16px rgba(234, 88, 12, 0.25))"/>
+  <path d="M165 160 C165 135 178 122 200 122 C222 122 235 135 235 160" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="200" cy="215" r="14" fill="#FFFFFF"/>
+  <path d="M192 215 L198 221 L210 209" fill="none" stroke="#EA580C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="200" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#EA580C" text-anchor="middle" letter-spacing="1">100% GENUINE FMCG</text>
+  <text x="200" y="352" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" fill="#9A3412" text-anchor="middle">KharchDaan Certified</text>
+</svg>

@@ -6,7 +6,7 @@ import {
   HelpCircle, Info, HeartHandshake, Eye
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useProducts } from '../context/ProductsContext';
+import { useProducts, getSmartProductImage } from '../context/ProductsContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const ProductDetailPage = ({ 
@@ -120,9 +120,13 @@ export const ProductDetailPage = ({
 
               <div className="pdp-hero-image-wrap">
                 <img 
-                  src={product.image} 
+                  src={product.image || getSmartProductImage(product)} 
                   alt={product.name} 
                   className="pdp-hero-image"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = getSmartProductImage(product);
+                  }}
                 />
               </div>
             </div>

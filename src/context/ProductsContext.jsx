@@ -13,6 +13,36 @@ const toSlug = (text) => {
     .replace(/(^-|-$)/g, '');
 };
 
+// Smart fallback image matcher based on product name and category
+export const getSmartProductImage = (item) => {
+  const name = String(item?.name || '').toLowerCase();
+  const cat = String(typeof item?.category === 'object' ? (item?.category?.name || '') : (item?.category || '')).toLowerCase();
+
+  if (name.includes('besan')) return '/images/besan.jpg';
+  if (name.includes('atta') || name.includes('wheat') || name.includes('flour') || name.includes('suji') || name.includes('maida')) return '/images/aashirvaad-atta.jpg';
+  if (name.includes('mustard') || (name.includes('oil') && !name.includes('sunflower'))) return '/images/fortune-oil.jpg';
+  if (name.includes('sunflower') || name.includes('oil')) return '/images/fortune-oil.jpg';
+  if (name.includes('rice') || name.includes('basmati') || name.includes('chawal')) return '/images/daawat-rice.jpg';
+  if (name.includes('dal') || name.includes('toor') || name.includes('pulse') || name.includes('chana') || name.includes('moong')) return '/images/tata-dal.jpg';
+  if (name.includes('ghee') || name.includes('butter') || name.includes('amul')) return '/images/amul-ghee.jpg';
+  if (name.includes('tea') || name.includes('chai')) return '/images/tata-tea.jpg';
+  if (name.includes('chocolate') || name.includes('dairy milk') || name.includes('cadbury') || name.includes('silk')) return '/images/cadbury-dairy-milk.jpg';
+  if (name.includes('noodle') || name.includes('maggi')) return '/images/maggi-noodles.jpg';
+  if (name.includes('detergent') || name.includes('surf') || name.includes('powder')) return '/images/surf-excel.jpg';
+  if (name.includes('dishwash') || name.includes('vim') || name.includes('gel')) return '/images/vim-gel.jpg';
+  if (name.includes('toothpaste') || name.includes('colgate') || name.includes('oral')) return '/images/colgate-maxfresh.jpg';
+  if (name.includes('chyawanprash') || name.includes('awaleha')) return '/images/dabur-chyawanprash.jpg';
+  if (name.includes('honey') || name.includes('tulsi') || name.includes('green tea') || name.includes('ayurved')) return '/images/health-wellness-ayurveda.jpg';
+  if (name.includes('handwash') || name.includes('dettol') || name.includes('soap')) return '/images/dettol-handwash.jpg';
+  if (name.includes('hamper') || name.includes('starter') || name.includes('wellness') || name.includes('kit') || name.includes('package')) return '/images/family-grocery-hamper.jpg';
+  
+  if (cat.includes('food') || cat.includes('beverage')) return '/images/tata-tea.jpg';
+  if (cat.includes('home') || cat.includes('personal') || cat.includes('cleaning')) return '/images/surf-excel.jpg';
+  if (cat.includes('health') || cat.includes('wellness')) return '/images/health-wellness-ayurveda.jpg';
+
+  return '/images/aashirvaad-atta.jpg';
+};
+
 // Normalize a single product item from backend or local data
 export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
   if (!item) return null;
@@ -35,15 +65,18 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
 
   const discount = item.discount || (mrp > price ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : (fallback?.discount || '15% OFF'));
 
-  // Ensure image is clean URL
-  let image = item.image || item.image_url || fallback?.image || '/images/default-product.svg';
-  if (typeof image === 'string' && image.startsWith('http://127.0.0.1:8000/media/images/')) {
-    image = image.replace('http://127.0.0.1:8000/media', '');
+  let rawImage = item.image || item.image_url || fallback?.image;
+  if (!rawImage || rawImage === '/images/default-product.svg' || rawImage === 'null') {
+    rawImage = getSmartProductImage(item);
   }
+  if (typeof rawImage === 'string' && rawImage.startsWith('http://127.0.0.1:8000/media/images/')) {
+    rawImage = rawImage.replace('http://127.0.0.1:8000/media', '');
+  }
+  const image = rawImage;
 
   const images = Array.isArray(item.images) && item.images.length > 0 
     ? item.images.map(img => typeof img === 'string' && img.startsWith('http://127.0.0.1:8000/media/images/') ? img.replace('http://127.0.0.1:8000/media', '') : img)
-    : (fallback?.images || [image]);
+    : [image];
 
   const variants = Array.isArray(item.variants) && item.variants.length > 0
     ? item.variants
