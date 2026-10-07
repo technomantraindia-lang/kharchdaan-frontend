@@ -6,6 +6,7 @@ import {
   HelpCircle, Info, HeartHandshake, Eye
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductsContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const ProductDetailPage = ({ 
@@ -16,6 +17,8 @@ export const ProductDetailPage = ({
   onOpenAuth 
 }) => {
   const { addToCart, setIsCartOpen } = useCart();
+  const { products } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
   const [selectedVariant, setSelectedVariant] = useState(
     product?.variants?.find(v => v.isDefault) || product?.variants?.[0] || null
   );
@@ -75,7 +78,7 @@ export const ProductDetailPage = ({
     }
   };
 
-  const relatedProducts = ALL_PRODUCTS.filter(p => p.id !== product.id).slice(0, 4);
+  const relatedProducts = sourceList.filter(p => p.id !== product.id).slice(0, 4);
 
   return (
     <div className="product-detail-page-wrapper">

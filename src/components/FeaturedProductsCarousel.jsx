@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, ShoppingCart, Check, Coins, Star, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, ShoppingCart, Check, Coins, Star, Eye, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductsContext';
+import { ALL_PRODUCTS } from '../data/productsData';
 
 export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, onCategoryFilterChange }) => {
   const { addToCart } = useCart();
+  const { products } = useProducts();
   const [internalCategory, setInternalCategory] = useState('All');
   const [addedItemMap, setAddedItemMap] = useState({});
   const scrollRef = useRef(null);
@@ -19,100 +22,11 @@ export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, on
   };
 
   const filterTabs = [
-    'All',
-    'Daily Needs',
-    'Health',
-    'Home',
-    'Fashion',
-    'Food',
-    'Electronics'
-  ];
-
-  const products = [
-    {
-      id: 'prod-atta-1',
-      name: 'Aashirvaad Shudh Chakki Atta',
-      weight: '5 Kg',
-      price: 245,
-      mrp: 290,
-      discount: '15% OFF',
-      category: 'Daily Needs',
-      image: '/images/aashirvaad-atta.jpg',
-      cashbackPercent: 100,
-      rating: 4.9,
-      reviews: 328,
-      description: 'Superior quality 100% Shudh Chakki whole wheat atta for soft, fluffy rotis.'
-    },
-    {
-      id: 'prod-oil-2',
-      name: 'Fortune Sunlite Sunflower Oil',
-      weight: '1 Litre',
-      price: 165,
-      mrp: 195,
-      discount: '15% OFF',
-      category: 'Daily Needs',
-      image: '/images/fortune-oil.jpg',
-      cashbackPercent: 100,
-      rating: 4.8,
-      reviews: 215,
-      description: 'Refined sunflower oil, rich in natural vitamins and light for everyday family cooking.'
-    },
-    {
-      id: 'prod-choc-3',
-      name: 'Cadbury Dairy Milk Chocolate',
-      weight: '100 g',
-      price: 70,
-      mrp: 85,
-      discount: '18% OFF',
-      category: 'Food',
-      image: '/images/cadbury-dairy-milk.jpg',
-      cashbackPercent: 100,
-      rating: 5.0,
-      reviews: 412,
-      description: 'Delicious creamy milk chocolate bar, classic taste loved by all generations.'
-    },
-    {
-      id: 'prod-surf-4',
-      name: 'Surf Excel Easy Wash Detergent',
-      weight: '1 Kg',
-      price: 175,
-      mrp: 210,
-      discount: '17% OFF',
-      category: 'Home',
-      image: '/images/surf-excel.jpg',
-      cashbackPercent: 100,
-      rating: 4.9,
-      reviews: 189,
-      description: 'Superior stain removal washing powder suitable for bucket and machine wash.'
-    },
-    {
-      id: 'prod-tea-5',
-      name: 'Tata Tea Premium Blend',
-      weight: '250 g',
-      price: 135,
-      mrp: 160,
-      discount: '16% OFF',
-      category: 'Daily Needs',
-      image: '/images/tata-tea.jpg',
-      cashbackPercent: 100,
-      rating: 4.9,
-      reviews: 276,
-      description: 'India’s favorite tea with blended aroma and rich taste for the perfect morning cup.'
-    },
-    {
-      id: 'prod-dettol-6',
-      name: 'Dettol Skincare Handwash',
-      weight: '200 ml',
-      price: 120,
-      mrp: 145,
-      discount: '17% OFF',
-      category: 'Health',
-      image: '/images/dettol-handwash.jpg',
-      cashbackPercent: 100,
-      rating: 4.8,
-      reviews: 194,
-      description: 'Effective germ protection liquid handwash with skin moisturizing formula.'
-    }
+    { id: 'All', label: 'All Items' },
+    { id: 'Daily Needs', label: 'Grocery & Staples' },
+    { id: 'Food', label: 'Food & Beverages' },
+    { id: 'Home', label: 'Personal & Home' },
+    { id: 'Health', label: 'Health & Wellness' }
   ];
 
   const handleAddToCart = (e, prod) => {
@@ -134,142 +48,151 @@ export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, on
 
   const handleScroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -320 : 320;
+      const scrollAmount = direction === 'left' ? -340 : 340;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
   const filteredProducts = (!activeCategory || activeCategory === 'All') 
-    ? products 
-    : products.filter(p => p.category.toLowerCase().includes(activeCategory.toLowerCase()) || activeCategory === 'All');
+    ? sourceList 
+    : sourceList.filter(p => p.category === activeCategory || (p.category && String(p.category).toLowerCase().includes(activeCategory.toLowerCase())));
 
   return (
     <section id="products-store" className="featured-products-premium-section">
       <div className="container">
         {/* Section Top Header & Filters */}
         <div className="featured-header-container">
-          <div className="featured-title-and-filters">
-            <h2 className="featured-section-title">Featured Products</h2>
-            
-            {/* Filter Pills */}
-            <div className="filter-pills-bar">
+          <div className="featured-title-wrap">
+            <div className="featured-badge-pill">
+              <Sparkles size={14} className="text-orange" />
+              <span>GUARANTEED TOP-BRAND QUALITY</span>
+            </div>
+            <h2 className="featured-main-heading">Featured FMCG Products</h2>
+            <p className="featured-sub-heading">
+              Shop authentic daily essentials from India's trusted FMCG manufacturers with instant wallet cashback on every order.
+            </p>
+          </div>
+
+          {/* Category Filter Pills & Arrows */}
+          <div className="featured-controls-wrap">
+            <div className="category-filter-pills-row">
               {filterTabs.map((tab) => (
                 <button
-                  key={tab}
-                  className={`product-tab-btn ${activeCategory === tab ? 'active' : ''}`}
-                  onClick={() => handleCategoryChange(tab)}
+                  key={tab.id}
+                  className={`filter-pill-btn ${activeCategory === tab.id ? 'active' : ''}`}
+                  onClick={() => handleCategoryChange(tab.id)}
                 >
-                  {tab}
+                  <span>{tab.label}</span>
                 </button>
               ))}
             </div>
-          </div>
 
-          <a href="#products-services" className="featured-view-all-link">
-            <span>View All Products</span>
-            <ArrowRight size={16} />
-          </a>
+            <div className="carousel-nav-arrows">
+              <button 
+                className="btn-arrow-circle prev" 
+                onClick={() => handleScroll('left')}
+                aria-label="Previous products"
+                title="Scroll left"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button 
+                className="btn-arrow-circle next" 
+                onClick={() => handleScroll('right')}
+                aria-label="Next products"
+                title="Scroll right"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Products Carousel Track */}
-        <div className="featured-carousel-container">
-          <button 
-            className="prod-arrow-button left" 
-            onClick={() => handleScroll('left')}
-            aria-label="Previous products"
-          >
-            <ChevronLeft size={22} />
-          </button>
-
-          <div className="featured-products-track-grid" ref={scrollRef}>
+        {/* Horizontal Products Carousel Track */}
+        <div className="featured-carousel-viewport" ref={scrollRef}>
+          <div className="featured-carousel-track">
             {filteredProducts.map((prod) => (
               <div 
                 key={prod.id} 
-                className="product-card-premium"
+                className="featured-product-card"
                 onClick={() => onQuickView && onQuickView(prod)}
                 role="button"
                 tabIndex={0}
               >
-                {/* Cashback Badge on top */}
-                <div className="product-cashback-badge">
-                  <Coins size={12} className="coin-icon" />
-                  <span>Up to 100% Cashback</span>
+                {/* Top Tags */}
+                <div className="card-top-badges">
+                  <span className="badge-discount">{prod.discount || '15% OFF'}</span>
+                  <div className="badge-cashback">
+                    <Coins size={12} className="coin-icon" />
+                    <span>Up to 100% Cashback</span>
+                  </div>
                 </div>
 
                 {/* Product Image Stage */}
-                <div className="product-image-stage">
-                  <img
-                    src={prod.image}
-                    alt={prod.name}
-                    className="product-packshot-img"
-                    loading="lazy"
+                <div className="card-image-stage">
+                  <img 
+                    src={prod.image} 
+                    alt={prod.name} 
+                    className="card-prod-img"
+                    onError={(e) => { e.target.src = '/images/kharchdaan-logo.png'; }}
                   />
-                  {/* Quick View Hover Pill */}
-                  <div className="quick-view-overlay-pill">
-                    <Eye size={13} />
+                  <span className="card-brand-pill">{prod.brand}</span>
+                  <button 
+                    className="quick-view-overlay-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onQuickView) onQuickView(prod);
+                    }}
+                    title="Quick preview"
+                  >
+                    <Eye size={15} />
                     <span>Quick View</span>
-                  </div>
+                  </button>
                 </div>
 
-                {/* Product Details Block */}
-                <div className="product-card-body">
-                  {/* Category & Weight Pill Row */}
-                  <div className="product-meta-row">
-                    <span className="product-cat-tag">{prod.category}</span>
-                    <span className="product-weight-badge">{prod.weight}</span>
+                {/* Product Info */}
+                <div className="card-info-stage">
+                  <div className="card-rating-line">
+                    <div className="stars-mini">
+                      <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                      <span className="rating-score">{prod.rating}</span>
+                    </div>
+                    <span className="rating-count">({prod.reviews} verified reviews)</span>
                   </div>
 
-                  {/* 2-line Clean Product Title */}
-                  <h3 className="product-main-name" title={prod.name}>
+                  <h3 className="card-prod-title" title={prod.name}>
                     {prod.name}
                   </h3>
 
-                  {/* Rating Stars Row */}
-                  <div className="product-rating-row">
-                    <div className="rating-stars-badge">
-                      <svg 
-                        width="13" 
-                        height="13" 
-                        viewBox="0 0 24 24" 
-                        fill="#F59E0B" 
-                        stroke="#F59E0B" 
-                        strokeWidth="1"
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        className="star-svg-icon"
-                        aria-hidden="true"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                      </svg>
-                      <span className="rating-score">{prod.rating}</span>
+                  <span className="card-prod-weight">{prod.weight}</span>
+
+                  {/* Pricing Row */}
+                  <div className="card-pricing-row">
+                    <div className="price-box">
+                      <span className="price-val">₹{prod.price}</span>
+                      <span className="mrp-val">MRP ₹{prod.mrp}</span>
                     </div>
-                    <span className="review-count-text">({prod.reviews})</span>
+                    <div className="pv-box">
+                      <span>+{prod.pvPoints} PV</span>
+                    </div>
                   </div>
 
-                  {/* Price & Savings Line */}
-                  <div className="product-pricing-box">
-                    <div className="product-current-price">
-                      <span className="currency-symbol">₹</span>
-                      <span className="price-number">{prod.price}</span>
-                    </div>
-                    {prod.mrp && (
-                      <span className="product-mrp-strike">MRP ₹{prod.mrp}</span>
-                    )}
-                    {prod.discount && (
-                      <span className="product-discount-pill">{prod.discount}</span>
-                    )}
+                  {/* Instant Direct Cashback Pill */}
+                  <div className="card-cashback-callout">
+                    <Sparkles size={12} className="text-orange" />
+                    <span>₹{prod.cashbackAmount} Instant Cashback in Wallet</span>
                   </div>
 
-                  {/* Orange Add to Cart Button */}
-                  <button
-                    className={`btn-add-to-cart-master ${addedItemMap[prod.id] ? 'is-added' : ''}`}
+                  {/* Action Button */}
+                  <button 
+                    className={`btn-card-add-cart ${addedItemMap[prod.id] ? 'is-added' : ''}`}
                     onClick={(e) => handleAddToCart(e, prod)}
-                    aria-label={`Add ${prod.name} to Cart`}
                   >
                     {addedItemMap[prod.id] ? (
                       <>
-                        <Check size={16} />
-                        <span>Added to Cart</span>
+                        <Check size={15} />
+                        <span>Added to Cart!</span>
                       </>
                     ) : (
                       <>
@@ -282,18 +205,23 @@ export const FeaturedProductsCarousel = ({ onQuickView, activeCategoryFilter, on
               </div>
             ))}
           </div>
+        </div>
 
+        {/* Bottom Banner & Action */}
+        <div className="featured-bottom-banner">
+          <div className="bottom-banner-text">
+            <strong>Looking for more daily household brands?</strong>
+            <span>Explore 500+ genuine products with guaranteed 20-level compensation and up to 100% wallet cashback.</span>
+          </div>
           <button 
-            className="prod-arrow-button right" 
-            onClick={() => handleScroll('right')}
-            aria-label="Next products"
+            className="btn-explore-all-store"
+            onClick={() => onCategoryFilterChange ? onCategoryFilterChange('All') : null}
           >
-            <ChevronRight size={22} />
+            <span>View All Products in Store</span>
+            <ArrowRight size={15} />
           </button>
         </div>
       </div>
     </section>
   );
 };
-
-

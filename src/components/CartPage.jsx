@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useProducts } from '../context/ProductsContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOpenAuth }) => {
@@ -20,6 +21,8 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
     estimatedCashback, 
     totalItems 
   } = useCart();
+  const { products } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
   
   const { isAuthenticated } = useAuth();
   const [couponCode, setCouponCode] = useState('');
@@ -63,7 +66,7 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
     if (item.image && !item.image.includes('default-product.svg')) {
       return item.image;
     }
-    const matched = ALL_PRODUCTS.find(p => p.id === item.productId || p.name.toLowerCase().includes((item.name || '').toLowerCase().slice(0, 8)));
+    const matched = sourceList.find(p => p.id === item.productId || (p.name && p.name.toLowerCase().includes((item.name || '').toLowerCase().slice(0, 8))));
     if (matched && matched.image) {
       return matched.image;
     }

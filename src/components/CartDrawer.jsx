@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { X, Trash2, Plus, Minus, ArrowRight, Sparkles, ShieldCheck, ShoppingBag, Coins, CheckCircle2, Info } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useProducts } from '../context/ProductsContext';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const CartDrawer = ({ onOpenAuth, onNavigate }) => {
   const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, subtotal, platformFee, grandTotal, estimatedCashback, totalItems } = useCart();
   const { isAuthenticated } = useAuth();
+  const { products } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -31,7 +34,7 @@ export const CartDrawer = ({ onOpenAuth, onNavigate }) => {
     if (item.image && !item.image.includes('default-product.svg')) {
       return item.image;
     }
-    const matched = ALL_PRODUCTS.find(p => p.id === item.productId || p.name.toLowerCase().includes((item.name || '').toLowerCase().slice(0, 8)));
+    const matched = sourceList.find(p => p.id === item.productId || (p.name && p.name.toLowerCase().includes((item.name || '').toLowerCase().slice(0, 8))));
     if (matched && matched.image) {
       return matched.image;
     }
@@ -79,7 +82,7 @@ export const CartDrawer = ({ onOpenAuth, onNavigate }) => {
                 <CheckCircle2 size={42} />
               </div>
               <h3>Order Placed Successfully!</h3>
-              <p>Your order has been recorded into the BachatGanga priority fulfillment queue. ₹{estimatedCashback} cashback is being credited to your wallet.</p>
+              <p>Your order has been recorded into the KharchDaan priority fulfillment queue. ₹{estimatedCashback} cashback is being credited to your wallet.</p>
               <div className="success-perks-box">
                 <span>✓ Free doorstep express delivery</span>
                 <span>✓ Direct Swadeshi producer guarantee</span>

@@ -6,19 +6,24 @@ import {
   Package, Store, Award, X
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductsContext';
 import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
 
 export const ProductsAndServicesPage = ({ 
   onNavigateHome, 
   onProductClick, 
   initialCategory = 'All',
+  searchTerm = '',
+  onSearchChange,
   onOpenAuth 
 }) => {
   const { addToCart } = useCart();
-  const [activeTab, setActiveTab] = useState('products'); // 'products' | 'services'
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const { products, isBackendConnected } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const [activeTab, setActiveTab] = useState(initialCategory === 'Services' ? 'services' : 'products'); // 'products' | 'services'
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory === 'Services' ? 'All' : initialCategory);
   const [selectedBrand, setSelectedBrand] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchTerm || '');
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'price-low' | 'price-high' | 'rating' | 'cashback'
   const [priceRange, setPriceRange] = useState('all'); // 'all' | 'under-150' | '150-300' | '300-500' | 'above-500'
   const [addedItemMap, setAddedItemMap] = useState({});
@@ -26,19 +31,44 @@ export const ProductsAndServicesPage = ({
   // Sync state if initialCategory changes from outside navigation
   useEffect(() => {
     if (initialCategory) {
-      setSelectedCategory(initialCategory);
+      if (initialCategory === 'Services') {
+        setActiveTab('services');
+        setSelectedCategory('All');
+      } else {
+        setActiveTab('products');
+        setSelectedCategory(initialCategory);
+      }
       setSelectedBrand('All');
       setPriceRange('all');
-      setSearchQuery('');
     }
   }, [initialCategory]);
 
+  // Sync external search term changes (from header search bar)
+  useEffect(() => {
+    if (searchTerm !== undefined && searchTerm !== searchQuery) {
+      setSearchQuery(searchTerm);
+      if (searchTerm.trim()) {
+        setActiveTab('products');
+      }
+    }
+  }, [searchTerm]);
+
+  const handleSearchInputChange = (val) => {
+    setSearchQuery(val);
+    if (onSearchChange) onSearchChange(val);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    if (onSearchChange) onSearchChange('');
+  };
+
   const categories = [
-    { id: 'All', name: 'All Products', count: ALL_PRODUCTS.length },
-    { id: 'Daily Needs', name: 'Grocery & Staples', count: ALL_PRODUCTS.filter(p => p.category === 'Daily Needs').length },
-    { id: 'Food', name: 'Food & Beverages', count: ALL_PRODUCTS.filter(p => p.category === 'Food').length },
-    { id: 'Home', name: 'Personal & Household Care', count: ALL_PRODUCTS.filter(p => p.category === 'Home').length },
-    { id: 'Health', name: 'Health & Wellness', count: ALL_PRODUCTS.filter(p => p.category === 'Health').length }
+    { id: 'All', name: 'All Products', count: sourceList.length },
+    { id: 'Daily Needs', name: 'Grocery & Staples', count: sourceList.filter(p => p.category === 'Daily Needs').length },
+    { id: 'Food', name: 'Food & Beverages', count: sourceList.filter(p => p.category === 'Food').length },
+    { id: 'Home', name: 'Personal & Household Care', count: sourceList.filter(p => p.category === 'Home').length },
+    { id: 'Health', name: 'Health & Wellness', count: sourceList.filter(p => p.category === 'Health').length }
   ];
 
   const categoryInfoMap = {
@@ -73,6 +103,8 @@ export const ProductsAndServicesPage = ({
 
   const brands = ['All', 'Aashirvaad', 'Fortune', 'Tata Tea', 'Surf Excel', 'Cadbury', 'Dettol', 'Daawat', 'Amul', 'Maggi', 'Vim', 'Dabur', 'Colgate'];
 
+  const quickSearchTags = ['Aashirvaad Atta', 'Fortune Oil', 'Tata Tea', 'Surf Excel', 'Cadbury Silk', 'Amul Ghee', 'Dabur Honey', 'Dettol'];
+
   const handleAddToCart = (e, prod) => {
     e.stopPropagation();
     addToCart({
@@ -103,7 +135,7 @@ export const ProductsAndServicesPage = ({
 
   // Filtered & Sorted Products
   const filteredProducts = useMemo(() => {
-    return ALL_PRODUCTS.filter(prod => {
+    return sourceList.filter(prod => {
       // Category filter
       if (selectedCategory !== 'All' && prod.category !== selectedCategory) {
         return false;
@@ -117,13 +149,19 @@ export const ProductsAndServicesPage = ({
       if (priceRange === '150-300' && (prod.price < 150 || prod.price > 300)) return false;
       if (priceRange === '300-500' && (prod.price < 300 || prod.price > 500)) return false;
       if (priceRange === 'above-500' && prod.price <= 500) return false;
-      // Search query
+      
+      // Search query filter matching multiple attributes
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+        const q = searchQuery.toLowerCase().trim();
         const matchesName = prod.name.toLowerCase().includes(q);
         const matchesBrand = prod.brand.toLowerCase().includes(q);
-        const matchesDesc = prod.shortDescription?.toLowerCase().includes(q);
-        if (!matchesName && !matchesBrand && !matchesDesc) return false;
+        const matchesCategory = (prod.category || '').toLowerCase().includes(q);
+        const matchesSubCategory = (prod.subCategory || '').toLowerCase().includes(q);
+        const matchesDesc = (prod.shortDescription || '').toLowerCase().includes(q) || (prod.description || '').toLowerCase().includes(q);
+        
+        if (!matchesName && !matchesBrand && !matchesCategory && !matchesSubCategory && !matchesDesc) {
+          return false;
+        }
       }
       return true;
     }).sort((a, b) => {
@@ -141,6 +179,7 @@ export const ProductsAndServicesPage = ({
     setPriceRange('all');
     setSearchQuery('');
     setSortBy('featured');
+    if (onSearchChange) onSearchChange('');
   };
 
   return (
@@ -157,14 +196,20 @@ export const ProductsAndServicesPage = ({
             <ChevronRight size={13} className="breadcrumb-sep" />
             <button 
               className="breadcrumb-link" 
-              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); }}
+              onClick={() => { setSelectedCategory('All'); setSelectedBrand('All'); setSearchQuery(''); }}
             >
-              <span>Products & Services</span>
+              <span>Shop Store</span>
             </button>
             {selectedCategory !== 'All' && (
               <>
                 <ChevronRight size={13} className="breadcrumb-sep" />
                 <span className="breadcrumb-current">{currentInfo.label}</span>
+              </>
+            )}
+            {searchQuery && (
+              <>
+                <ChevronRight size={13} className="breadcrumb-sep" />
+                <span className="breadcrumb-current">Search: "{searchQuery}"</span>
               </>
             )}
           </div>
@@ -175,10 +220,18 @@ export const ProductsAndServicesPage = ({
               <span>100% GENUINE FMCG DIRECT COMMERCE MARKETPLACE</span>
             </div>
             <h1 className="products-page-title">
-              {currentInfo.title} <span className="text-orange-gradient">100% Wallet Cashback</span>
+              {searchQuery ? (
+                <>Search Results for <span className="text-orange-gradient">"{searchQuery}"</span></>
+              ) : (
+                <>{currentInfo.title} <span className="text-orange-gradient">100% Wallet Cashback</span></>
+              )}
             </h1>
             <p className="products-page-sub">
-              {currentInfo.sub}
+              {searchQuery ? (
+                `Found ${filteredProducts.length} authentic products matching "${searchQuery}". Every purchase earns instant direct cashback and 20-level network royalty points.`
+              ) : (
+                currentInfo.sub
+              )}
             </p>
 
             {/* 4 Trust Feature Badges */}
@@ -217,7 +270,7 @@ export const ProductsAndServicesPage = ({
               >
                 <ShoppingBag size={16} />
                 <span>Daily FMCG Products</span>
-                <span className="tab-count-badge">{ALL_PRODUCTS.length}</span>
+                <span className="tab-count-badge">{sourceList.length}</span>
               </button>
               <button 
                 className={`catalog-tab-btn ${activeTab === 'services' ? 'is-active' : ''}`}
@@ -238,10 +291,10 @@ export const ProductsAndServicesPage = ({
                     type="text"
                     placeholder="Search brand, atta, oil, tea..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchInputChange(e.target.value)}
                   />
                   {searchQuery && (
-                    <button className="search-clear-btn" onClick={() => setSearchQuery('')}>
+                    <button className="search-clear-btn" onClick={handleClearSearch} title="Clear search">
                       <X size={13} />
                     </button>
                   )}
@@ -383,6 +436,12 @@ export const ProductsAndServicesPage = ({
                 {(selectedCategory !== 'All' || selectedBrand !== 'All' || priceRange !== 'all' || searchQuery) && (
                   <div className="active-filter-chips-row">
                     <span className="active-label">Active Filters:</span>
+                    {searchQuery && (
+                      <span className="filter-chip highlight">
+                        Search: "{searchQuery}"
+                        <button onClick={handleClearSearch} title="Remove search"><X size={11} /></button>
+                      </span>
+                    )}
                     {selectedCategory !== 'All' && (
                       <span className="filter-chip">
                         Category: {selectedCategory}
@@ -401,12 +460,9 @@ export const ProductsAndServicesPage = ({
                         <button onClick={() => setPriceRange('all')}><X size={11} /></button>
                       </span>
                     )}
-                    {searchQuery && (
-                      <span className="filter-chip">
-                        Keyword: "{searchQuery}"
-                        <button onClick={() => setSearchQuery('')}><X size={11} /></button>
-                      </span>
-                    )}
+                    <button className="btn-clear-all-text" onClick={clearAllFilters}>
+                      Clear All
+                    </button>
                   </div>
                 )}
 
@@ -417,11 +473,26 @@ export const ProductsAndServicesPage = ({
 
                 {filteredProducts.length === 0 ? (
                   <div className="no-products-found-card">
-                    <ShoppingBag size={48} className="empty-icon" />
-                    <h3>No products found</h3>
-                    <p>Try adjusting your category, brand or price filters to see more results.</p>
+                    <Search size={48} className="empty-icon text-orange" />
+                    <h3>No products found {searchQuery ? `for "${searchQuery}"` : ''}</h3>
+                    <p>We couldn't find any products matching your current filters. Try searching for these popular items or reset your filters:</p>
+                    
+                    {/* Quick Search Tag Suggestions */}
+                    <div className="empty-state-tags-wrap">
+                      <span className="tags-label">Popular Searches:</span>
+                      {quickSearchTags.map((tag) => (
+                        <button 
+                          key={tag} 
+                          className="empty-tag-pill"
+                          onClick={() => handleSearchInputChange(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+
                     <button className="btn-reset-filters" onClick={clearAllFilters}>
-                      Reset All Filters
+                      Reset All Filters & View Catalog
                     </button>
                   </div>
                 ) : (
@@ -449,64 +520,59 @@ export const ProductsAndServicesPage = ({
                         <div className="catalog-image-box">
                           <img 
                             src={prod.image} 
-                            alt={prod.name} 
-                            className="catalog-img"
-                            loading="lazy"
+                            alt={prod.name}
+                            className="catalog-prod-img"
+                            onError={(e) => { e.target.src = '/images/kharchdaan-logo.png'; }}
                           />
-                          <div className="quick-view-hover-btn">
-                            <Eye size={13} />
-                            <span>View Details</span>
-                          </div>
+                          <span className="card-brand-badge">{prod.brand}</span>
                         </div>
 
-                        {/* Card Info Body */}
-                        <div className="catalog-card-body">
-                          <div className="catalog-meta-row">
-                            <span className="catalog-brand-tag">{prod.brand}</span>
-                            <span className="catalog-weight-tag">{prod.weight}</span>
+                        {/* Product Details */}
+                        <div className="catalog-card-details">
+                          <div className="card-rating-strip">
+                            <div className="stars-wrap">
+                              <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                              <span className="rating-val">{prod.rating}</span>
+                            </div>
+                            <span className="reviews-count">({prod.reviews} reviews)</span>
                           </div>
 
-                          <h3 className="catalog-product-name" title={prod.name}>
+                          <h3 className="catalog-product-title" title={prod.name}>
                             {prod.name}
                           </h3>
 
-                          {/* Star Rating Row */}
-                          <div className="catalog-rating-row">
-                            <div className="rating-stars-badge">
-                              <Star size={12} fill="#F59E0B" color="#F59E0B" />
-                              <span className="rating-num">{prod.rating}</span>
+                          <span className="catalog-weight-badge">{prod.weight}</span>
+
+                          {/* Pricing & Cashback Info */}
+                          <div className="catalog-price-row">
+                            <div className="price-stack">
+                              <div className="price-main-line">
+                                <span className="price-current">₹{prod.price}</span>
+                                <span className="price-mrp">MRP ₹{prod.mrp}</span>
+                              </div>
+                              <span className="price-discount-tag">{prod.discount}</span>
                             </div>
-                            <span className="rating-reviews">({prod.reviews} reviews)</span>
                           </div>
 
-                          {/* Pricing Box */}
-                          <div className="catalog-pricing-row">
-                            <div className="catalog-current-price">
-                              <span className="curr">₹</span>
-                              <span className="val">{prod.price}</span>
-                            </div>
-                            {prod.mrp && (
-                              <span className="catalog-mrp-strike">MRP ₹{prod.mrp}</span>
-                            )}
-                            {prod.discount && (
-                              <span className="catalog-discount-tag">{prod.discount}</span>
-                            )}
+                          {/* Direct Cashback Callout */}
+                          <div className="card-cashback-info-box">
+                            <Sparkles size={13} className="text-orange" />
+                            <span>₹{prod.cashbackAmount} Instant Cashback in Wallet</span>
                           </div>
 
-                          {/* Add to Cart Button */}
-                          <button
+                          {/* Card Action Button */}
+                          <button 
                             className={`btn-catalog-add-cart ${addedItemMap[prod.id] ? 'is-added' : ''}`}
                             onClick={(e) => handleAddToCart(e, prod)}
-                            aria-label={`Add ${prod.name} to Cart`}
                           >
                             {addedItemMap[prod.id] ? (
                               <>
-                                <Check size={15} />
-                                <span>Added to Cart</span>
+                                <Check size={14} />
+                                <span>Added to Cart!</span>
                               </>
                             ) : (
                               <>
-                                <ShoppingCart size={15} />
+                                <ShoppingCart size={14} />
                                 <span>Add to Cart</span>
                               </>
                             )}
@@ -517,89 +583,90 @@ export const ProductsAndServicesPage = ({
                   </div>
                 )}
               </main>
-
             </div>
           )}
 
-          {/* TAB 2: SERVICES & MONTHLY RATION HAMPERS VIEW */}
+          {/* TAB 2: SERVICES & MONTHLY HAMPERS */}
           {activeTab === 'services' && (
-            <div className="services-packages-container">
-              <div className="services-intro-banner">
-                <div className="services-intro-badge">
-                  <Sparkles size={13} />
-                  <span>PREMIUM GROCERY PLANS & MERCHANT HUBS</span>
+            <div className="services-packages-section">
+              <div className="services-intro-card">
+                <div className="services-intro-text">
+                  <div className="services-badge-pill">
+                    <Award size={14} className="text-orange" />
+                    <span>CURATED PACKAGES & DIRECT COMMERCE SERVICES</span>
+                  </div>
+                  <h2>Monthly Ration Hampers & Merchant QR Programs</h2>
+                  <p>
+                    Subscribe to hassle-free monthly household grocery packages delivered on the 1st of every month, or join as a neighbourhood Kirana partner to accept customer wallet payments.
+                  </p>
                 </div>
-                <h2>Curated Subscription Plans & Kirana Services</h2>
-                <p>
-                  Automate your monthly family grocery needs with pre-packaged ration hampers offering maximum 20-level compensation royalty and direct wallet cashback.
-                </p>
               </div>
 
               <div className="services-packages-grid">
                 {SERVICES_PACKAGES.map((pkg) => (
                   <div key={pkg.id} className="service-package-card">
-                    <div className="service-card-top-tag">
-                      <span>{pkg.tag}</span>
+                    <div className="service-card-image-wrap">
+                      <img src={pkg.image} alt={pkg.title} className="service-img" onError={(e) => { e.target.src = '/images/family-grocery-hamper.jpg'; }} />
+                      <span className={`service-tag-pill ${pkg.badgeColor}`}>{pkg.tag}</span>
                     </div>
 
-                    <h3 className="service-pkg-title">{pkg.title}</h3>
-                    <p className="service-pkg-desc">{pkg.description}</p>
+                    <div className="service-card-body">
+                      <h3 className="service-title">{pkg.title}</h3>
+                      <p className="service-desc">{pkg.description}</p>
 
-                    <div className="service-benefits-box">
-                      <div className="benefit-badge-item">
-                        <Coins size={14} className="text-green" />
-                        <span>{pkg.cashback}</span>
+                      <div className="service-includes-box">
+                        <strong>Includes:</strong>
+                        <ul className="service-items-list">
+                          {pkg.itemsIncluded.map((item, i) => (
+                            <li key={i}>
+                              <CheckCircle2 size={13} className="text-green" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <div className="benefit-badge-item">
-                        <Layers size={14} className="text-purple" />
-                        <span>{pkg.pv}</span>
+
+                      <div className="service-metrics-row">
+                        <div className="service-metric-item">
+                          <Coins size={14} className="text-orange" />
+                          <span>{pkg.cashback}</span>
+                        </div>
+                        <div className="service-metric-item">
+                          <Layers size={14} className="text-purple" />
+                          <span>{pkg.pv}</span>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Items Included List */}
-                    <div className="service-included-box">
-                      <strong>Package Includes:</strong>
-                      <ul className="included-items-list">
-                        {pkg.itemsIncluded.map((item, idx) => (
-                          <li key={idx}>
-                            <CheckCircle2 size={14} className="text-green" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                      <div className="service-price-cta-row">
+                        <div className="service-price-block">
+                          {pkg.price > 0 ? (
+                            <>
+                              <span className="service-price-main">₹{pkg.price}</span>
+                              <span className="service-price-mrp">MRP ₹{pkg.mrp}</span>
+                            </>
+                          ) : (
+                            <span className="service-price-free">FREE ONBOARDING</span>
+                          )}
+                        </div>
 
-                    {/* Price & Action */}
-                    <div className="service-card-footer">
-                      <div className="service-price-block">
                         {pkg.price > 0 ? (
-                          <>
-                            <div className="service-current-price">₹{pkg.price}</div>
-                            {pkg.mrp > 0 && <span className="service-mrp">MRP ₹{pkg.mrp}</span>}
-                            <span className="service-savings-pill">{pkg.discount}</span>
-                          </>
+                          <button 
+                            className="btn-add-service-cart"
+                            onClick={() => handleAddServiceToCart(pkg)}
+                          >
+                            <ShoppingCart size={14} />
+                            <span>Subscribe Now</span>
+                          </button>
                         ) : (
-                          <div className="service-current-price free">100% Free</div>
+                          <button 
+                            className="btn-add-service-cart partner"
+                            onClick={onOpenAuth}
+                          >
+                            <span>Register Store</span>
+                            <ArrowRight size={14} />
+                          </button>
                         )}
                       </div>
-
-                      {pkg.price > 0 ? (
-                        <button 
-                          className="btn-subscribe-pkg"
-                          onClick={() => handleAddServiceToCart(pkg)}
-                        >
-                          <span>Subscribe Hamper</span>
-                          <ArrowRight size={15} />
-                        </button>
-                      ) : (
-                        <button 
-                          className="btn-merchant-join"
-                          onClick={onOpenAuth}
-                        >
-                          <span>Register as Kirana Partner</span>
-                          <ArrowRight size={15} />
-                        </button>
-                      )}
                     </div>
                   </div>
                 ))}

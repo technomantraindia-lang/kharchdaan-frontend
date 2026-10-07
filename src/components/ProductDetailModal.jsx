@@ -58,8 +58,10 @@ export const ProductDetailModal = ({ product, onClose }) => {
 
           {/* Product Info */}
           <div className="product-modal-info">
-            {product.category?.name && (
-              <span className="product-category-tag">{product.category.name}</span>
+            {product.category && (
+              <span className="product-category-tag">
+                {typeof product.category === 'string' ? product.category : (product.category.name || '')}
+              </span>
             )}
             <h2 className="modal-product-title">{product.name}</h2>
 
@@ -76,7 +78,7 @@ export const ProductDetailModal = ({ product, onClose }) => {
               <Sparkles size={18} className="cb-sparkle" />
               <div>
                 <strong>₹{cashbackAmount} Direct Cashback</strong>
-                <span className="cb-sub">Credited to your BachatGanga wallet instantly upon delivery</span>
+                <span className="cb-sub">Credited to your KharchDaan wallet instantly upon delivery</span>
               </div>
             </div>
 
@@ -123,7 +125,7 @@ export const ProductDetailModal = ({ product, onClose }) => {
 
             {/* Description */}
             <div className="product-desc-box">
-              <p>{product.description || product.short_description || 'High quality certified genuine product backed by BachatGanga guarantee and fast door-step delivery.'}</p>
+              <p>{product.description || product.short_description || 'High quality certified genuine product backed by KharchDaan guarantee and fast door-step delivery.'}</p>
             </div>
 
             {/* Quantity & Add to Cart */}

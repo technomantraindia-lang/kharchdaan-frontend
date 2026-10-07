@@ -6,6 +6,7 @@ import {
   Package, Store, Award, X, Percent, Flame, HeartHandshake
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductsContext';
 import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
 import { 
   WheatStaplesSvg, 
@@ -100,6 +101,8 @@ export const CategoryProductListPage = ({
   onOpenAuth 
 }) => {
   const { addToCart } = useCart();
+  const { products } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
   const config = CATEGORY_CONFIG[categorySlug] || CATEGORY_CONFIG['grocery-staples'];
   const HeaderIcon = config.Icon;
 
@@ -128,7 +131,7 @@ export const CategoryProductListPage = ({
 
   // Filtered Products for this Category
   const categoryProducts = useMemo(() => {
-    return ALL_PRODUCTS.filter(prod => {
+    return sourceList.filter(prod => {
       // Must match active category
       if (prod.category !== config.id) {
         return false;

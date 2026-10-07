@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useProducts } from '../context/ProductsContext';
+import { api } from '../services/api';
 import { ALL_PRODUCTS } from '../data/productsData';
 
 export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOpenAuth }) => {
@@ -21,6 +23,8 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
   } = useCart();
   
   const { user, isAuthenticated } = useAuth();
+  const { products } = useProducts();
+  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
 
   // Form States
   const [formData, setFormData] = useState({
@@ -53,14 +57,14 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
     if (item.image && !item.image.includes('default-product.svg')) {
       return item.image;
     }
-    const matched = ALL_PRODUCTS.find(p => p.id === item.productId || p.name.toLowerCase().includes((item.name || '').toLowerCase().slice(0, 8)));
+    const matched = sourceList.find(p => p.id === item.productId || (p.name && p.name.toLowerCase().includes((item.name || '').toLowerCase().slice(0, 8))));
     if (matched && matched.image) {
       return matched.image;
     }
     return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&auto=format&fit=crop&q=80';
   };
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setFormError('');
 
@@ -83,26 +87,48 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
 
     setIsSubmitting(true);
 
+    const fullShippingAddr = `${formData.addressLine1}, ${formData.addressLine2 ? formData.addressLine2 + ', ' : ''}${formData.landmark ? 'Near ' + formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`;
+
+    let backendOrderNum = null;
+    try {
+      const orderPayload = {
+        items: items.map(it => ({
+          product_id: it.productId || it.id,
+          name: it.name,
+          price: it.price,
+          qty: it.quantity || 1
+        })),
+        payment_method: paymentMethod,
+        shipping_address: fullShippingAddr,
+        shipping_charge: 0,
+        discount: 0
+      };
+      const apiRes = await api.createOrder(orderPayload);
+      if (apiRes?.success && apiRes?.data?.order_number) {
+        backendOrderNum = apiRes.data.order_number;
+      }
+    } catch (apiErr) {
+      console.warn('Backend order sync warning:', apiErr);
+    }
+
     const generatedOrder = {
-      orderNumber: `BG-${Date.now().toString().slice(-6)}`,
+      orderNumber: backendOrderNum || `BG-${Date.now().toString().slice(-6)}`,
       date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       itemsCount: totalItems,
       totalAmount: grandTotal,
       cashbackEarned: estimatedCashback,
       deliverySlotText: deliverySlot === 'morning' ? 'Tomorrow Morning (7:00 AM - 11:00 AM)' : deliverySlot === 'afternoon' ? 'Tomorrow Afternoon (12:00 PM - 4:00 PM)' : 'Tomorrow Evening (5:00 PM - 9:00 PM)',
       paymentMode: paymentMethod.toUpperCase(),
-      shippingAddress: `${formData.addressLine1}, ${formData.addressLine2 ? formData.addressLine2 + ', ' : ''}${formData.landmark ? 'Near ' + formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`,
+      shippingAddress: fullShippingAddr,
       customerName: formData.fullName,
       customerPhone: formData.phone
     };
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setCreatedOrder(generatedOrder);
-      setOrderSuccess(true);
-      clearCart();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1200);
+    setIsSubmitting(false);
+    setCreatedOrder(generatedOrder);
+    setOrderSuccess(true);
+    clearCart();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // If cart is empty and order not placed yet, show empty bag state
@@ -151,7 +177,7 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
               </span>
               <h1 className="co-success-main-title">Order Placed Successfully!</h1>
               <p className="co-success-sub-text">
-                Thank you, <strong>{createdOrder.customerName}</strong>! Your order has been registered into the direct BachatGanga priority fulfillment queue.
+                Thank you, <strong>{createdOrder.customerName}</strong>! Your order has been registered into the direct KharchDaan priority fulfillment queue.
               </p>
             </div>
 

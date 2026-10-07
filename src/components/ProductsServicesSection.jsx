@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ProductCard } from './ProductCard';
-import { api } from '../services/api';
+import { useProducts } from '../context/ProductsContext';
 import { RefreshCw, ShoppingBag, Sparkles, Flame, SlidersHorizontal } from 'lucide-react';
 
 const DEFAULT_CATALOG = [
@@ -138,50 +138,22 @@ const CATEGORY_TABS = [
 ];
 
 export const ProductsServicesSection = ({ onQuickView }) => {
-  const [products, setProducts] = useState(DEFAULT_CATALOG);
+  const { products: contextProducts, loading, refreshProducts } = useProducts();
+  const products = (contextProducts && contextProducts.length > 0) ? contextProducts : DEFAULT_CATALOG;
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('latest');
-  const [loading, setLoading] = useState(false);
-
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const res = await api.getProducts().catch(() => null);
-      if (res?.success && Array.isArray(res.data) && res.data.length > 0) {
-        // Merge backend seeded items with rich default catalog
-        const backendItems = res.data;
-        const combined = [...backendItems];
-        
-        DEFAULT_CATALOG.forEach(defItem => {
-          if (!combined.some(c => c.name?.toLowerCase() === defItem.name?.toLowerCase())) {
-            combined.push(defItem);
-          }
-        });
-        setProducts(combined);
-      } else {
-        setProducts(DEFAULT_CATALOG);
-      }
-    } catch (err) {
-      setProducts(DEFAULT_CATALOG);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   // Filter products based on selected tab
   let filtered = [...products];
   if (selectedCategory !== 'all') {
     filtered = filtered.filter(p => {
-      const catSlug = p.category?.slug || '';
-      const catName = p.category?.name || '';
+      const catSlug = (p.category_slug || p.category?.slug || (typeof p.category === 'string' ? p.category : '') || '').toLowerCase();
+      const catName = (typeof p.category === 'string' ? p.category : (p.category?.name || '')).toLowerCase();
+      const cleanFilter = selectedCategory.replace('-', ' ').toLowerCase();
       return (
-        catSlug.includes(selectedCategory) ||
-        catName.toLowerCase().includes(selectedCategory.replace('-', ' ')) ||
-        p.name.toLowerCase().includes(selectedCategory.split('-')[0])
+        catSlug.includes(selectedCategory.toLowerCase()) ||
+        catName.includes(cleanFilter) ||
+        (p.name && p.name.toLowerCase().includes(selectedCategory.split('-')[0].toLowerCase()))
       );
     });
   }

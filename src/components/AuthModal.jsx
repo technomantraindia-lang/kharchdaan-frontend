@@ -88,7 +88,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
           <div className="auth-logo-badge">
             <Sparkles size={24} className="text-orange" />
           </div>
-          <h2>{tab === 'login' ? 'Welcome Back to BachatGanga' : 'Join BachatGanga Rewards'}</h2>
+          <h2>{tab === 'login' ? 'Welcome Back to KharchDaan' : 'Join KharchDaan Rewards'}</h2>
           <p>
             {tab === 'login' 
               ? 'Sign in to access your wallet, cashback, and order status.' 

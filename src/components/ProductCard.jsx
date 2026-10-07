@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 
 export const getProductImageUrl = (product) => {
   const name = (product.name || '').toLowerCase();
-  const cat = (product.category?.name || product.category?.slug || '').toLowerCase();
+  const cat = (typeof product.category === 'string' ? product.category : (product.category?.name || product.category?.slug || '')).toLowerCase();
   
   if (name.includes('rice') || cat.includes('rice')) {
     return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80';
@@ -95,7 +95,7 @@ export const ProductCard = ({ product, onQuickView }) => {
       <div className="product-details">
         <div className="product-category-row">
           <span className="product-category-tag">
-            {product.category?.name || 'Swadeshi Essentials'}
+            {typeof product.category === 'string' ? product.category : (product.category?.name || 'Swadeshi Essentials')}
           </span>
           <span className="product-pv-badge">
             {pvPoints} PV Points

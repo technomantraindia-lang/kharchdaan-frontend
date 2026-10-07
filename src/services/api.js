@@ -149,5 +149,23 @@ export const api = {
       console.warn('Orders API error:', err);
       return { success: false, data: [] };
     }
+  },
+
+  async createOrder(orderPayload) {
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/orders`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(orderPayload)
+      }, 15000);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || `Order creation failed with status ${res.status}`);
+      }
+      return data;
+    } catch (err) {
+      console.warn('createOrder API notice:', err.message);
+      return { success: false, error: err.message };
+    }
   }
 };

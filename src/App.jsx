@@ -39,6 +39,7 @@ import { CartPage } from './components/CartPage';
 import { CheckoutPage } from './components/CheckoutPage';
 import { IndianCornerFiligree } from './components/StepIllustrations';
 import { Preloader } from './components/Preloader';
+import { ProductsProvider, useProducts } from './context/ProductsContext';
 import { ALL_PRODUCTS } from './data/productsData';
 import './App.css';
 
@@ -57,18 +58,22 @@ const findProduct = (identifier) => {
   const target = String(identifier).trim().toLowerCase();
   
   // 1. Direct ID match
-  let found = ALL_PRODUCTS.find(p => p.id && p.id.toLowerCase() === target);
+  let found = ALL_PRODUCTS.find(p => p.id && String(p.id).toLowerCase() === target);
   if (found) return found;
 
   // 2. Exact slug match
-  found = ALL_PRODUCTS.find(p => toSlug(p.name) === target || toSlug(p.id) === target);
+  found = ALL_PRODUCTS.find(p => p.slug === target || toSlug(p.name) === target || toSlug(p.id) === target);
   if (found) return found;
 
-  // 3. Partial slug match
+  // 3. SKU match
+  found = ALL_PRODUCTS.find(p => p.sku && p.sku.toLowerCase() === target);
+  if (found) return found;
+
+  // 4. Partial slug match
   found = ALL_PRODUCTS.find(p => target.includes(toSlug(p.name)) || toSlug(p.name).includes(target));
   if (found) return found;
 
-  // 4. Name contains target
+  // 5. Name contains target
   found = ALL_PRODUCTS.find(p => (p.name || '').toLowerCase().includes(target));
   return found || null;
 };
@@ -206,6 +211,7 @@ const getRouteUrl = (page, extra = null, product = null) => {
 };
 
 function MainStore() {
+  const { products, findProduct: findProductFromContext, isBackendConnected } = useProducts();
   const initialRoute = parseRouteFromLocation();
   const [currentPage, setCurrentPage] = useState(initialRoute.page); 
   const [searchTerm, setSearchTerm] = useState('');
@@ -215,6 +221,14 @@ function MainStore() {
   const [selectedProduct, setSelectedProduct] = useState(initialRoute.product);
   const [selectedCategory, setSelectedCategory] = useState(initialRoute.category);
   const [selectedTopic, setSelectedTopic] = useState(initialRoute.topic);
+
+  // Sync selectedProduct with live backend data once loaded
+  useEffect(() => {
+    if (selectedProduct?.id) {
+      const live = findProductFromContext(selectedProduct.id);
+      if (live) setSelectedProduct(live);
+    }
+  }, [products]);
 
   // Sync state to URL and localStorage
   const syncRouteAndStorage = (page, extra = null, product = null, push = true) => {
@@ -302,6 +316,13 @@ function MainStore() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleSearchSubmit = (term) => {
+    setSearchTerm(term);
+    setCurrentPage('products');
+    syncRouteAndStorage('products', selectedCategory, null, true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="kharchdaan-page-wrapper">
       {/* Ultra-Premium Clean KharchDaan Preloader */}
@@ -316,11 +337,13 @@ function MainStore() {
       <Navbar
         onOpenAuth={() => setAuthModalOpen(true)}
         onOpenAccount={() => setAccountModalOpen(true)}
+        onSearchSubmit={handleSearchSubmit}
         onSearchChange={setSearchTerm}
         searchTerm={searchTerm}
         currentPage={currentPage}
         onNavigate={handleNavigation}
         onSelectCategory={handleCategorySelect}
+        onSelectProduct={handleProductSelect}
       />
 
       {/* 2. Main Page Content */}
@@ -347,6 +370,8 @@ function MainStore() {
           onNavigateHome={() => handleNavigation('home')}
           onProductClick={handleProductSelect}
           initialCategory={selectedCategory}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
           onOpenAuth={() => setAuthModalOpen(true)}
         />
       ) : currentPage === 'product-detail' ? (
@@ -558,9 +583,11 @@ function MainStore() {
 export default function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <MainStore />
-      </CartProvider>
+      <ProductsProvider>
+        <CartProvider>
+          <MainStore />
+        </CartProvider>
+      </ProductsProvider>
     </AuthProvider>
   );
 }
