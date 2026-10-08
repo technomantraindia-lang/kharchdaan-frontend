@@ -40,7 +40,6 @@ import { CheckoutPage } from './components/CheckoutPage';
 import { IndianCornerFiligree } from './components/StepIllustrations';
 import { Preloader } from './components/Preloader';
 import { ProductsProvider, useProducts } from './context/ProductsContext';
-import { ALL_PRODUCTS } from './data/productsData';
 import './App.css';
 
 // Helper to generate clean URL slug
@@ -50,32 +49,6 @@ const toSlug = (text) => {
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
-};
-
-// Helper to find a product by ID, slug, or name
-const findProduct = (identifier) => {
-  if (!identifier) return null;
-  const target = String(identifier).trim().toLowerCase();
-  
-  // 1. Direct ID match
-  let found = ALL_PRODUCTS.find(p => p.id && String(p.id).toLowerCase() === target);
-  if (found) return found;
-
-  // 2. Exact slug match
-  found = ALL_PRODUCTS.find(p => p.slug === target || toSlug(p.name) === target || toSlug(p.id) === target);
-  if (found) return found;
-
-  // 3. SKU match
-  found = ALL_PRODUCTS.find(p => p.sku && p.sku.toLowerCase() === target);
-  if (found) return found;
-
-  // 4. Partial slug match
-  found = ALL_PRODUCTS.find(p => target.includes(toSlug(p.name)) || toSlug(p.name).includes(target));
-  if (found) return found;
-
-  // 5. Name contains target
-  found = ALL_PRODUCTS.find(p => (p.name || '').toLowerCase().includes(target));
-  return found || null;
 };
 
 // Mapping of route slugs to valid page identifiers
@@ -125,7 +98,7 @@ const parseRouteFromLocation = () => {
     const hashParams = hash.includes('?') ? new URLSearchParams(hash.split('?')[1]) : new URLSearchParams();
     const cleanHash = hash.split('?')[0].replace(/^\/|\/$/g, '');
 
-    // 1. Check for product in query params (e.g. ?product=prod-oil-mustard)
+    // 1. Check for product in query params
     const productParam = searchParams.get('product') || 
                          searchParams.get('productId') || 
                          searchParams.get('id') ||
@@ -133,37 +106,31 @@ const parseRouteFromLocation = () => {
                          hashParams.get('id');
 
     if (productParam) {
-      const prod = findProduct(productParam);
-      if (prod) {
-        return { page: 'product-detail', product: prod, category: prod.category || 'All', topic: 'matrix-system' };
-      }
+      return { page: 'product-detail', productId: productParam, product: null, category: 'All', topic: 'matrix-system' };
     }
 
     // Check path /product/:id or /p/:id
     const productPathMatch = rawPath.match(/^(?:product|p)\/(.+)$/i) || cleanHash.match(/^(?:product|p)\/(.+)$/i);
     if (productPathMatch) {
-      const prod = findProduct(productPathMatch[1]);
-      if (prod) {
-        return { page: 'product-detail', product: prod, category: prod.category || 'All', topic: 'matrix-system' };
-      }
+      return { page: 'product-detail', productId: productPathMatch[1], product: null, category: 'All', topic: 'matrix-system' };
     }
 
     // 2. Check for category param
     const categoryParam = searchParams.get('category') || searchParams.get('cat') || hashParams.get('category');
     if (categoryParam) {
-      return { page: 'products', product: ALL_PRODUCTS[0], category: decodeURIComponent(categoryParam), topic: 'matrix-system' };
+      return { page: 'products', productId: null, product: null, category: decodeURIComponent(categoryParam), topic: 'matrix-system' };
     }
 
     // 3. Check for topic param
     const topicParam = searchParams.get('topic') || hashParams.get('topic');
     if (topicParam) {
-      return { page: 'direct-selling-topic', product: ALL_PRODUCTS[0], category: 'All', topic: topicParam };
+      return { page: 'direct-selling-topic', productId: null, product: null, category: 'All', topic: topicParam };
     }
 
     // 4. Check known page slug in path or hash
     const targetSlug = rawPath || cleanHash;
     if (targetSlug && PAGE_SLUG_MAP[targetSlug.toLowerCase()]) {
-      return { page: PAGE_SLUG_MAP[targetSlug.toLowerCase()], product: ALL_PRODUCTS[0], category: 'All', topic: 'matrix-system' };
+      return { page: PAGE_SLUG_MAP[targetSlug.toLowerCase()], productId: null, product: null, category: 'All', topic: 'matrix-system' };
     }
 
     // 5. Fallback to localStorage / sessionStorage persistence
@@ -173,13 +140,10 @@ const parseRouteFromLocation = () => {
     const savedTopic = sessionStorage.getItem('kharchdaan_topic') || localStorage.getItem('kharchdaan_topic');
 
     if (savedPage && (savedPage === 'product-detail' || PAGE_SLUG_MAP[savedPage])) {
-      if (savedPage === 'product-detail' && savedProductId) {
-        const prod = findProduct(savedProductId) || ALL_PRODUCTS[0];
-        return { page: 'product-detail', product: prod, category: savedCategory || prod.category || 'All', topic: savedTopic || 'matrix-system' };
-      }
       return { 
         page: savedPage, 
-        product: (savedProductId ? findProduct(savedProductId) : null) || ALL_PRODUCTS[0], 
+        productId: savedProductId || null,
+        product: null, 
         category: savedCategory || 'All', 
         topic: savedTopic || 'matrix-system' 
       };
@@ -188,15 +152,18 @@ const parseRouteFromLocation = () => {
     console.error('Error parsing route:', e);
   }
 
-  return { page: 'home', product: ALL_PRODUCTS[0], category: 'All', topic: 'matrix-system' };
+  return { page: 'home', productId: null, product: null, category: 'All', topic: 'matrix-system' };
 };
 
 const getRouteUrl = (page, extra = null, product = null) => {
   if (page === 'home') return '/';
   if (page === 'product-detail') {
-    const prod = product || (typeof extra === 'object' ? extra : findProduct(extra));
+    const prod = product || (typeof extra === 'object' ? extra : null);
     if (prod) {
       return `/product/${prod.id || toSlug(prod.name)}`;
+    }
+    if (typeof extra === 'string') {
+      return `/product/${extra}`;
     }
     return '/products';
   }
@@ -211,24 +178,44 @@ const getRouteUrl = (page, extra = null, product = null) => {
 };
 
 function MainStore() {
-  const { products, findProduct: findProductFromContext, isBackendConnected } = useProducts();
+  const { products, findProduct: findProductFromContext, isBackendConnected, loading } = useProducts();
   const initialRoute = parseRouteFromLocation();
   const [currentPage, setCurrentPage] = useState(initialRoute.page); 
   const [searchTerm, setSearchTerm] = useState('');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(initialRoute.product);
+  const [targetProductId, setTargetProductId] = useState(initialRoute.productId);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(initialRoute.category);
   const [selectedTopic, setSelectedTopic] = useState(initialRoute.topic);
 
+  // Clear legacy mock product IDs from storage on mount
+  useEffect(() => {
+    try {
+      const legacyPid = localStorage.getItem('kharchdaan_product_id');
+      if (legacyPid && String(legacyPid).startsWith('prod-')) {
+        localStorage.removeItem('kharchdaan_product_id');
+        sessionStorage.removeItem('kharchdaan_product_id');
+      }
+    } catch {}
+  }, []);
+
   // Sync selectedProduct with live backend data once loaded
   useEffect(() => {
-    if (selectedProduct?.id) {
-      const live = findProductFromContext(selectedProduct.id);
-      if (live) setSelectedProduct(live);
+    if (products.length > 0) {
+      if (targetProductId) {
+        const live = findProductFromContext(targetProductId);
+        if (live) {
+          setSelectedProduct(live);
+        } else if (currentPage === 'product-detail') {
+          setSelectedProduct(products[0]);
+        }
+      } else if (currentPage === 'product-detail' && !selectedProduct) {
+        setSelectedProduct(products[0]);
+      }
     }
-  }, [products]);
+  }, [products, targetProductId, currentPage, findProductFromContext, selectedProduct]);
 
   // Sync state to URL and localStorage
   const syncRouteAndStorage = (page, extra = null, product = null, push = true) => {

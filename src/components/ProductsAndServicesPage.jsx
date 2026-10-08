@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useProducts, getSmartProductImage } from '../context/ProductsContext';
-import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
+import { SERVICES_PACKAGES } from '../data/productsData';
 
 export const ProductsAndServicesPage = ({ 
   onNavigateHome, 
@@ -19,7 +19,7 @@ export const ProductsAndServicesPage = ({
 }) => {
   const { addToCart } = useCart();
   const { products, isBackendConnected, loading } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : (isBackendConnected ? [] : ALL_PRODUCTS);
+  const sourceList = products || [];
   const [activeTab, setActiveTab] = useState(initialCategory === 'Services' ? 'services' : 'products'); // 'products' | 'services'
   const [selectedCategory, setSelectedCategory] = useState(initialCategory === 'Services' ? 'All' : initialCategory);
   const [selectedBrand, setSelectedBrand] = useState('All');
@@ -162,10 +162,11 @@ export const ProductsAndServicesPage = ({
     e.stopPropagation();
     addToCart({
       id: prod.id,
-      name: `${prod.name} (${prod.weight})`,
+      name: `${prod.name} (${prod.weight || '1 Unit'})`,
       price: prod.price,
       image: prod.image,
-      cashbackPercent: prod.cashbackPercent,
+      cashbackAmount: prod.cashbackAmount,
+      cashbackPercent: prod.cashbackPercent || 100,
       category: prod.category
     }, 1);
 

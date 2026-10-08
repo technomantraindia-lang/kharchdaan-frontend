@@ -9,7 +9,6 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
 import { api } from '../services/api';
-import { ALL_PRODUCTS } from '../data/productsData';
 
 export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOpenAuth }) => {
   const { 
@@ -19,12 +18,14 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
     platformFee, 
     grandTotal, 
     estimatedCashback, 
-    totalItems 
+    totalItems,
+    appliedCoupon,
+    discountAmount
   } = useCart();
   
   const { user, isAuthenticated } = useAuth();
   const { products } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const sourceList = products || [];
 
   // Form States
   const [formData, setFormData] = useState({
@@ -93,15 +94,17 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
     try {
       const orderPayload = {
         items: items.map(it => ({
-          product_id: it.productId || it.id,
+          product_id: isNaN(Number(it.productId || it.id)) ? null : Number(it.productId || it.id),
           name: it.name,
-          price: it.price,
-          qty: it.quantity || 1
+          price: Number(it.price || 0),
+          qty: Number(it.quantity || 1)
         })),
         payment_method: paymentMethod,
         shipping_address: fullShippingAddr,
         shipping_charge: 0,
-        discount: 0
+        platform_fee: platformFee,
+        discount: discountAmount,
+        total: grandTotal
       };
       const apiRes = await api.createOrder(orderPayload);
       if (apiRes?.success && apiRes?.data?.order_number) {
@@ -703,6 +706,13 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                       </div>
                       <span className="co-sum-val">₹{platformFee.toLocaleString('en-IN')}</span>
                     </div>
+
+                    {appliedCoupon && discountAmount > 0 && (
+                      <div className="co-sum-row" style={{ color: '#16a34a', fontWeight: 600 }}>
+                        <span>Coupon Voucher ({appliedCoupon.code})</span>
+                        <span className="co-sum-val" style={{ color: '#16a34a' }}>- ₹{discountAmount.toLocaleString('en-IN')}</span>
+                      </div>
+                    )}
 
                     <div className="co-sum-divider" />
 

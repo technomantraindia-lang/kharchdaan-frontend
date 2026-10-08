@@ -3,13 +3,12 @@ import { X, Trash2, Plus, Minus, ArrowRight, Sparkles, ShieldCheck, ShoppingBag,
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
-import { ALL_PRODUCTS } from '../data/productsData';
 
 export const CartDrawer = ({ onOpenAuth, onNavigate }) => {
-  const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, subtotal, platformFee, grandTotal, estimatedCashback, totalItems } = useCart();
+  const { items, isCartOpen, setIsCartOpen, updateQuantity, removeItem, clearCart, subtotal, platformFee, grandTotal, estimatedCashback, totalItems, appliedCoupon } = useCart();
   const { isAuthenticated } = useAuth();
   const { products } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const sourceList = products || [];
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -180,6 +179,12 @@ export const CartDrawer = ({ onOpenAuth, onNavigate }) => {
                 <span className="row-label">Estimated Cashback</span>
                 <span className="row-val">+ ₹{estimatedCashback.toLocaleString('en-IN')}</span>
               </div>
+              {appliedCoupon && (
+                <div className="breakdown-row" style={{ color: '#16a34a', fontWeight: 600 }}>
+                  <span className="row-label">Coupon Voucher ({appliedCoupon.code})</span>
+                  <span className="row-val">- ₹{appliedCoupon.discount}</span>
+                </div>
+              )}
               <div className="breakdown-row">
                 <span className="row-label">Delivery Fee</span>
                 <div className="delivery-fee-badge-wrap">

@@ -38,7 +38,7 @@ export async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
 
 export const api = {
   // Products API
-  async getProducts(params = {}) {
+  async getProducts(params = {}, retry = true) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -47,22 +47,27 @@ export const api = {
     });
     const url = `${API_BASE}/products${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
     try {
-      const res = await fetchWithTimeout(url, { headers: getAuthHeaders() }, 10000);
+      const res = await fetchWithTimeout(url, { headers: getAuthHeaders() }, 30000);
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       return await res.json();
     } catch (err) {
-      console.warn('API getProducts fallback:', err.message);
+      if (retry) {
+        console.warn('API getProducts initial attempt failed, retrying for server wake-up:', err.message);
+        await new Promise(r => setTimeout(r, 1500));
+        return this.getProducts(params, false);
+      }
+      console.warn('API getProducts error:', err.message);
       return { success: false, data: [], pagination: null, error: err.message };
     }
   },
 
   async getProduct(slug) {
     try {
-      const res = await fetchWithTimeout(`${API_BASE}/products/${slug}`, { headers: getAuthHeaders() }, 10000);
+      const res = await fetchWithTimeout(`${API_BASE}/products/${slug}`, { headers: getAuthHeaders() }, 20000);
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       return await res.json();
     } catch (err) {
-      console.warn('API getProduct fallback:', err.message);
+      console.warn('API getProduct error:', err.message);
       return { success: false, data: null, error: err.message };
     }
   },

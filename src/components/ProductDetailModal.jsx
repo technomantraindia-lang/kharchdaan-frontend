@@ -11,13 +11,17 @@ export const ProductDetailModal = ({ product, onClose }) => {
   if (!product) return null;
 
   const images = product.images?.length > 0 ? product.images : [product.image_url || '/images/default-product.svg'];
-  const price = Number(selectedVariation?.price ?? product.display_price ?? product.price ?? 0);
-  const cashbackAmount = Math.max(10, Math.round(price * 0.08));
+  const price = Number(selectedVariation ? (selectedVariation.sale_price || selectedVariation.price) : (product.display_price ?? product.price ?? 0));
+  const mrp = Number(selectedVariation ? (selectedVariation.mrp || selectedVariation.price) : (product.mrp || (price > 0 ? Math.round(price * 1.20) : price)));
+  const cashbackAmount = Number(product.cashbackAmount ?? Math.max(15, Math.round(price * 0.10)));
   // Sourced directly on-demand from verified FMCG vendors as per requirement
   const isInStock = true;
 
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedVariation);
+    addToCart({
+      ...product,
+      cashbackAmount: cashbackAmount
+    }, quantity, selectedVariation);
     onClose();
   };
 
@@ -84,14 +88,13 @@ export const ProductDetailModal = ({ product, onClose }) => {
 
             <div className="modal-pricing-box">
               <span className="modal-price">₹{price.toLocaleString('en-IN')}</span>
-              {selectedVariation ? (
-                selectedVariation.sale_price && selectedVariation.price && (
-                  <span className="modal-price-old">₹{Number(selectedVariation.price).toLocaleString('en-IN')}</span>
-                )
-              ) : (
-                product.price && product.sale_price && (
-                  <span className="modal-price-old">₹{Number(product.price).toLocaleString('en-IN')}</span>
-                )
+              {mrp > price && (
+                <span className="modal-price-old">₹{mrp.toLocaleString('en-IN')}</span>
+              )}
+              {mrp > price && (
+                <span className="modal-discount-pill" style={{ marginLeft: '8px', padding: '2px 8px', background: '#dcfce7', color: '#166534', borderRadius: '4px', fontSize: '12px', fontWeight: 700 }}>
+                  {Math.round(((mrp - price) / mrp) * 100)}% OFF
+                </span>
               )}
               <span className="modal-tax-tag">Inclusive of all GST taxes</span>
             </div>

@@ -1,12 +1,11 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useProducts } from '../context/ProductsContext';
-import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
 
 export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) => {
   const scrollRef = useRef(null);
-  const { products } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const { products, loading } = useProducts();
+  const sourceList = products || [];
 
   const categories = [
     {

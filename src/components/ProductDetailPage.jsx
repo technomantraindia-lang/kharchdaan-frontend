@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useProducts, getSmartProductImage } from '../context/ProductsContext';
-import { ALL_PRODUCTS } from '../data/productsData';
 
 export const ProductDetailPage = ({ 
   product, 
@@ -18,7 +17,7 @@ export const ProductDetailPage = ({
 }) => {
   const { addToCart, setIsCartOpen } = useCart();
   const { products } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const sourceList = products || [];
   const [selectedVariant, setSelectedVariant] = useState(
     product?.variants?.find(v => v.isDefault) || product?.variants?.[0] || null
   );
@@ -39,18 +38,19 @@ export const ProductDetailPage = ({
     );
   }
 
-  const currentPrice = selectedVariant ? selectedVariant.price : product.price;
-  const currentMrp = selectedVariant ? selectedVariant.mrp : product.mrp;
-  const savings = currentMrp - currentPrice;
-  const discountPercent = Math.round((savings / currentMrp) * 100);
+  const currentPrice = Number(selectedVariant ? selectedVariant.price : (product.price || 0));
+  const currentMrp = Number(selectedVariant ? selectedVariant.mrp : (product.mrp || currentPrice));
+  const savings = Math.max(0, currentMrp - currentPrice);
+  const discountPercent = currentMrp > currentPrice ? Math.round((savings / currentMrp) * 100) : 0;
 
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
-      name: `${product.name} (${selectedVariant?.size || product.weight})`,
+      name: `${product.name} (${selectedVariant?.size || product.weight || '1 Unit'})`,
       price: currentPrice,
       image: product.image,
-      cashbackPercent: product.cashbackPercent,
+      cashbackAmount: product.cashbackAmount,
+      cashbackPercent: product.cashbackPercent || 100,
       category: product.category
     }, quantity);
 
@@ -61,10 +61,11 @@ export const ProductDetailPage = ({
   const handleBuyNow = () => {
     addToCart({
       id: product.id,
-      name: `${product.name} (${selectedVariant?.size || product.weight})`,
+      name: `${product.name} (${selectedVariant?.size || product.weight || '1 Unit'})`,
       price: currentPrice,
       image: product.image,
-      cashbackPercent: product.cashbackPercent,
+      cashbackAmount: product.cashbackAmount,
+      cashbackPercent: product.cashbackPercent || 100,
       category: product.category
     }, quantity);
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../services/api';
-import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
+import { SERVICES_PACKAGES } from '../data/productsData';
 
 const ProductsContext = createContext(null);
 
@@ -46,29 +46,21 @@ export const getSmartProductImage = (item) => {
   return '/images/family-grocery-hamper.jpg';
 };
 
-// Normalize a single product item from backend or local data
-export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
+// Normalize a single product item from backend data
+export const normalizeProduct = (item) => {
   if (!item) return null;
 
-  // Find counterpart in fallback catalog for rich descriptions/specifications if needed
-  const fallback = fallbackCatalog.find(
-    f => (f.id && String(f.id).toLowerCase() === String(item.id || '').toLowerCase()) ||
-         (f.sku && String(f.sku).toLowerCase() === String(item.sku || '').toLowerCase()) ||
-         (f.slug && String(f.slug).toLowerCase() === String(item.slug || '').toLowerCase()) ||
-         (f.name && f.name.toLowerCase() === (item.name || '').toLowerCase())
-  );
+  const rawBrand = item.brand_name || (typeof item.brand === 'object' ? item.brand?.name : item.brand) || 'KharchDaan';
+  const rawCat = item.category_name || (typeof item.category === 'object' ? item.category?.name : item.category) || 'Grocery';
+  const rawSubCat = item.subCategory || item.sub_category || (typeof item.sub_category === 'object' ? item.sub_category?.name : null) || null;
 
-  const rawBrand = item.brand_name || (typeof item.brand === 'object' ? item.brand?.name : item.brand) || fallback?.brand || 'KharchDaan';
-  const rawCat = item.category_name || (typeof item.category === 'object' ? item.category?.name : item.category) || fallback?.category || 'Grocery';
-  const rawSubCat = item.subCategory || item.sub_category || (typeof item.sub_category === 'object' ? item.sub_category?.name : null) || fallback?.subCategory || null;
-
-  const price = Number(item.price ?? fallback?.price ?? 0);
-  const mrp = Number(item.mrp ?? fallback?.mrp ?? (price > 0 ? Math.round(price * 1.20) : 0));
+  const price = Number(item.price ?? 0);
+  const mrp = Number(item.mrp ?? (price > 0 ? Math.round(price * 1.20) : 0));
   const displayPrice = Number(item.display_price ?? price);
 
-  const discount = item.discount || (mrp > price ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : (fallback?.discount || '15% OFF'));
+  const discount = item.discount || (mrp > price ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : '15% OFF');
 
-  let rawImage = item.image_url || item.image || fallback?.image;
+  let rawImage = item.image_url || item.image;
 
   if (typeof rawImage === 'string') {
     // If it's a relative path stored by Laravel disk (e.g. "products/xyz.png")
@@ -110,54 +102,56 @@ export const normalizeProduct = (item, fallbackCatalog = ALL_PRODUCTS) => {
 
   const variants = Array.isArray(item.variants) && item.variants.length > 0
     ? item.variants
-    : (fallback?.variants || [
+    : [
         { id: 'v1', size: item.weight || 'Standard Pack', price: price, mrp: mrp, isDefault: true }
-      ]);
+      ];
+
+  const cashbackAmt = Number(item.cashbackAmount ?? item.cashback_amount ?? Math.max(15, Math.round(price * 0.10)));
 
   return {
-    id: String(item.id || fallback?.id || toSlug(item.name)),
-    name: item.name || fallback?.name || 'FMCG Product',
-    slug: item.slug || toSlug(item.name || fallback?.name),
-    sku: item.sku || fallback?.sku || `KD-${toSlug(item.name).slice(0, 8).toUpperCase()}`,
+    id: String(item.id || toSlug(item.name)),
+    name: item.name || 'FMCG Product',
+    slug: item.slug || toSlug(item.name),
+    sku: item.sku || `KD-${toSlug(item.name).slice(0, 8).toUpperCase()}`,
     brand: rawBrand,
     brand_details: item.brand_details || null,
     category: rawCat,
     category_details: item.category_details || null,
     category_slug: item.category_slug || toSlug(rawCat),
     subCategory: rawSubCat,
-    weight: item.weight || fallback?.weight || '1 Unit',
+    weight: item.weight || '1 Unit',
     price: price,
     mrp: mrp,
-    sale_price: item.sale_price !== undefined ? Number(item.sale_price) : (fallback?.price || price),
+    sale_price: item.sale_price !== undefined ? Number(item.sale_price) : price,
     display_price: displayPrice,
     discount: discount,
     image: image,
     image_url: item.image_url || image,
     images: images,
-    cashbackPercent: Number(item.cashbackPercent ?? fallback?.cashbackPercent ?? 100),
-    cashbackAmount: Number(item.cashbackAmount ?? fallback?.cashbackAmount ?? Math.max(15, Math.round(price * 0.10))),
-    pvPoints: Number(item.pvPoints ?? fallback?.pvPoints ?? Math.max(25, Math.round(price * 0.20))),
-    rating: Number(item.rating ?? fallback?.rating ?? 4.9),
-    reviews: Number(item.reviews ?? fallback?.reviews ?? 240),
+    cashbackPercent: Number(item.cashbackPercent ?? item.cashback_percent ?? 100),
+    cashbackAmount: cashbackAmt,
+    pvPoints: Number(item.pvPoints ?? item.pv_points ?? Math.max(25, Math.round(price * 0.20))),
+    rating: Number(item.rating ?? 4.9),
+    reviews: Number(item.reviews ?? 240),
     inStock: item.inStock !== undefined ? Boolean(item.inStock) : (item.available_stock !== undefined ? item.available_stock > 0 : true),
     stock_status: item.stock_status || (item.available_stock > 0 ? 'in_stock' : 'out_of_stock'),
     available_stock: item.available_stock !== undefined ? Number(item.available_stock) : 100,
-    featured: Boolean(item.featured ?? fallback?.featured ?? false),
-    shortDescription: item.shortDescription || item.short_desc || item.short_description || fallback?.shortDescription || '',
-    description: item.description || fallback?.description || '',
+    featured: Boolean(item.featured ?? false),
+    shortDescription: item.shortDescription || item.short_desc || item.short_description || '',
+    description: item.description || '',
     variants: variants,
-    specifications: fallback?.specifications || item.specifications || {
+    specifications: item.specifications || {
       'Brand': rawBrand,
       'Category': rawCat,
       'Quality Check': '100% Genuine Certified',
       'Country of Origin': 'India'
     },
-    ingredients: item.ingredients || fallback?.ingredients || 'Standard genuine FMCG formulation compliant with FSSAI regulations.'
+    ingredients: item.ingredients || 'Standard genuine FMCG formulation compliant with FSSAI regulations.'
   };
 };
 
 export const ProductsProvider = ({ children }) => {
-  // Start with empty state so live backend products are purely loaded
+  // Start with empty state and strictly load from backend API
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
@@ -169,8 +163,8 @@ export const ProductsProvider = ({ children }) => {
     try {
       const res = await api.getProducts({ per_page: 100 });
       if (res && res.success && Array.isArray(res.data)) {
-        // Normalize backend items strictly from the live database
-        const backendNormalized = res.data.map(item => normalizeProduct(item, ALL_PRODUCTS));
+        // Normalize backend items strictly from live database
+        const backendNormalized = res.data.map(item => normalizeProduct(item));
         setProducts(backendNormalized);
         setIsBackendConnected(true);
         setBackendError(null);
@@ -178,16 +172,14 @@ export const ProductsProvider = ({ children }) => {
         console.log(`[KharchDaan API] Successfully loaded ${backendNormalized.length} products live from backend.`);
       } else {
         setIsBackendConnected(false);
-        setBackendError('Backend returned empty or invalid response.');
-        // Fall back to offline catalog only if no products are loaded
-        setProducts(prev => (prev.length === 0 ? ALL_PRODUCTS.map(p => normalizeProduct(p)) : prev));
+        setBackendError(res?.error || 'Backend returned empty or invalid response.');
+        setProducts([]);
       }
     } catch (err) {
-      console.warn('[KharchDaan API] Products fetch error, fallback active:', err.message);
+      console.warn('[KharchDaan API] Products fetch error:', err.message);
       setIsBackendConnected(false);
       setBackendError(err.message);
-      // Fall back to offline catalog only if no products are loaded
-      setProducts(prev => (prev.length === 0 ? ALL_PRODUCTS.map(p => normalizeProduct(p)) : prev));
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -197,31 +189,29 @@ export const ProductsProvider = ({ children }) => {
     fetchProductsFromBackend();
   }, [fetchProductsFromBackend]);
 
-  // Robust product lookup by identifier (ID, slug, or name)
+  // Robust product lookup by identifier (ID, slug, or name) strictly in active products
   const findProduct = useCallback((identifier) => {
     if (!identifier) return null;
     const target = String(identifier).trim().toLowerCase();
 
-    const searchPool = products.length > 0 ? products : ALL_PRODUCTS;
-
     // 1. Direct ID match
-    let found = searchPool.find(p => p.id && String(p.id).toLowerCase() === target);
+    let found = products.find(p => p.id && String(p.id).toLowerCase() === target);
     if (found) return found;
 
     // 2. Exact slug match
-    found = searchPool.find(p => p.slug === target || toSlug(p.name) === target || toSlug(p.id) === target);
+    found = products.find(p => p.slug === target || toSlug(p.name) === target || toSlug(p.id) === target);
     if (found) return found;
 
     // 3. SKU match
-    found = searchPool.find(p => p.sku && p.sku.toLowerCase() === target);
+    found = products.find(p => p.sku && p.sku.toLowerCase() === target);
     if (found) return found;
 
     // 4. Partial slug match
-    found = searchPool.find(p => target.includes(p.slug) || (p.slug && p.slug.includes(target)));
+    found = products.find(p => target.includes(p.slug) || (p.slug && p.slug.includes(target)));
     if (found) return found;
 
     // 5. Name contains target
-    found = searchPool.find(p => (p.name || '').toLowerCase().includes(target));
+    found = products.find(p => (p.name || '').toLowerCase().includes(target));
     return found || null;
   }, [products]);
 

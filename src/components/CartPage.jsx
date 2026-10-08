@@ -7,8 +7,6 @@ import {
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
-import { ALL_PRODUCTS } from '../data/productsData';
-
 export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOpenAuth }) => {
   const { 
     items, 
@@ -19,37 +17,32 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
     platformFee, 
     grandTotal, 
     estimatedCashback, 
-    totalItems 
+    totalItems,
+    appliedCoupon,
+    couponError,
+    applyCoupon,
+    removeCoupon,
+    discountAmount
   } = useCart();
   const { products } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const sourceList = products || [];
   
   const { isAuthenticated } = useAuth();
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [couponError, setCouponError] = useState('');
+  const [couponInput, setCouponInput] = useState('');
   const [pincode, setPincode] = useState('380001');
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
   const [pincodeStatus, setPincodeStatus] = useState('Verified: Express 24-Hour Delivery to Pincode 380001');
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
-    setCouponError('');
-    const code = couponCode.trim().toUpperCase();
-    if (!code) return;
-
-    if (code === 'SWADESHI50' || code === 'BACHATGROW' || code === 'WELCOME10') {
-      const discount = code === 'SWADESHI50' ? Math.min(50, subtotal * 0.1) : 25;
-      setAppliedCoupon({ code, discount: Math.round(discount) });
-      setCouponCode('');
-    } else {
-      setCouponError('Invalid coupon code. Try SWADESHI50 or WELCOME10');
+    const res = applyCoupon(couponInput);
+    if (res?.success) {
+      setCouponInput('');
     }
   };
 
   const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponError('');
+    removeCoupon();
   };
 
   const handlePincodeCheck = (e) => {
@@ -73,8 +66,7 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
     return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&auto=format&fit=crop&q=80';
   };
 
-  const discountAmount = appliedCoupon ? appliedCoupon.discount : 0;
-  const finalPayable = Math.max(0, grandTotal - discountAmount);
+  const finalPayable = grandTotal;
 
   return (
     <div className="co-page-wrapper">
@@ -318,8 +310,8 @@ export const CartPage = ({ onNavigateHome, onNavigateCheckout, onShopClick, onOp
                     <form onSubmit={handleApplyCoupon} className="cp-coupon-form">
                       <input 
                         type="text" 
-                        value={couponCode} 
-                        onChange={(e) => setCouponCode(e.target.value)} 
+                        value={couponInput} 
+                        onChange={(e) => setCouponInput(e.target.value)} 
                         placeholder="e.g. SWADESHI50" 
                         className="cp-coupon-input"
                       />

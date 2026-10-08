@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
-import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
+import { SERVICES_PACKAGES } from '../data/productsData';
 import { 
   WheatStaplesSvg, 
   FoodBeverageSvg, 
@@ -101,8 +101,8 @@ export const CategoryProductListPage = ({
   onOpenAuth 
 }) => {
   const { addToCart } = useCart();
-  const { products } = useProducts();
-  const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+  const { products, loading } = useProducts();
+  const sourceList = products || [];
   const config = CATEGORY_CONFIG[categorySlug] || CATEGORY_CONFIG['grocery-staples'];
   const HeaderIcon = config.Icon;
 
@@ -116,10 +116,11 @@ export const CategoryProductListPage = ({
     e.stopPropagation();
     addToCart({
       id: prod.id,
-      name: `${prod.name} (${prod.weight})`,
+      name: `${prod.name} (${prod.weight || '1 Unit'})`,
       price: prod.price,
       image: prod.image,
-      cashbackPercent: prod.cashbackPercent,
+      cashbackAmount: prod.cashbackAmount,
+      cashbackPercent: prod.cashbackPercent || 100,
       category: prod.category
     }, 1);
 

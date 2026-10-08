@@ -8,7 +8,6 @@ import {
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts, getSmartProductImage } from '../context/ProductsContext';
-import { ALL_PRODUCTS } from '../data/productsData';
 
 /* ==========================================================================
    CLEAN VECTOR SVG ICONS FOR INTUITIVE DROPDOWNS
@@ -88,7 +87,7 @@ export const Navbar = ({
   const searchSuggestions = React.useMemo(() => {
     const q = (localSearch || '').trim().toLowerCase();
     if (!q || q.length < 1) return [];
-    const sourceList = (products && products.length > 0) ? products : ALL_PRODUCTS;
+    const sourceList = products || [];
     return sourceList.filter(p => 
       (p.name && p.name.toLowerCase().includes(q)) || 
       (p.brand && String(p.brand).toLowerCase().includes(q)) || 
