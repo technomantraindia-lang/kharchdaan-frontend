@@ -135,7 +135,13 @@ export const Navbar = ({
       return;
     }
 
-    if (target === 'direct-selling' || target === 'power-matrix') {
+    if (target === 'direct-selling' || target === 'mlm-plan') {
+      if (onNavigate) onNavigate('direct-selling');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (target === 'power-matrix') {
       if (onNavigate) onNavigate('power-matrix');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -346,7 +352,7 @@ export const Navbar = ({
               onMouseLeave={handleMouseLeave}
             >
               <button 
-                className={`nav-link-btn with-arrow ${['power-matrix', 'earning-depth', 'royalty-pool', 'instant-payouts'].includes(currentPage) || activeDropdown === 'directSelling' ? 'active' : ''}`}
+                className={`nav-link-btn with-arrow ${['direct-selling', 'mlm-plan', 'power-matrix', 'earning-depth', 'royalty-pool', 'instant-payouts'].includes(currentPage) || activeDropdown === 'directSelling' ? 'active' : ''}`}
                 onClick={() => handleNavClick('direct-selling')}
               >
                 <span>Direct Selling Plan</span>
@@ -357,8 +363,23 @@ export const Navbar = ({
               <div className="simple-dropdown-menu">
                 <div className="dropdown-header-strip">
                   <TrendingUp size={15} className="text-orange" />
-                  <span>Compensation & Benefits</span>
+                  <span>1:3 Matrix Compensation Plan</span>
                 </div>
+
+                {/* Top Featured Flowchart */}
+                <button 
+                  className="dropdown-item-btn featured-flowchart-btn"
+                  onClick={() => handleNavClick('direct-selling')}
+                >
+                  <div className="dropdown-item-icon saffron">
+                    <TrendingUp size={16} />
+                  </div>
+                  <div className="dropdown-item-text">
+                    <strong>1:3 Matrix Visual Flowchart</strong>
+                    <span>5-Step roadmap, spillover tree & calculator</span>
+                  </div>
+                </button>
+
                 <button 
                   className="dropdown-item-btn"
                   onClick={() => handleNavClick('power-matrix')}

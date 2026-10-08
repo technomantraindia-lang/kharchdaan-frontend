@@ -37,6 +37,8 @@ import { CartDrawer } from './components/CartDrawer';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartPage } from './components/CartPage';
 import { CheckoutPage } from './components/CheckoutPage';
+import { MlmPlanPage } from './components/MlmPlanPage';
+import { MlmStructureModal } from './components/MlmStructureModal';
 import { IndianCornerFiligree } from './components/StepIllustrations';
 import { Preloader } from './components/Preloader';
 import { ProductsProvider, useProducts } from './context/ProductsContext';
@@ -62,6 +64,10 @@ const PAGE_SLUG_MAP = {
   'store': 'products',
   'shop': 'products',
   'power-matrix': 'power-matrix',
+  'direct-selling': 'direct-selling',
+  'mlm-plan': 'direct-selling',
+  'mlm-flowchart': 'direct-selling',
+  'mlm': 'direct-selling',
   'earning-depth': 'earning-depth',
   'royalty-pool': 'royalty-pool',
   'instant-payouts': 'instant-payouts',
@@ -171,6 +177,9 @@ const getRouteUrl = (page, extra = null, product = null) => {
     const cat = typeof extra === 'string' && extra !== 'All' ? extra : null;
     return cat ? `/products?category=${encodeURIComponent(cat)}` : '/products';
   }
+  if (page === 'direct-selling' || page === 'mlm-plan') {
+    return '/direct-selling';
+  }
   if (page === 'direct-selling-topic') {
     return `/direct-selling?topic=${encodeURIComponent(extra || 'matrix-system')}`;
   }
@@ -184,6 +193,7 @@ function MainStore() {
   const [searchTerm, setSearchTerm] = useState('');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const [mlmFlowchartModalOpen, setMlmFlowchartModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [targetProductId, setTargetProductId] = useState(initialRoute.productId);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -369,6 +379,12 @@ function MainStore() {
           onProductClick={handleProductSelect}
           onOpenAuth={() => setAuthModalOpen(true)}
         />
+      ) : currentPage === 'direct-selling' || currentPage === 'mlm-plan' ? (
+        <MlmPlanPage
+          onNavigateHome={() => handleNavigation('home')}
+          onOpenAuth={() => setAuthModalOpen(true)}
+          onShopClick={() => handleNavigation('products')}
+        />
       ) : currentPage === 'power-matrix' ? (
         <PowerMatrixPage
           onNavigate={handleNavigation}
@@ -523,7 +539,8 @@ function MainStore() {
 
           {/* Direct Selling Network (3 Columns) */}
           <NetworkStructureSection
-            onOpenDetailsModal={() => setAuthModalOpen(true)}
+            onOpenDetailsModal={() => setMlmFlowchartModalOpen(true)}
+            onOpenFlowchartModal={() => setMlmFlowchartModalOpen(true)}
           />
 
           {/* Why Choose KharchDaan.Com & 100% Direct Cashback Hub */}
@@ -557,6 +574,13 @@ function MainStore() {
       <AccountModal
         isOpen={accountModalOpen}
         onClose={() => setAccountModalOpen(false)}
+      />
+
+      <MlmStructureModal
+        isOpen={mlmFlowchartModalOpen}
+        onClose={() => setMlmFlowchartModalOpen(false)}
+        onOpenAuth={() => setAuthModalOpen(true)}
+        onShopClick={() => handleNavigation('products')}
       />
 
       <CartDrawer 

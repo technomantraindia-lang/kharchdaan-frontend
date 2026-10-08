@@ -28,9 +28,11 @@ const testimonialsData = [
   }
 ];
 
-export const NetworkStructureSection = ({ onOpenDetailsModal }) => {
+export const NetworkStructureSection = ({ onOpenDetailsModal, onOpenFlowchartModal }) => {
   const [activeNode, setActiveNode] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const handleOpenFlowchart = onOpenFlowchartModal || onOpenDetailsModal;
 
   // Automatically slide every 4 seconds smoothly
   useEffect(() => {
@@ -71,6 +73,14 @@ export const NetworkStructureSection = ({ onOpenDetailsModal }) => {
           <p className="network-subtitle-text">
             Explore how our 1:3 placement matrix and 20-level distribution system create long-term financial security for Indian families.
           </p>
+
+          <div className="network-header-action-row">
+            <button className="btn-network-header-flowchart" onClick={handleOpenFlowchart}>
+              <TrendingUp size={15} />
+              <span>Open 5-Step Visual Flowchart & Tree Visualizer</span>
+              <ChevronRight size={15} />
+            </button>
+          </div>
         </div>
 
         {/* 3 Interactive Feature Cards */}
@@ -167,8 +177,8 @@ export const NetworkStructureSection = ({ onOpenDetailsModal }) => {
 
             {/* Learn More Button */}
             <div className="orange-card-footer-btn-wrapper">
-              <button className="btn-learn-more-orange-card" onClick={onOpenDetailsModal}>
-                <span>Learn Compensation Plan</span>
+              <button className="btn-learn-more-orange-card" onClick={handleOpenFlowchart}>
+                <span>Open 1:3 Matrix Flowchart</span>
                 <ArrowRight size={14} />
               </button>
             </div>
@@ -258,9 +268,9 @@ export const NetworkStructureSection = ({ onOpenDetailsModal }) => {
             <div className="white-card-footer">
               <button 
                 className="btn-view-details-outline" 
-                onClick={onOpenDetailsModal}
+                onClick={handleOpenFlowchart}
               >
-                <span>View Full 20-Level Breakdown</span>
+                <span>View Full 20-Level Matrix & Tree</span>
                 <ArrowRight size={14} />
               </button>
             </div>
