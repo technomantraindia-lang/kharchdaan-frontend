@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useProducts } from '../context/ProductsContext';
+import { SERVICES_PACKAGES } from '../data/productsData';
 
 export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) => {
   const scrollRef = useRef(null);
-  const { products, loading } = useProducts();
+  const { products, servicesPackages, loading } = useProducts();
   const sourceList = products || [];
+  const packagesList = (servicesPackages && servicesPackages.length > 0) ? servicesPackages : (SERVICES_PACKAGES || []);
 
   const categories = [
     {
@@ -77,7 +79,7 @@ export const ShopByCategorySection = ({ onSelectCategory, activeCategoryId }) =>
       id: 'services',
       filterKey: 'Services',
       name: 'Family Ration\nBundles',
-      itemCount: SERVICES_PACKAGES.length,
+      itemCount: packagesList.length,
       color: '#FFEDD5',
       borderColor: '#FED7AA',
       icon: (
