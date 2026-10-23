@@ -125,9 +125,11 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
           <div className="flowchart-steps-grid">
             {/* Step 1 */}
             <div className="flowchart-step-card step-1">
-              <div className="step-number-badge">STEP 1</div>
-              <div className="step-icon-bubble">
-                <Users size={22} />
+              <div className="step-card-top-row">
+                <span className="step-number-badge">STEP 1</span>
+                <div className="step-icon-bubble">
+                  <Users size={20} />
+                </div>
               </div>
               <h3 className="step-card-title">Free Registration & KYC</h3>
               <p className="step-card-desc">
@@ -151,9 +153,11 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
 
             {/* Step 2 */}
             <div className="flowchart-step-card step-2">
-              <div className="step-number-badge">STEP 2</div>
-              <div className="step-icon-bubble">
-                <ShoppingBag size={22} />
+              <div className="step-card-top-row">
+                <span className="step-number-badge">STEP 2</span>
+                <div className="step-icon-bubble">
+                  <ShoppingBag size={20} />
+                </div>
               </div>
               <h3 className="step-card-title">Shop Household Groceries</h3>
               <p className="step-card-desc">
@@ -177,9 +181,11 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
 
             {/* Step 3 */}
             <div className="flowchart-step-card step-3 highlight-step">
-              <div className="step-number-badge gold">STEP 3</div>
-              <div className="step-icon-bubble gold">
-                <Sparkles size={22} />
+              <div className="step-card-top-row">
+                <span className="step-number-badge gold">STEP 3</span>
+                <div className="step-icon-bubble gold">
+                  <Sparkles size={20} />
+                </div>
               </div>
               <h3 className="step-card-title">1:3 Placement Matrix</h3>
               <p className="step-card-desc">
@@ -203,9 +209,11 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
 
             {/* Step 4 */}
             <div className="flowchart-step-card step-4">
-              <div className="step-number-badge">STEP 4</div>
-              <div className="step-icon-bubble">
-                <TrendingUp size={22} />
+              <div className="step-card-top-row">
+                <span className="step-number-badge">STEP 4</span>
+                <div className="step-icon-bubble">
+                  <TrendingUp size={20} />
+                </div>
               </div>
               <h3 className="step-card-title">Automatic Spillover</h3>
               <p className="step-card-desc">
@@ -229,9 +237,11 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
 
             {/* Step 5 */}
             <div className="flowchart-step-card step-5">
-              <div className="step-number-badge emerald">STEP 5</div>
-              <div className="step-icon-bubble emerald">
-                <Wallet size={22} />
+              <div className="step-card-top-row">
+                <span className="step-number-badge emerald">STEP 5</span>
+                <div className="step-icon-bubble emerald">
+                  <Wallet size={20} />
+                </div>
               </div>
               <h3 className="step-card-title">Weekly & Monthly Payouts</h3>
               <p className="step-card-desc">
