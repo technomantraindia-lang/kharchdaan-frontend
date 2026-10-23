@@ -58,18 +58,22 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
       )}
 
       {/* Header Banner */}
-      <div className="flowchart-header">
-        <div className="flowchart-badge">
-          <Sparkles size={15} className="text-orange" />
-          <span>SIMPLIFIED & TRANSPARENT DIRECT SELLING MODEL</span>
-        </div>
-        <h2 className="flowchart-title">
-          KharchDaan 1:3 Power Matrix Roadmap
-        </h2>
-        <p className="flowchart-subtitle">
-          Everything you need to know about our community earning model in one clear visual guide. 
-          No confusing binary leg balancing, no expensive joining kits—just 100% everyday household grocery savings.
-        </p>
+      <div className={`flowchart-header ${!isModal ? 'compact-page-header' : ''}`}>
+        {isModal && (
+          <>
+            <div className="flowchart-badge">
+              <Sparkles size={15} className="text-orange" />
+              <span>SIMPLIFIED & TRANSPARENT DIRECT SELLING MODEL</span>
+            </div>
+            <h2 className="flowchart-title">
+              KharchDaan 1:3 Power Matrix Roadmap
+            </h2>
+            <p className="flowchart-subtitle">
+              Everything you need to know about our community earning model in one clear visual guide. 
+              No confusing binary leg balancing, no expensive joining kits—just 100% everyday household grocery savings.
+            </p>
+          </>
+        )}
 
         {/* Navigation Tabs */}
         <div className="flowchart-tabs-bar">
@@ -110,7 +114,7 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
             onClick={() => setActiveTab('rules')}
           >
             <ShieldCheck size={16} />
-            <span>5. 100% Legal & Govt Ethics</span>
+            <span>5. Legal & Govt Ethics</span>
           </button>
         </div>
       </div>
@@ -123,11 +127,11 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
             <div className="flowchart-step-card step-1">
               <div className="step-number-badge">STEP 1</div>
               <div className="step-icon-bubble">
-                <Users size={24} />
+                <Users size={22} />
               </div>
               <h3 className="step-card-title">Free Registration & KYC</h3>
               <p className="step-card-desc">
-                Sign up for <strong>100% FREE</strong> with your mobile number. No mandatory registration fees, no investment kits.
+                Sign up 100% free with your mobile number. No mandatory registration fees or investment kits.
               </p>
               <ul className="step-card-points">
                 <li><Check size={13} /> ₹0 Joining / Membership Fee</li>
@@ -140,69 +144,75 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
             </div>
 
             <div className="flowchart-connector-arrow">
-              <span>➔</span>
+              <div className="connector-circle">
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </div>
             </div>
 
             {/* Step 2 */}
             <div className="flowchart-step-card step-2">
               <div className="step-number-badge">STEP 2</div>
               <div className="step-icon-bubble">
-                <ShoppingBag size={24} />
+                <ShoppingBag size={22} />
               </div>
               <h3 className="step-card-title">Shop Household Groceries</h3>
               <p className="step-card-desc">
-                Order your family’s routine monthly groceries—<strong>Atta, Rice, Oil, Spices & Tea</strong> at direct MRP discounts.
+                Order routine household essentials—Atta, Rice, Oil, Spices & Tea at direct MRP discounts.
               </p>
               <ul className="step-card-points">
-                <li><Check size={13} /> 100% National Brands (Tata, Fortune, Dabur)</li>
+                <li><Check size={13} /> 100% National Brands (Tata, Fortune)</li>
                 <li><Check size={13} /> Up to 100% Cashback benefits</li>
-                <li><Check size={13} /> Qualifies your account for full royalties</li>
+                <li><Check size={13} /> Qualifies account for full royalties</li>
               </ul>
               <div className="step-card-footer-pill">
-                <span>Real FMCG • Zero Forced Products</span>
+                <span>Real FMCG • Zero Forced Stock</span>
               </div>
             </div>
 
             <div className="flowchart-connector-arrow">
-              <span>➔</span>
+              <div className="connector-circle">
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </div>
             </div>
 
             {/* Step 3 */}
             <div className="flowchart-step-card step-3 highlight-step">
               <div className="step-number-badge gold">STEP 3</div>
               <div className="step-icon-bubble gold">
-                <Sparkles size={24} />
+                <Sparkles size={22} />
               </div>
               <h3 className="step-card-title">1:3 Placement Matrix</h3>
               <p className="step-card-desc">
-                Introduce just <strong>3 consumer families</strong> on your direct frontline (Left, Middle, Right). That's your full direct foundation!
+                Introduce just 3 consumer families on your direct frontline (Left, Middle, Right foundation).
               </p>
               <ul className="step-card-points">
                 <li><Check size={13} /> 3 direct node slots to complete</li>
-                <li><Check size={13} /> Unlocks multi-tier matrix rewards</li>
-                <li><Check size={13} /> <strong>NO binary 1:1 leg balancing hassle!</strong></li>
+                <li><Check size={13} /> Unlocks 20-level matrix rewards</li>
+                <li><Check size={13} /> NO binary 1:1 leg balancing hassle</li>
               </ul>
               <div className="step-card-footer-pill gold">
-                <span>Simple 3-Node Frontline</span>
+                <span>Simple 3-Node Foundation</span>
               </div>
             </div>
 
             <div className="flowchart-connector-arrow">
-              <span>➔</span>
+              <div className="connector-circle">
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </div>
             </div>
 
             {/* Step 4 */}
             <div className="flowchart-step-card step-4">
               <div className="step-number-badge">STEP 4</div>
               <div className="step-icon-bubble">
-                <TrendingUp size={24} />
+                <TrendingUp size={22} />
               </div>
               <h3 className="step-card-title">Automatic Spillover</h3>
               <p className="step-card-desc">
-                When you or your upline leaders sponsor a <strong>4th, 5th, or 6th member</strong>, they automatically spill down under your team!
+                When you or your upline sponsor a 4th, 5th, or 6th member, they automatically spill down under your team!
               </p>
               <ul className="step-card-points">
-                <li><Check size={13} /> Extra referrals help downline earn</li>
+                <li><Check size={13} /> Extra referrals help downlines earn</li>
                 <li><Check size={13} /> Geometric 3 ➔ 9 ➔ 27 duplication</li>
                 <li><Check size={13} /> Everyone grows together as a family</li>
               </ul>
@@ -212,26 +222,28 @@ export const MlmStructureFlowchart = ({ onOpenAuth, onShopClick, isModal = false
             </div>
 
             <div className="flowchart-connector-arrow">
-              <span>➔</span>
+              <div className="connector-circle">
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </div>
             </div>
 
             {/* Step 5 */}
             <div className="flowchart-step-card step-5">
               <div className="step-number-badge emerald">STEP 5</div>
               <div className="step-icon-bubble emerald">
-                <Wallet size={24} />
+                <Wallet size={22} />
               </div>
-              <h3 className="step-card-title">Daily Instant UPI Payouts</h3>
+              <h3 className="step-card-title">Weekly & Monthly Payouts</h3>
               <p className="step-card-desc">
-                Every grocery purchase in your <strong>20 levels</strong> generates PV credits. Cash transfers straight to your bank or UPI.
+                Every grocery purchase in your 20 levels generates earnings directly into your bank or UPI account.
               </p>
               <ul className="step-card-points">
-                <li><Check size={13} /> Instant credit to KharchDaan Wallet</li>
-                <li><Check size={13} /> Direct UPI / IMPS bank withdrawal</li>
+                <li><Check size={13} /> Weekly 100% Cashback cycles</li>
+                <li><Check size={13} /> Monthly Direct Selling payouts</li>
                 <li><Check size={13} /> 100% transparent audit ledger</li>
               </ul>
               <div className="step-card-footer-pill emerald">
-                <span>Real-Time Bank Transfers</span>
+                <span>Bank Verified Payouts</span>
               </div>
             </div>
           </div>
