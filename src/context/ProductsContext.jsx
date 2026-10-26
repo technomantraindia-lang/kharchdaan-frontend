@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../services/api';
-import { SERVICES_PACKAGES } from '../data/productsData';
+import { ALL_PRODUCTS, SERVICES_PACKAGES } from '../data/productsData';
 
 const ProductsContext = createContext(null);
 
@@ -151,18 +151,19 @@ export const normalizeProduct = (item) => {
 };
 
 export const ProductsProvider = ({ children }) => {
-  // Start with empty state and strictly load from backend API
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Start with normalized products immediately so search & suggestions never fail or start blank
+  const [products, setProducts] = useState(() => {
+    return (ALL_PRODUCTS || []).map(item => normalizeProduct(item));
+  });
+  const [loading, setLoading] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [backendError, setBackendError] = useState(null);
   const [lastFetchedAt, setLastFetchedAt] = useState(null);
 
   const fetchProductsFromBackend = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await api.getProducts({ per_page: 100 });
-      if (res && res.success && Array.isArray(res.data)) {
+      if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
         // Normalize backend items strictly from live database
         const backendNormalized = res.data.map(item => normalizeProduct(item));
         setProducts(backendNormalized);
@@ -173,13 +174,11 @@ export const ProductsProvider = ({ children }) => {
       } else {
         setIsBackendConnected(false);
         setBackendError(res?.error || 'Backend returned empty or invalid response.');
-        setProducts([]);
       }
     } catch (err) {
       console.warn('[KharchDaan API] Products fetch error:', err.message);
       setIsBackendConnected(false);
       setBackendError(err.message);
-      setProducts([]);
     } finally {
       setLoading(false);
     }

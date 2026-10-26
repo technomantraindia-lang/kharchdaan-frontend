@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Home, ChevronRight, ShoppingBag, Search, SlidersHorizontal, 
   Coins, Star, Check, ShoppingCart, Eye, Sparkles, Filter, 
@@ -14,7 +14,7 @@ export const ProductsAndServicesPage = ({
   onProductClick, 
   initialCategory = 'All',
   searchTerm = '',
-  onSearchChange,
+  onSearchChange, 
   onOpenAuth 
 }) => {
   const { addToCart } = useCart();
@@ -27,6 +27,21 @@ export const ProductsAndServicesPage = ({
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'price-low' | 'price-high' | 'rating' | 'cashback'
   const [priceRange, setPriceRange] = useState('all'); // 'all' | 'under-150' | '150-300' | '300-500' | 'above-500'
   const [addedItemMap, setAddedItemMap] = useState({});
+  const [showCatalogSuggestions, setShowCatalogSuggestions] = useState(false);
+  const [catalogHighlightedIndex, setCatalogHighlightedIndex] = useState(-1);
+  const catalogSearchRef = useRef(null);
+
+  // Outside click listener for catalog search suggestions
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (catalogSearchRef.current && !catalogSearchRef.current.contains(e.target)) {
+        setShowCatalogSuggestions(false);
+        setCatalogHighlightedIndex(-1);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Sync state if initialCategory changes from outside navigation
   useEffect(() => {
@@ -231,6 +246,35 @@ export const ProductsAndServicesPage = ({
     });
   }, [sourceList, selectedCategory, selectedBrand, priceRange, searchQuery, sortBy]);
 
+  // Live autocomplete suggestions for catalog search bar
+  const catalogSuggestions = useMemo(() => {
+    const q = (searchQuery || '').trim().toLowerCase();
+    if (!q || q.length < 1) return [];
+    return sourceList.filter(p => {
+      const name = (p.name || '').toLowerCase();
+      const brand = String(p.brand || '').toLowerCase();
+      const cat = String(p.category || '').toLowerCase();
+      const subCat = String(p.subCategory || '').toLowerCase();
+      const shortDesc = String(p.shortDescription || '').toLowerCase();
+      const desc = String(p.description || '').toLowerCase();
+      return name.includes(q) || brand.includes(q) || cat.includes(q) || subCat.includes(q) || shortDesc.includes(q) || desc.includes(q);
+    }).slice(0, 6);
+  }, [searchQuery, sourceList]);
+
+  // Calculate if matching products exist across other categories when current category yields 0
+  const crossCategoryMatches = useMemo(() => {
+    if (!searchQuery.trim() || selectedCategory === 'All') return 0;
+    const q = searchQuery.toLowerCase().trim();
+    return sourceList.filter(prod => {
+      const matchesName = (prod.name || '').toLowerCase().includes(q);
+      const matchesBrand = (prod.brand || '').toLowerCase().includes(q);
+      const matchesCategory = (prod.category || '').toLowerCase().includes(q);
+      const matchesSubCategory = (prod.subCategory || '').toLowerCase().includes(q);
+      const matchesDesc = (prod.shortDescription || '').toLowerCase().includes(q) || (prod.description || '').toLowerCase().includes(q);
+      return matchesName || matchesBrand || matchesCategory || matchesSubCategory || matchesDesc;
+    }).length;
+  }, [sourceList, searchQuery, selectedCategory]);
+
   const clearAllFilters = () => {
     setSelectedCategory('All');
     setSelectedBrand('All');
@@ -343,18 +387,146 @@ export const ProductsAndServicesPage = ({
             {/* Quick Search & Sort Control */}
             {activeTab === 'products' && (
               <div className="catalog-controls-right">
-                <div className="catalog-search-box">
+                <div className="catalog-search-box" ref={catalogSearchRef}>
                   <Search size={15} className="search-icon" />
                   <input 
                     type="text"
                     placeholder="Search brand, atta, oil, tea..."
                     value={searchQuery}
-                    onChange={(e) => handleSearchInputChange(e.target.value)}
+                    onChange={(e) => {
+                      handleSearchInputChange(e.target.value);
+                      setShowCatalogSuggestions(true);
+                      setCatalogHighlightedIndex(-1);
+                    }}
+                    onFocus={() => setShowCatalogSuggestions(true)}
+                    onKeyDown={(e) => {
+                      if (!showCatalogSuggestions) {
+                        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                          setShowCatalogSuggestions(true);
+                        }
+                        return;
+                      }
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setCatalogHighlightedIndex(prev => (prev < catalogSuggestions.length - 1 ? prev + 1 : 0));
+                      } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setCatalogHighlightedIndex(prev => (prev > 0 ? prev - 1 : catalogSuggestions.length - 1));
+                      } else if (e.key === 'Enter') {
+                        if (catalogHighlightedIndex >= 0 && catalogSuggestions[catalogHighlightedIndex]) {
+                          e.preventDefault();
+                          const target = catalogSuggestions[catalogHighlightedIndex];
+                          setShowCatalogSuggestions(false);
+                          if (onProductClick) onProductClick(target);
+                        } else {
+                          setShowCatalogSuggestions(false);
+                        }
+                      } else if (e.key === 'Escape') {
+                        setShowCatalogSuggestions(false);
+                        setCatalogHighlightedIndex(-1);
+                      }
+                    }}
+                    autoComplete="off"
                   />
                   {searchQuery && (
                     <button className="search-clear-btn" onClick={handleClearSearch} title="Clear search">
                       <X size={13} />
                     </button>
+                  )}
+
+                  {/* Catalog live autocomplete dropdown */}
+                  {showCatalogSuggestions && (
+                    <div className="search-suggestions-dropdown catalog-suggestions-dropdown">
+                      {searchQuery.trim().length === 0 ? (
+                        <div className="suggestions-popular-section">
+                          <div className="suggestions-header">
+                            <span>Popular Searches</span>
+                          </div>
+                          <div className="suggestions-popular-chips-wrap">
+                            {quickSearchTags.slice(0, 6).map((tag) => (
+                              <button
+                                key={tag}
+                                type="button"
+                                className="popular-chip-btn"
+                                onClick={() => {
+                                  handleSearchInputChange(tag);
+                                  setShowCatalogSuggestions(false);
+                                }}
+                              >
+                                <span>{tag}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : catalogSuggestions.length > 0 ? (
+                        <>
+                          <div className="suggestions-header">
+                            <span>Matching Products ({catalogSuggestions.length})</span>
+                          </div>
+                          <ul className="suggestions-list">
+                            {catalogSuggestions.map((prod, idx) => (
+                              <li 
+                                key={prod.id} 
+                                className={`suggestion-item ${idx === catalogHighlightedIndex ? 'is-highlighted' : ''}`}
+                                onClick={() => {
+                                  setShowCatalogSuggestions(false);
+                                  if (onProductClick) onProductClick(prod);
+                                }}
+                                onMouseEnter={() => setCatalogHighlightedIndex(idx)}
+                              >
+                                <img 
+                                  src={prod.image || getSmartProductImage(prod)} 
+                                  alt={prod.name} 
+                                  className="suggestion-thumb"
+                                  onError={(e) => { 
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = getSmartProductImage(prod); 
+                                  }}
+                                />
+                                <div className="suggestion-info">
+                                  <span className="suggestion-name">{prod.name}</span>
+                                  <div className="suggestion-meta">
+                                    <span className="suggestion-category">{prod.category}</span>
+                                    <span className="suggestion-price">₹{prod.price}</span>
+                                    {prod.cashbackAmount && (
+                                      <span className="suggestion-cashback">₹{prod.cashbackAmount} Cashback</span>
+                                    )}
+                                  </div>
+                                </div>
+                                <ChevronRight size={14} className="suggestion-arrow" />
+                              </li>
+                            ))}
+                          </ul>
+                          <button 
+                            type="button" 
+                            className="suggestions-view-all-btn"
+                            onClick={() => setShowCatalogSuggestions(false)}
+                          >
+                            <span>Filter catalog for "{searchQuery}"</span>
+                            <ArrowRight size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <div className="suggestions-no-results">
+                          <p className="no-res-title">No products found for "<strong>{searchQuery}</strong>"</p>
+                          <div className="suggestions-popular-chips-wrap">
+                            {quickSearchTags.slice(0, 4).map((tag) => (
+                              <button
+                                key={tag}
+                                type="button"
+                                className="popular-chip-btn"
+                                onClick={() => {
+                                  handleSearchInputChange(tag);
+                                  setShowCatalogSuggestions(false);
+                                }}
+                              >
+                                <span>{tag}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -532,8 +704,27 @@ export const ProductsAndServicesPage = ({
                 {filteredProducts.length === 0 ? (
                   <div className="no-products-found-card">
                     <Search size={48} className="empty-icon text-orange" />
-                    <h3>No products found {searchQuery ? `for "${searchQuery}"` : ''}</h3>
-                    <p>We couldn't find any products matching your current filters. Try searching for these popular items or reset your filters:</p>
+                    <h3>No products found {searchQuery ? `in ${currentInfo.label} for "${searchQuery}"` : ''}</h3>
+                    
+                    {crossCategoryMatches > 0 && selectedCategory !== 'All' ? (
+                      <div className="cross-category-found-banner">
+                        <div className="banner-text">
+                          <Sparkles size={18} className="text-orange" />
+                          <span>We found <strong>{crossCategoryMatches} matching items</strong> in other categories!</span>
+                        </div>
+                        <button 
+                          className="btn-show-cross-category"
+                          onClick={() => {
+                            setSelectedCategory('All');
+                            setSelectedBrand('All');
+                          }}
+                        >
+                          View All {crossCategoryMatches} Results Across Store
+                        </button>
+                      </div>
+                    ) : (
+                      <p>We couldn't find any products matching your current filters. Try searching for these popular items or reset your filters:</p>
+                    )}
                     
                     {/* Quick Search Tag Suggestions */}
                     <div className="empty-state-tags-wrap">

@@ -64,8 +64,12 @@ export const Navbar = ({
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const [activeDropdown, setActiveDropdown] = useState(null); // 'products' | 'directSelling' | null
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const searchContainerRef = useRef(null);
+  const mobileSearchContainerRef = useRef(null);
   const dropdownTimeoutRef = useRef(null);
+
+  const POPULAR_SEARCH_CHIPS = ['Aashirvaad Atta', 'Fortune Oil', 'Tata Tea', 'Amul Ghee', 'Surf Excel', 'Daawat Basmati Rice'];
 
   // Sync external search term
   useEffect(() => {
@@ -75,25 +79,32 @@ export const Navbar = ({
   // Handle outside click to close search suggestions
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+      const inDesktop = searchContainerRef.current && searchContainerRef.current.contains(e.target);
+      const inMobile = mobileSearchContainerRef.current && mobileSearchContainerRef.current.contains(e.target);
+      if (!inDesktop && !inMobile) {
         setShowSearchSuggestions(false);
+        setHighlightedIndex(-1);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Compute live search suggestions (up to 5 items)
+  // Compute live search suggestions (up to 6 items across all product attributes)
   const searchSuggestions = React.useMemo(() => {
     const q = (localSearch || '').trim().toLowerCase();
     if (!q || q.length < 1) return [];
     const sourceList = products || [];
-    return sourceList.filter(p => 
-      (p.name && p.name.toLowerCase().includes(q)) || 
-      (p.brand && String(p.brand).toLowerCase().includes(q)) || 
-      (p.category && String(p.category).toLowerCase().includes(q)) ||
-      (p.subCategory && String(p.subCategory).toLowerCase().includes(q))
-    ).slice(0, 5);
+    return sourceList.filter(p => {
+      const name = (p.name || '').toLowerCase();
+      const brand = String(p.brand || '').toLowerCase();
+      const cat = String(p.category || '').toLowerCase();
+      const subCat = String(p.subCategory || '').toLowerCase();
+      const shortDesc = String(p.shortDescription || '').toLowerCase();
+      const desc = String(p.description || '').toLowerCase();
+      const ingredients = String(p.ingredients || '').toLowerCase();
+      return name.includes(q) || brand.includes(q) || cat.includes(q) || subCat.includes(q) || shortDesc.includes(q) || desc.includes(q) || ingredients.includes(q);
+    }).slice(0, 6);
   }, [localSearch, products]);
 
   const handleMouseEnter = (menuName) => {
@@ -185,13 +196,42 @@ export const Navbar = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleSearchKeyDown = (e) => {
+    if (!showSearchSuggestions) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        setShowSearchSuggestions(true);
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(prev => (prev < searchSuggestions.length - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : searchSuggestions.length - 1));
+    } else if (e.key === 'Enter') {
+      if (highlightedIndex >= 0 && searchSuggestions[highlightedIndex]) {
+        e.preventDefault();
+        handleSuggestionClick(searchSuggestions[highlightedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSearchSuggestions(false);
+      setHighlightedIndex(-1);
+    }
+  };
+
   const handleSearchFormSubmit = (e) => {
     e.preventDefault();
-    executeSearch(localSearch);
+    if (highlightedIndex >= 0 && searchSuggestions[highlightedIndex]) {
+      handleSuggestionClick(searchSuggestions[highlightedIndex]);
+    } else {
+      executeSearch(localSearch);
+    }
   };
 
   const handleSuggestionClick = (product) => {
     setShowSearchSuggestions(false);
+    setHighlightedIndex(-1);
     setLocalSearch('');
     if (onSelectProduct) {
       onSelectProduct(product);
@@ -462,13 +502,16 @@ export const Navbar = ({
                 onChange={(e) => {
                   setLocalSearch(e.target.value);
                   setShowSearchSuggestions(true);
+                  setHighlightedIndex(-1);
                   if (onSearchChange) onSearchChange(e.target.value);
                 }}
                 onFocus={() => {
-                  if (localSearch.trim().length > 0) setShowSearchSuggestions(true);
+                  setShowSearchSuggestions(true);
                 }}
+                onKeyDown={handleSearchKeyDown}
                 className="nav-search-input"
                 aria-label="Search products"
+                autoComplete="off"
               />
               {localSearch && (
                 <button 
@@ -486,49 +529,96 @@ export const Navbar = ({
             </form>
 
             {/* Live Search Suggestions Dropdown */}
-            {showSearchSuggestions && searchSuggestions.length > 0 && (
+            {showSearchSuggestions && (
               <div className="search-suggestions-dropdown">
-                <div className="suggestions-header">
-                  <span>Matching Products ({searchSuggestions.length})</span>
-                </div>
-                <ul className="suggestions-list">
-                  {searchSuggestions.map((prod) => (
-                    <li 
-                      key={prod.id} 
-                      className="suggestion-item"
-                      onClick={() => handleSuggestionClick(prod)}
+                {localSearch.trim().length === 0 ? (
+                  <div className="suggestions-popular-section">
+                    <div className="suggestions-header">
+                      <span>Popular Trending Searches</span>
+                    </div>
+                    <div className="suggestions-popular-chips-wrap">
+                      {POPULAR_SEARCH_CHIPS.map((chip) => (
+                        <button
+                          key={chip}
+                          type="button"
+                          className="popular-chip-btn"
+                          onClick={() => {
+                            setLocalSearch(chip);
+                            executeSearch(chip);
+                          }}
+                        >
+                          <Search size={12} className="chip-icon" />
+                          <span>{chip}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : searchSuggestions.length > 0 ? (
+                  <>
+                    <div className="suggestions-header">
+                      <span>Matching Products ({searchSuggestions.length})</span>
+                    </div>
+                    <ul className="suggestions-list">
+                      {searchSuggestions.map((prod, idx) => (
+                        <li 
+                          key={prod.id} 
+                          className={`suggestion-item ${idx === highlightedIndex ? 'is-highlighted' : ''}`}
+                          onClick={() => handleSuggestionClick(prod)}
+                          onMouseEnter={() => setHighlightedIndex(idx)}
+                        >
+                          <img 
+                            src={prod.image} 
+                            alt={prod.name} 
+                            className="suggestion-thumb"
+                            onError={(e) => { 
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getSmartProductImage(prod); 
+                            }}
+                          />
+                          <div className="suggestion-info">
+                            <span className="suggestion-name">{prod.name}</span>
+                            <div className="suggestion-meta">
+                              <span className="suggestion-category">{prod.category}</span>
+                              <span className="suggestion-price">₹{prod.price}</span>
+                              {prod.cashbackAmount && (
+                                <span className="suggestion-cashback">₹{prod.cashbackAmount} Cashback</span>
+                              )}
+                            </div>
+                          </div>
+                          <ChevronRight size={14} className="suggestion-arrow" />
+                        </li>
+                      ))}
+                    </ul>
+                    <button 
+                      type="button" 
+                      className="suggestions-view-all-btn"
+                      onClick={() => executeSearch(localSearch)}
                     >
-                      <img 
-                        src={prod.image} 
-                        alt={prod.name} 
-                        className="suggestion-thumb"
-                        onError={(e) => { 
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = getSmartProductImage(prod); 
-                        }}
-                      />
-                      <div className="suggestion-info">
-                        <span className="suggestion-name">{prod.name}</span>
-                        <div className="suggestion-meta">
-                          <span className="suggestion-category">{prod.category}</span>
-                          <span className="suggestion-price">₹{prod.price}</span>
-                          {prod.cashbackAmount && (
-                            <span className="suggestion-cashback">₹{prod.cashbackAmount} Cashback</span>
-                          )}
-                        </div>
-                      </div>
-                      <ChevronRight size={14} className="suggestion-arrow" />
-                    </li>
-                  ))}
-                </ul>
-                <button 
-                  type="button" 
-                  className="suggestions-view-all-btn"
-                  onClick={() => executeSearch(localSearch)}
-                >
-                  <span>View all results for "{localSearch}"</span>
-                  <ArrowRight size={14} />
-                </button>
+                      <span>View all results for "{localSearch}"</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </>
+                ) : (
+                  <div className="suggestions-no-results">
+                    <p className="no-res-title">No direct products found for "<strong>{localSearch}</strong>"</p>
+                    <p className="no-res-sub">Try searching popular staples:</p>
+                    <div className="suggestions-popular-chips-wrap">
+                      {POPULAR_SEARCH_CHIPS.slice(0, 4).map((chip) => (
+                        <button
+                          key={chip}
+                          type="button"
+                          className="popular-chip-btn"
+                          onClick={() => {
+                            setLocalSearch(chip);
+                            executeSearch(chip);
+                          }}
+                        >
+                          <span>{chip}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -580,21 +670,126 @@ export const Navbar = ({
         {/* Clean, Functional Mobile Navigation Drawer */}
         {mobileMenuOpen && (
           <div className="mobile-menu-drawer">
-            {/* Mobile Live Search Form */}
-            <form className="mobile-search-form" onSubmit={handleSearchFormSubmit}>
-              <input
-                type="text"
-                placeholder="Search products, brands..."
-                value={localSearch}
-                onChange={(e) => {
-                  setLocalSearch(e.target.value);
-                  if (onSearchChange) onSearchChange(e.target.value);
-                }}
-              />
-              <button type="submit" title="Search">
-                <Search size={16} />
-              </button>
-            </form>
+            {/* Mobile Live Search Form with Suggestions */}
+            <div className="mobile-search-wrapper" ref={mobileSearchContainerRef}>
+              <form className="mobile-search-form" onSubmit={handleSearchFormSubmit}>
+                <input
+                  type="text"
+                  placeholder="Search products, brands..."
+                  value={localSearch}
+                  onChange={(e) => {
+                    setLocalSearch(e.target.value);
+                    setShowSearchSuggestions(true);
+                    setHighlightedIndex(-1);
+                    if (onSearchChange) onSearchChange(e.target.value);
+                  }}
+                  onFocus={() => setShowSearchSuggestions(true)}
+                  onKeyDown={handleSearchKeyDown}
+                  autoComplete="off"
+                />
+                {localSearch && (
+                  <button 
+                    type="button" 
+                    className="mobile-search-clear-btn" 
+                    onClick={handleClearSearch}
+                    title="Clear search"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+                <button type="submit" title="Search">
+                  <Search size={16} />
+                </button>
+              </form>
+
+              {/* Mobile suggestions */}
+              {showSearchSuggestions && (
+                <div className="search-suggestions-dropdown mobile-dropdown">
+                  {localSearch.trim().length === 0 ? (
+                    <div className="suggestions-popular-section">
+                      <div className="suggestions-header">
+                        <span>Popular Searches</span>
+                      </div>
+                      <div className="suggestions-popular-chips-wrap">
+                        {POPULAR_SEARCH_CHIPS.map((chip) => (
+                          <button
+                            key={chip}
+                            type="button"
+                            className="popular-chip-btn"
+                            onClick={() => {
+                              setLocalSearch(chip);
+                              executeSearch(chip);
+                            }}
+                          >
+                            <span>{chip}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : searchSuggestions.length > 0 ? (
+                    <>
+                      <div className="suggestions-header">
+                        <span>Matching Products ({searchSuggestions.length})</span>
+                      </div>
+                      <ul className="suggestions-list">
+                        {searchSuggestions.map((prod, idx) => (
+                          <li 
+                            key={prod.id} 
+                            className="suggestion-item"
+                            onClick={() => handleSuggestionClick(prod)}
+                          >
+                            <img 
+                              src={prod.image} 
+                              alt={prod.name} 
+                              className="suggestion-thumb"
+                              onError={(e) => { 
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = getSmartProductImage(prod); 
+                              }}
+                            />
+                            <div className="suggestion-info">
+                              <span className="suggestion-name">{prod.name}</span>
+                              <div className="suggestion-meta">
+                                <span className="suggestion-category">{prod.category}</span>
+                                <span className="suggestion-price">₹{prod.price}</span>
+                              </div>
+                            </div>
+                            <ChevronRight size={14} className="suggestion-arrow" />
+                          </li>
+                        ))}
+                      </ul>
+                      <button 
+                        type="button" 
+                        className="suggestions-view-all-btn"
+                        onClick={() => executeSearch(localSearch)}
+                      >
+                        <span>View all results for "{localSearch}"</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <div className="suggestions-no-results">
+                      <p className="no-res-title">No products found for "<strong>{localSearch}</strong>"</p>
+                      <div className="suggestions-popular-chips-wrap">
+                        {POPULAR_SEARCH_CHIPS.slice(0, 4).map((chip) => (
+                          <button
+                            key={chip}
+                            type="button"
+                            className="popular-chip-btn"
+                            onClick={() => {
+                              setLocalSearch(chip);
+                              executeSearch(chip);
+                            }}
+                          >
+                            <span>{chip}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="mobile-nav-links-list">
               <button 

@@ -315,8 +315,9 @@ function MainStore() {
 
   const handleSearchSubmit = (term) => {
     setSearchTerm(term);
+    setSelectedCategory('All');
     setCurrentPage('products');
-    syncRouteAndStorage('products', selectedCategory, null, true);
+    syncRouteAndStorage('products', 'All', null, true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
