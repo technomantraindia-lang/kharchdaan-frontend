@@ -8,6 +8,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts, getSmartProductImage } from '../context/ProductsContext';
+import { ALL_PRODUCTS } from '../data/productsData';
 
 /* ==========================================================================
    CLEAN VECTOR SVG ICONS FOR INTUITIVE DROPDOWNS
@@ -90,21 +91,18 @@ export const Navbar = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Compute live search suggestions (up to 6 items across all product attributes)
+  // Compute live search suggestions (up to 8 items across all product attributes with token matching)
   const searchSuggestions = React.useMemo(() => {
     const q = (localSearch || '').trim().toLowerCase();
     if (!q || q.length < 1) return [];
-    const sourceList = products || [];
+    const sourceList = (products && products.length > 0) ? products : (ALL_PRODUCTS || []);
+    const tokens = q.split(/\s+/).filter(Boolean);
+
     return sourceList.filter(p => {
-      const name = (p.name || '').toLowerCase();
-      const brand = String(p.brand || '').toLowerCase();
-      const cat = String(p.category || '').toLowerCase();
-      const subCat = String(p.subCategory || '').toLowerCase();
-      const shortDesc = String(p.shortDescription || '').toLowerCase();
-      const desc = String(p.description || '').toLowerCase();
-      const ingredients = String(p.ingredients || '').toLowerCase();
-      return name.includes(q) || brand.includes(q) || cat.includes(q) || subCat.includes(q) || shortDesc.includes(q) || desc.includes(q) || ingredients.includes(q);
-    }).slice(0, 6);
+      const catName = typeof p.category === 'object' ? (p.category?.name || '') : String(p.category || '');
+      const searchable = `${p.name || ''} ${p.brand || ''} ${catName} ${p.subCategory || ''} ${p.shortDescription || ''} ${p.description || ''} ${p.ingredients || ''} ${p.sku || ''}`.toLowerCase();
+      return tokens.every(tok => searchable.includes(tok));
+    }).slice(0, 8);
   }, [localSearch, products]);
 
   const handleMouseEnter = (menuName) => {

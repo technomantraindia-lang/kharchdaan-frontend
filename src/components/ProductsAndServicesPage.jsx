@@ -250,15 +250,12 @@ export const ProductsAndServicesPage = ({
   const catalogSuggestions = useMemo(() => {
     const q = (searchQuery || '').trim().toLowerCase();
     if (!q || q.length < 1) return [];
+    const tokens = q.split(/\s+/).filter(Boolean);
     return sourceList.filter(p => {
-      const name = (p.name || '').toLowerCase();
-      const brand = String(p.brand || '').toLowerCase();
-      const cat = String(p.category || '').toLowerCase();
-      const subCat = String(p.subCategory || '').toLowerCase();
-      const shortDesc = String(p.shortDescription || '').toLowerCase();
-      const desc = String(p.description || '').toLowerCase();
-      return name.includes(q) || brand.includes(q) || cat.includes(q) || subCat.includes(q) || shortDesc.includes(q) || desc.includes(q);
-    }).slice(0, 6);
+      const catName = typeof p.category === 'object' ? (p.category?.name || '') : String(p.category || '');
+      const searchable = `${p.name || ''} ${p.brand || ''} ${catName} ${p.subCategory || ''} ${p.shortDescription || ''} ${p.description || ''} ${p.sku || ''}`.toLowerCase();
+      return tokens.every(tok => searchable.includes(tok));
+    }).slice(0, 8);
   }, [searchQuery, sourceList]);
 
   // Calculate if matching products exist across other categories when current category yields 0

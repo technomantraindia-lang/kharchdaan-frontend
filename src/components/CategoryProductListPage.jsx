@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Home, ChevronRight, ShoppingBag, Search, SlidersHorizontal, 
   Coins, Star, Check, ShoppingCart, Eye, Sparkles, Filter, 
@@ -6,8 +6,8 @@ import {
   Package, Store, Award, X, Percent, Flame, HeartHandshake
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useProducts } from '../context/ProductsContext';
-import { SERVICES_PACKAGES } from '../data/productsData';
+import { useProducts, getSmartProductImage } from '../context/ProductsContext';
+import { SERVICES_PACKAGES, ALL_PRODUCTS } from '../data/productsData';
 import { 
   WheatStaplesSvg, 
   FoodBeverageSvg, 
@@ -111,6 +111,41 @@ export const CategoryProductListPage = ({
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'price-low' | 'price-high' | 'rating' | 'cashback'
   const [priceRange, setPriceRange] = useState('all'); // 'all' | 'under-150' | '150-300' | '300-500' | 'above-500'
   const [addedItemMap, setAddedItemMap] = useState({});
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const catSearchRef = useRef(null);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleOutside = (e) => {
+      if (catSearchRef.current && !catSearchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+        setHighlightedIndex(-1);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
+
+  // Compute category-filtered live suggestions
+  const categorySuggestions = useMemo(() => {
+    const q = (searchQuery || '').trim().toLowerCase();
+    if (!q || q.length < 1) return [];
+    const tokens = q.split(/\s+/).filter(Boolean);
+    const pool = (sourceList && sourceList.length > 0) ? sourceList : (ALL_PRODUCTS || []);
+    return pool.filter(p => {
+      const pCat = (p.category || '').toLowerCase();
+      const cId = (config.id || '').toLowerCase();
+      const inCat = pCat === cId || 
+        (cId === 'daily needs' && (pCat === 'grocery' || pCat.includes('grocery') || pCat.includes('staple'))) ||
+        (cId === 'food' && (pCat === 'beverages' || pCat.includes('beverage') || pCat.includes('drink'))) ||
+        (cId === 'home' && (pCat.includes('home') || pCat.includes('personal') || pCat.includes('cleaning'))) ||
+        (cId === 'health' && (pCat.includes('health') || pCat.includes('wellness') || pCat.includes('ayurved')));
+      if (!inCat) return false;
+      const searchable = `${p.name || ''} ${p.brand || ''} ${p.shortDescription || ''}`.toLowerCase();
+      return tokens.every(tok => searchable.includes(tok));
+    }).slice(0, 6);
+  }, [searchQuery, sourceList, config.id]);
 
   const handleAddToCart = (e, prod) => {
     e.stopPropagation();
@@ -307,18 +342,97 @@ export const CategoryProductListPage = ({
 
             {/* Right: Search & Sort Bar */}
             <div className="cat-toolbar-controls">
-              <div className="cat-search-box">
+              <div className="cat-search-box" ref={catSearchRef} style={{ position: 'relative' }}>
                 <Search size={15} className="search-icon" />
                 <input 
                   type="text" 
                   placeholder={`Search ${config.name.toLowerCase()}...`}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(true);
+                    setHighlightedIndex(-1);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onKeyDown={(e) => {
+                    if (!showSuggestions || !categorySuggestions.length) return;
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setHighlightedIndex(prev => (prev < categorySuggestions.length - 1 ? prev + 1 : 0));
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : categorySuggestions.length - 1));
+                    } else if (e.key === 'Enter') {
+                      if (highlightedIndex >= 0 && categorySuggestions[highlightedIndex]) {
+                        e.preventDefault();
+                        const chosen = categorySuggestions[highlightedIndex];
+                        setShowSuggestions(false);
+                        if (onProductClick) onProductClick(chosen);
+                        else setSearchQuery(chosen.name);
+                      }
+                    } else if (e.key === 'Escape') {
+                      setShowSuggestions(false);
+                    }
+                  }}
+                  autoComplete="off"
                 />
                 {searchQuery && (
-                  <button className="clear-search-btn" onClick={() => setSearchQuery('')}>
+                  <button className="clear-search-btn" onClick={() => { setSearchQuery(''); setShowSuggestions(false); }}>
                     <X size={13} />
                   </button>
+                )}
+
+                {/* Live Category Autocomplete Suggestions */}
+                {showSuggestions && searchQuery.trim().length > 0 && (
+                  <div className="search-suggestions-dropdown" style={{ width: '100%', minWidth: '280px', top: 'calc(100% + 6px)' }}>
+                    {categorySuggestions.length > 0 ? (
+                      <>
+                        <div className="suggestions-header">
+                          <span>Matching Products in {config.name} ({categorySuggestions.length})</span>
+                        </div>
+                        <ul className="suggestions-list">
+                          {categorySuggestions.map((prod, idx) => (
+                            <li 
+                              key={prod.id} 
+                              className={`suggestion-item ${idx === highlightedIndex ? 'is-highlighted' : ''}`}
+                              onClick={() => {
+                                setShowSuggestions(false);
+                                if (onProductClick) onProductClick(prod);
+                                else setSearchQuery(prod.name);
+                              }}
+                              onMouseEnter={() => setHighlightedIndex(idx)}
+                            >
+                              <img 
+                                src={prod.image} 
+                                alt={prod.name} 
+                                className="suggestion-thumb"
+                                onError={(e) => { 
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = getSmartProductImage(prod); 
+                                }}
+                              />
+                              <div className="suggestion-info">
+                                <span className="suggestion-name">{prod.name}</span>
+                                <div className="suggestion-meta">
+                                  <span className="suggestion-category">{prod.brand || config.name}</span>
+                                  <span className="suggestion-price">₹{prod.price}</span>
+                                  {prod.cashbackAmount && (
+                                    <span className="suggestion-cashback">₹{prod.cashbackAmount} Cashback</span>
+                                  )}
+                                </div>
+                              </div>
+                              <ChevronRight size={14} className="suggestion-arrow" />
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <div className="suggestions-no-results" style={{ padding: '12px 14px' }}>
+                        <p className="no-res-title" style={{ fontSize: '12px' }}>No direct items in {config.name} for "<strong>{searchQuery}</strong>"</p>
+                        <p className="no-res-sub" style={{ fontSize: '11px', color: '#64748B' }}>Try searching from the top header search bar to view products across all categories.</p>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
