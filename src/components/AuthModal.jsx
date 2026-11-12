@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { X, Lock, Mail, User, Phone, Sparkles, AlertCircle, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Lock, Mail, User, Phone, Sparkles, AlertCircle, ArrowRight, ShieldCheck, Loader2, Share2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+const REFERRAL_STORAGE_KEY = 'kharchdaan_referral_code';
 
 export const AuthModal = ({ isOpen, onClose }) => {
   const { login, register } = useAuth();
@@ -15,6 +17,18 @@ export const AuthModal = ({ isOpen, onClose }) => {
   });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      const saved = (localStorage.getItem(REFERRAL_STORAGE_KEY) || '').trim();
+      if (saved) {
+        setFormData((prev) => ({ ...prev, referral_code: prev.referral_code || saved }));
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -171,6 +185,24 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   value={formData.phone}
                   onChange={handleChange}
                   autoComplete="tel"
+                />
+              </div>
+            </div>
+          )}
+
+          {tab === 'register' && (
+            <div className="form-group">
+              <label htmlFor="auth-referral">Sponsor / Referral Member ID (Optional)</label>
+              <div className="input-icon-wrap">
+                <Share2 size={18} className="input-icon" />
+                <input
+                  id="auth-referral"
+                  type="text"
+                  name="referral_code"
+                  placeholder="e.g. C22020013"
+                  value={formData.referral_code}
+                  onChange={handleChange}
+                  autoComplete="off"
                 />
               </div>
             </div>

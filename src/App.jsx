@@ -104,6 +104,19 @@ const parseRouteFromLocation = () => {
     const hashParams = hash.includes('?') ? new URLSearchParams(hash.split('?')[1]) : new URLSearchParams();
     const cleanHash = hash.split('?')[0].replace(/^\/|\/$/g, '');
 
+    // Persist affiliate / sponsor referral for registration
+    const referralParam = searchParams.get('ref') || hashParams.get('ref');
+    if (referralParam) {
+      const cleanRef = String(referralParam).trim().toUpperCase();
+      if (cleanRef) {
+        try {
+          localStorage.setItem('kharchdaan_referral_code', cleanRef);
+        } catch (e) {
+          console.warn('Unable to persist referral code:', e);
+        }
+      }
+    }
+
     // 1. Check for product in query params
     const productParam = searchParams.get('product') || 
                          searchParams.get('productId') || 

@@ -145,6 +145,20 @@ export const api = {
     return await res.json();
   },
 
+  async getMyReferrals() {
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/me/referrals`, { headers: getAuthHeaders() }, 10000);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to load sponsored users');
+      }
+      return data;
+    } catch (err) {
+      console.warn('Referrals API error:', err.message);
+      return { success: false, data: { direct_referral_count: 0, referrals: [] }, error: err.message };
+    }
+  },
+
   async getOrders() {
     try {
       const res = await fetchWithTimeout(`${API_BASE}/orders`, { headers: getAuthHeaders() }, 10000);

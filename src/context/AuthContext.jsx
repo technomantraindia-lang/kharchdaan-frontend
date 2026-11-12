@@ -6,7 +6,8 @@ const AuthContext = createContext(null);
 const STORAGE_KEYS = {
   TOKEN: 'kharchdaan_auth_token',
   USER: 'kharchdaan_user',
-  USERS_CACHE: 'kharchdaan_registered_users'
+  USERS_CACHE: 'kharchdaan_registered_users',
+  REFERRAL: 'kharchdaan_referral_code'
 };
 
 const getLocalUsers = () => {
@@ -139,11 +140,23 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     const cleanEmail = userData.email.trim().toLowerCase();
+    const referralFromStorage = (() => {
+      try {
+        return (localStorage.getItem(STORAGE_KEYS.REFERRAL) || '').trim();
+      } catch {
+        return '';
+      }
+    })();
+    const referralCode = (userData.referral_code || userData.sponsor_customer_id || referralFromStorage || '').trim();
+
     const payload = {
       name: userData.name?.trim(),
       email: cleanEmail,
       password: userData.password,
-      phone: userData.phone || ''
+      password_confirmation: userData.password_confirmation || userData.password,
+      phone: userData.phone || '',
+      referral_code: referralCode || undefined,
+      sponsor_customer_id: referralCode || undefined
     };
 
     // Cache locally immediately so login will always succeed
@@ -155,39 +168,26 @@ export const AuthProvider = ({ children }) => {
     });
 
     try {
-      try {
-        const response = await api.register(payload);
-        if (response.success && response.data) {
-          const authToken = response.data.access_token;
-          const newUser = response.data.user;
-          setToken(authToken);
-          setUser(newUser);
-          localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
-          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
-          saveUserLocally({ ...newUser, email: cleanEmail, password: payload.password });
-          return { success: true, user: newUser };
+      const response = await api.register(payload);
+      if (response.success && response.data) {
+        const authToken = response.data.access_token;
+        const newUser = response.data.user;
+        setToken(authToken);
+        setUser(newUser);
+        localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
+        saveUserLocally({ ...newUser, email: cleanEmail, password: payload.password });
+        try {
+          localStorage.removeItem(STORAGE_KEYS.REFERRAL);
+        } catch {
+          /* ignore */
         }
-      } catch (apiErr) {
-        console.warn('API register error, activating local session fallback:', apiErr.message);
-
-        // If API fails due to connection or server cold start, create active session
-        const fallbackToken = `local_auth_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        const fallbackUser = {
-          id: Date.now(),
-          name: payload.name,
-          email: cleanEmail,
-          phone: payload.phone || '',
-          role: 'Customer',
-          wallet_balance: 0,
-          cashback_earned: 0
-        };
-
-        setToken(fallbackToken);
-        setUser(fallbackUser);
-        localStorage.setItem(STORAGE_KEYS.TOKEN, fallbackToken);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(fallbackUser));
-        return { success: true, user: fallbackUser };
+        return { success: true, user: newUser };
       }
+      throw new Error(response.message || 'Registration failed.');
+    } catch (apiErr) {
+      // Do not fake a successful MLM signup — client needs the member in admin directory
+      throw apiErr;
     } finally {
       setLoading(false);
     }
