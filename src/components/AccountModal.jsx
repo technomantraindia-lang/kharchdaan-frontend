@@ -94,7 +94,15 @@ export const AccountModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="account-wallet-grid">
-          <div className="wallet-card wallet-card-cashback">
+          <button
+            type="button"
+            className="wallet-card wallet-card-cashback"
+            style={{ cursor: 'pointer', textAlign: 'left', width: '100%', border: 'none' }}
+            onClick={() => {
+              const el = document.getElementById('account-direct-referrals');
+              el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
             <div className="wallet-card-header">
               <div className="wallet-icon-wrap emerald-icon">
                 <Users size={17} />
@@ -102,8 +110,8 @@ export const AccountModal = ({ isOpen, onClose }) => {
               <span className="wallet-title">Direct Referrals</span>
             </div>
             <div className="wallet-balance">{referralCount}</div>
-            <div className="wallet-subtext">Users registered under your Member ID</div>
-          </div>
+            <div className="wallet-subtext">Click to view contact details</div>
+          </button>
 
           <div className="wallet-card wallet-card-network">
             <div className="wallet-card-header">
@@ -159,7 +167,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <div className="account-orders-section">
+        <div className="account-orders-section" id="account-direct-referrals">
           <div className="orders-section-heading">
             <div className="heading-with-icon">
               <Users size={17} className="text-orange" />
@@ -189,7 +197,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
                 <thead>
                   <tr>
                     <th>Member ID</th>
-                    <th>Name</th>
+                    <th>Name / Contact</th>
                     <th>Status</th>
                     <th>Joined</th>
                   </tr>
@@ -200,7 +208,8 @@ export const AccountModal = ({ isOpen, onClose }) => {
                       <td className="order-id-cell">{ref.customer_id || '—'}</td>
                       <td>
                         <div>{ref.name || 'Unnamed'}</div>
-                        {ref.phone ? <div style={{ fontSize: 11, color: '#94a3b8' }}>{ref.phone}</div> : null}
+                        {ref.phone ? <div style={{ fontSize: 11, color: '#94a3b8' }}>📞 {ref.phone}</div> : null}
+                        {ref.email ? <div style={{ fontSize: 11, color: '#94a3b8' }}>{ref.email}</div> : null}
                       </td>
                       <td>
                         <span className={`order-status-pill status-${(ref.status || 'active').toLowerCase()}`}>

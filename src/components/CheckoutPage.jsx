@@ -44,6 +44,11 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
   const [deliverySlot, setDeliverySlot] = useState('morning');
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [upiId, setUpiId] = useState('');
+  const [orderChannel, setOrderChannel] = useState('online');
+  const [specialInstruction, setSpecialInstruction] = useState('');
+  const [offlineAmount, setOfflineAmount] = useState('');
+  const [offlineRemark, setOfflineRemark] = useState('');
+  const [offlineDocument, setOfflineDocument] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrder, setCreatedOrder] = useState(null);
@@ -85,57 +90,108 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
       setFormError('Please enter a valid 6-digit delivery pincode.');
       return;
     }
+    if (!specialInstruction.trim()) {
+      setFormError('Special Instruction is required for all orders.');
+      return;
+    }
+    if (orderChannel === 'online' && items.length === 0) {
+      setFormError('Your cart is empty. Add products or switch to Offline billing.');
+      return;
+    }
+    if (orderChannel === 'offline') {
+      if (!offlineAmount || Number(offlineAmount) <= 0) {
+        setFormError('Enter the offline bill amount before payment.');
+        return;
+      }
+      if (!offlineRemark.trim()) {
+        setFormError('Remark is mandatory for offline transactions.');
+        return;
+      }
+      if (!offlineDocument) {
+        setFormError('Document attachment is mandatory for offline transactions.');
+        return;
+      }
+    }
 
     setIsSubmitting(true);
 
     const fullShippingAddr = `${formData.addressLine1}, ${formData.addressLine2 ? formData.addressLine2 + ', ' : ''}${formData.landmark ? 'Near ' + formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`;
 
-    let backendOrderNum = null;
     try {
-      const orderPayload = {
-        items: items.map(it => ({
-          product_id: isNaN(Number(it.productId || it.id)) ? null : Number(it.productId || it.id),
-          name: it.name,
-          price: Number(it.price || 0),
-          qty: Number(it.quantity || 1)
-        })),
-        payment_method: paymentMethod,
-        shipping_address: fullShippingAddr,
-        shipping_charge: 0,
-        platform_fee: platformFee,
-        discount: discountAmount,
-        total: grandTotal
-      };
-      const apiRes = await api.createOrder(orderPayload);
-      if (apiRes?.success && apiRes?.data?.order_number) {
-        backendOrderNum = apiRes.data.order_number;
+      let apiRes;
+      if (orderChannel === 'offline') {
+        const fd = new FormData();
+        fd.append('order_channel', 'offline');
+        fd.append('offline_amount', String(offlineAmount));
+        fd.append('offline_remark', offlineRemark.trim());
+        fd.append('special_instruction', specialInstruction.trim());
+        fd.append('payment_method', paymentMethod);
+        fd.append('city', formData.city);
+        fd.append('pincode', formData.pincode);
+        fd.append('shipping_address', fullShippingAddr);
+        fd.append('shipping_charge', '0');
+        fd.append('platform_fee', '0');
+        fd.append('discount', '0');
+        fd.append('items[0][name]', 'Offline Purchase');
+        fd.append('items[0][price]', String(offlineAmount));
+        fd.append('items[0][qty]', '1');
+        fd.append('offline_document', offlineDocument);
+        apiRes = await api.createOrder(fd);
+      } else {
+        apiRes = await api.createOrder({
+          order_channel: 'online',
+          special_instruction: specialInstruction.trim(),
+          items: items.map(it => ({
+            product_id: isNaN(Number(it.productId || it.id)) ? null : Number(it.productId || it.id),
+            name: it.name,
+            price: Number(it.price || 0),
+            qty: Number(it.quantity || 1)
+          })),
+          payment_method: paymentMethod,
+          city: formData.city,
+          pincode: formData.pincode,
+          shipping_address: fullShippingAddr,
+          shipping_charge: 0,
+          platform_fee: platformFee,
+          discount: discountAmount,
+          total: grandTotal
+        });
       }
+
+      if (!apiRes?.success || !apiRes?.data?.order_number) {
+        throw new Error(apiRes?.error || apiRes?.message || 'Order could not be created.');
+      }
+
+      const orderTotal = orderChannel === 'offline' ? Number(offlineAmount) : grandTotal;
+      const generatedOrder = {
+        orderNumber: apiRes.data.order_number,
+        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        itemsCount: orderChannel === 'offline' ? 1 : totalItems,
+        totalAmount: orderTotal,
+        cashbackEarned: orderChannel === 'offline' ? 0 : estimatedCashback,
+        deliverySlotText: deliverySlot === 'morning' ? 'Tomorrow Morning (7:00 AM - 11:00 AM)' : deliverySlot === 'afternoon' ? 'Tomorrow Afternoon (12:00 PM - 4:00 PM)' : 'Tomorrow Evening (5:00 PM - 9:00 PM)',
+        paymentMode: paymentMethod.toUpperCase(),
+        shippingAddress: fullShippingAddr,
+        customerName: formData.fullName,
+        customerPhone: formData.phone,
+        channel: orderChannel,
+        specialInstruction: specialInstruction.trim(),
+        status: apiRes.data.status || 'pending'
+      };
+
+      setCreatedOrder(generatedOrder);
+      setOrderSuccess(true);
+      if (orderChannel === 'online') clearCart();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (apiErr) {
-      console.warn('Backend order sync warning:', apiErr);
+      setFormError(apiErr.message || 'Unable to place order. Please check delivery area and try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const generatedOrder = {
-      orderNumber: backendOrderNum || `BG-${Date.now().toString().slice(-6)}`,
-      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-      itemsCount: totalItems,
-      totalAmount: grandTotal,
-      cashbackEarned: estimatedCashback,
-      deliverySlotText: deliverySlot === 'morning' ? 'Tomorrow Morning (7:00 AM - 11:00 AM)' : deliverySlot === 'afternoon' ? 'Tomorrow Afternoon (12:00 PM - 4:00 PM)' : 'Tomorrow Evening (5:00 PM - 9:00 PM)',
-      paymentMode: paymentMethod.toUpperCase(),
-      shippingAddress: fullShippingAddr,
-      customerName: formData.fullName,
-      customerPhone: formData.phone
-    };
-
-    setIsSubmitting(false);
-    setCreatedOrder(generatedOrder);
-    setOrderSuccess(true);
-    clearCart();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // If cart is empty and order not placed yet, show empty bag state
-  if (items.length === 0 && !orderSuccess) {
+  // If cart is empty and order not placed yet (online only), show empty bag state
+  if (items.length === 0 && !orderSuccess && orderChannel === 'online') {
     return (
       <div className="co-page-wrapper">
         <div className="co-container">
@@ -145,12 +201,15 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
             </div>
             <h2 className="co-empty-title">Your Cart is Empty</h2>
             <p className="co-empty-desc">
-              You haven't added any products to your shopping bag yet. Explore our genuine Swadeshi grocery catalog and earn up to 100% direct cashback!
+              Add products for online checkout, or continue with Offline billing (enter amount + remark + document).
             </p>
             <div className="co-empty-actions">
               <button onClick={onShopClick} className="co-btn-primary-pill">
                 <span>Browse Grocery Products</span>
                 <ArrowRight size={16} />
+              </button>
+              <button type="button" onClick={() => setOrderChannel('offline')} className="co-btn-secondary-pill">
+                <span>Continue Offline Billing</span>
               </button>
               <button onClick={onNavigateHome} className="co-btn-secondary-pill">
                 <span>Return to Home</span>
@@ -492,11 +551,83 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                 </div>
               </div>
 
-              {/* Step 3: Payment Method Selector */}
+              {/* Step 3: Billing channel + special instruction / offline */}
               <div className="co-card-block">
                 <div className="co-step-header">
                   <div className="co-step-title-group">
                     <div className="co-step-num">3</div>
+                    <h2 className="co-step-heading">Billing Type &amp; Instructions</h2>
+                  </div>
+                </div>
+                <div className="co-form-grid" style={{ marginBottom: 12 }}>
+                  <div className="co-field-group">
+                    <label className="co-label">Order Channel *</label>
+                    <select
+                      className="co-input"
+                      value={orderChannel}
+                      onChange={(e) => setOrderChannel(e.target.value)}
+                    >
+                      <option value="online">Online (cart products)</option>
+                      <option value="offline">Offline (enter amount + remark + document)</option>
+                    </select>
+                  </div>
+                  <div className="co-field-group co-field-full">
+                    <label className="co-label">Special Instruction *</label>
+                    <textarea
+                      className="co-input"
+                      rows={2}
+                      value={specialInstruction}
+                      onChange={(e) => setSpecialInstruction(e.target.value)}
+                      placeholder="Delivery note / call before arrival / office pickup note"
+                      required
+                    />
+                  </div>
+                  {orderChannel === 'offline' && (
+                    <>
+                      <div className="co-field-group">
+                        <label className="co-label">Offline Amount (₹) *</label>
+                        <input
+                          type="number"
+                          min="1"
+                          step="0.01"
+                          className="co-input"
+                          value={offlineAmount}
+                          onChange={(e) => setOfflineAmount(e.target.value)}
+                          placeholder="Enter bill amount before payment"
+                          required
+                        />
+                      </div>
+                      <div className="co-field-group co-field-full">
+                        <label className="co-label">Offline Remark *</label>
+                        <textarea
+                          className="co-input"
+                          rows={2}
+                          value={offlineRemark}
+                          onChange={(e) => setOfflineRemark(e.target.value)}
+                          placeholder="Mandatory remark for offline billing"
+                          required
+                        />
+                      </div>
+                      <div className="co-field-group co-field-full">
+                        <label className="co-label">Document Attachment *</label>
+                        <input
+                          type="file"
+                          className="co-input"
+                          accept=".jpg,.jpeg,.png,.pdf,.webp"
+                          onChange={(e) => setOfflineDocument(e.target.files?.[0] || null)}
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Step 4: Payment Method Selector */}
+              <div className="co-card-block">
+                <div className="co-step-header">
+                  <div className="co-step-title-group">
+                    <div className="co-step-num">4</div>
                     <h2 className="co-step-heading">Select Payment Method</h2>
                   </div>
                 </div>

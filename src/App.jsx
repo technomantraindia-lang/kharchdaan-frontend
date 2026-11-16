@@ -33,6 +33,8 @@ import { FamilyGroceryHamperPage } from './components/topics/FamilyGroceryHamper
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
 import { AccountModal } from './components/AccountModal';
+import { TermsGateModal } from './components/TermsGateModal';
+import { useAuth } from './context/AuthContext';
 import { CartDrawer } from './components/CartDrawer';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartPage } from './components/CartPage';
@@ -206,6 +208,7 @@ function MainStore() {
   const [searchTerm, setSearchTerm] = useState('');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const { termsRequired, clearTermsRequired, isAuthenticated } = useAuth();
   const [mlmFlowchartModalOpen, setMlmFlowchartModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [targetProductId, setTargetProductId] = useState(initialRoute.productId);
@@ -585,8 +588,13 @@ function MainStore() {
         onClose={() => setAuthModalOpen(false)}
       />
 
+      <TermsGateModal
+        isOpen={Boolean(isAuthenticated && termsRequired)}
+        onAccepted={() => clearTermsRequired()}
+      />
+
       <AccountModal
-        isOpen={accountModalOpen}
+        isOpen={accountModalOpen && !(isAuthenticated && termsRequired)}
         onClose={() => setAccountModalOpen(false)}
       />
 

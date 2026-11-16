@@ -53,7 +53,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
     try {
       if (tab === 'login') {
         if (!cleanEmail || !cleanPassword) {
-          setError('Please enter both your email address and password.');
+          setError('Please enter Customer ID / Mobile / Email and password.');
           setSubmitting(false);
           return;
         }
@@ -62,6 +62,11 @@ export const AuthModal = ({ isOpen, onClose }) => {
       } else {
         if (!formData.name?.trim()) {
           setError('Please enter your full name.');
+          setSubmitting(false);
+          return;
+        }
+        if (!formData.phone?.trim()) {
+          setError('Mobile number is required (one mobile = one ID).');
           setSubmitting(false);
           return;
         }
@@ -79,6 +84,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
           ...formData,
           name: formData.name.trim(),
           email: cleanEmail,
+          phone: formData.phone.trim(),
           password: cleanPassword
         });
         onClose();
@@ -105,7 +111,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
           <h2>{tab === 'login' ? 'Welcome Back to KharchDaan' : 'Join KharchDaan Rewards'}</h2>
           <p>
             {tab === 'login' 
-              ? 'Sign in to access your wallet, cashback, and order status.' 
+              ? 'Sign in with Customer ID, Mobile, or Email.' 
               : 'Register to start earning cashback and building your affiliate income.'}
           </p>
         </div>
@@ -156,32 +162,33 @@ export const AuthModal = ({ isOpen, onClose }) => {
           )}
 
           <div className="form-group">
-            <label htmlFor="auth-email">Email Address</label>
+            <label htmlFor="auth-email">{tab === 'login' ? 'Customer ID / Mobile / Email' : 'Email Address'}</label>
             <div className="input-icon-wrap">
               <Mail size={18} className="input-icon" />
               <input
                 id="auth-email"
-                type="email"
+                type={tab === 'login' ? 'text' : 'email'}
                 name="email"
                 required
-                placeholder="pyash5231@gmail.com"
+                placeholder={tab === 'login' ? 'C25070002 / 98XXXXXXXX / email' : 'you@example.com'}
                 value={formData.email}
                 onChange={handleChange}
-                autoComplete="email"
+                autoComplete={tab === 'login' ? 'username' : 'email'}
               />
             </div>
           </div>
 
           {tab === 'register' && (
             <div className="form-group">
-              <label htmlFor="auth-phone">Mobile Number (Optional)</label>
+              <label htmlFor="auth-phone">Mobile Number</label>
               <div className="input-icon-wrap">
                 <Phone size={18} className="input-icon" />
                 <input
                   id="auth-phone"
                   type="tel"
                   name="phone"
-                  placeholder="+91 98765 43210"
+                  required
+                  placeholder="98XXXXXXXX"
                   value={formData.phone}
                   onChange={handleChange}
                   autoComplete="tel"

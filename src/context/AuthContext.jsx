@@ -58,6 +58,34 @@ export const AuthProvider = ({ children }) => {
 
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_KEYS.TOKEN));
   const [loading, setLoading] = useState(false);
+  const [termsRequired, setTermsRequired] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.USER);
+      const parsed = saved ? JSON.parse(saved) : null;
+      return Boolean(parsed && !parsed.terms_accepted && !parsed.terms_accepted_at);
+    } catch {
+      return false;
+    }
+  });
+
+  const applyUser = (userData, termsFlag) => {
+    setUser(userData);
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+    const needsTerms = typeof termsFlag === 'boolean'
+      ? termsFlag
+      : Boolean(userData && !userData.terms_accepted && !userData.terms_accepted_at);
+    setTermsRequired(needsTerms);
+  };
+
+  const refreshUser = async () => {
+    if (!token || token.startsWith('local_auth_')) return null;
+    const res = await api.getMe();
+    if (res?.data) {
+      applyUser(res.data, res.terms_required ?? res.data.terms_required);
+      return res.data;
+    }
+    return null;
+  };
 
   useEffect(() => {
     if (token && !user) {
@@ -67,8 +95,7 @@ export const AuthProvider = ({ children }) => {
       api.getMe()
         .then((res) => {
           if (res?.data) {
-            setUser(res.data);
-            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(res.data));
+            applyUser(res.data, res.terms_required ?? res.data.terms_required);
           }
         })
         .catch((err) => {
@@ -80,32 +107,37 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  const login = async (email, password) => {
+  const login = async (identifier, password) => {
     setLoading(true);
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanLogin = identifier.trim();
+    const cleanEmail = cleanLogin.toLowerCase();
 
     try {
-      // 1. Try remote API login
+      // 1. Try remote API login (Customer ID / Mobile / Email)
       try {
-        const response = await api.login({ email: cleanEmail, password });
+        const response = await api.login({ login: cleanLogin, email: cleanEmail, password });
         if (response.success && response.data) {
           const authToken = response.data.access_token;
           const userData = response.data.user;
           setToken(authToken);
-          setUser(userData);
           localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
-          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+          applyUser(userData, response.data.terms_required);
 
           // Save to local cache for resilience
-          saveUserLocally({ ...userData, email: cleanEmail, password });
-          return { success: true, user: userData };
+          saveUserLocally({ ...userData, email: userData.email || cleanEmail, password, login: cleanLogin });
+          return { success: true, user: userData, terms_required: response.data.terms_required };
         }
       } catch (apiErr) {
         console.warn('API login error, checking local fallback:', apiErr.message);
 
         // 2. Check local fallback cache
         const localUsers = getLocalUsers();
-        const matched = localUsers.find(u => u.email?.toLowerCase() === cleanEmail);
+        const matched = localUsers.find(u =>
+          u.email?.toLowerCase() === cleanEmail
+          || u.phone === cleanLogin
+          || u.mlm_member_id?.toUpperCase() === cleanLogin.toUpperCase()
+          || u.login === cleanLogin
+        );
 
         if (matched) {
           if (matched.password && matched.password !== password) {
@@ -173,16 +205,15 @@ export const AuthProvider = ({ children }) => {
         const authToken = response.data.access_token;
         const newUser = response.data.user;
         setToken(authToken);
-        setUser(newUser);
         localStorage.setItem(STORAGE_KEYS.TOKEN, authToken);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
+        applyUser(newUser, response.data.terms_required ?? true);
         saveUserLocally({ ...newUser, email: cleanEmail, password: payload.password });
         try {
           localStorage.removeItem(STORAGE_KEYS.REFERRAL);
         } catch {
           /* ignore */
         }
-        return { success: true, user: newUser };
+        return { success: true, user: newUser, terms_required: true };
       }
       throw new Error(response.message || 'Registration failed.');
     } catch (apiErr) {
@@ -203,10 +234,13 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setToken(null);
       setUser(null);
+      setTermsRequired(false);
       localStorage.removeItem(STORAGE_KEYS.TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER);
     }
   };
+
+  const clearTermsRequired = () => setTermsRequired(false);
 
   return (
     <AuthContext.Provider
@@ -215,6 +249,9 @@ export const AuthProvider = ({ children }) => {
         token,
         loading,
         isAuthenticated: !!token,
+        termsRequired,
+        clearTermsRequired,
+        refreshUser,
         login,
         register,
         logout

@@ -145,6 +145,31 @@ export const api = {
     return await res.json();
   },
 
+  async acceptTerms() {
+    const res = await fetchWithTimeout(`${API_BASE}/me/accept-terms`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accept_terms: true }),
+    }, 10000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Unable to accept Terms & Conditions.');
+    }
+    return data;
+  },
+
+  async getTransactions(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    const res = await fetchWithTimeout(`${API_BASE}/me/transactions${qs ? `?${qs}` : ''}`, {
+      headers: getAuthHeaders(),
+    }, 10000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Failed to load transactions');
+    }
+    return data;
+  },
+
   async getMyReferrals() {
     try {
       const res = await fetchWithTimeout(`${API_BASE}/me/referrals`, { headers: getAuthHeaders() }, 10000);
@@ -171,20 +196,23 @@ export const api = {
   },
 
   async createOrder(orderPayload) {
-    try {
-      const res = await fetchWithTimeout(`${API_BASE}/orders`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(orderPayload)
-      }, 15000);
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.message || `Order creation failed with status ${res.status}`);
-      }
-      return data;
-    } catch (err) {
-      console.warn('createOrder API notice:', err.message);
-      return { success: false, error: err.message };
+    const token = localStorage.getItem('kharchdaan_auth_token');
+    const isFormData = typeof FormData !== 'undefined' && orderPayload instanceof FormData;
+    const headers = {
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+    };
+
+    const res = await fetchWithTimeout(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers,
+      body: isFormData ? orderPayload : JSON.stringify(orderPayload),
+    }, 20000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || `Order creation failed with status ${res.status}`);
     }
+    return data;
   }
 };
