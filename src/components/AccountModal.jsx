@@ -186,7 +186,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
               <span className="wallet-title">Cashback</span>
             </div>
             <div className="wallet-balance">₹{Number(txnSummary?.cashback_total_rounded || 0).toLocaleString('en-IN')}</div>
-            <div className="wallet-subtext">Rounded eligible (awaiting company profit)</div>
+            <div className="wallet-subtext">Depends on Sanstha profit (rounded eligible)</div>
           </div>
 
           <button
@@ -201,7 +201,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
             </div>
             <div className="wallet-balance">{referralCount}</div>
             <div className="wallet-subtext">
-              {txnSummary?.referral_month_eligible ? 'Month eligible (rate sheet pending)' : 'Not eligible this month (need ₹200 txn)'}
+              {txnSummary?.referral_month_eligible ? 'Month eligible — payout after Sanstha profit' : 'Not eligible this month (need ₹200 txn)'}
             </div>
           </button>
 

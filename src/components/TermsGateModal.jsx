@@ -65,7 +65,7 @@ export const TermsGateModal = ({ isOpen, onAccepted }) => {
           <h3 style={{ fontSize: '1.25rem', color: '#9a3412' }}>2. Direct Selling Network</h3>
           <p>Sponsor and 1:3 placement follow KharchDaan rules. Benefits follow published Direct Selling criteria including monthly purchase gates.</p>
           <h3 style={{ fontSize: '1.25rem', color: '#9a3412' }}>3. Cashback &amp; Referral</h3>
-          <p>Cashback and Referral Income are conditional (including ₹200 minimum transaction rules and company profit). Pending amounts are not guaranteed until marked paid.</p>
+          <p>CashBack and Referral Income depend on Sanstha&apos;s profit and system criteria. Minimum ₹200 transaction rules apply. Amounts shown as pending are not guaranteed until marked Paid by admin after profit availability.</p>
           <h3 style={{ fontSize: '1.25rem', color: '#9a3412' }}>4. Delivery</h3>
           <p>Orders are accepted in the Ahmedabad service area only. Status updates will appear on your order.</p>
           <h3 style={{ fontSize: '1.25rem', color: '#9a3412' }}>5. KYC &amp; Payouts</h3>
