@@ -201,7 +201,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
             </div>
             <div className="wallet-balance">{referralCount}</div>
             <div className="wallet-subtext">
-              {txnSummary?.referral_month_eligible ? 'Month eligible — payout after Sanstha profit' : 'Not eligible this month (need ₹200 txn)'}
+              {txnSummary?.referral_month_eligible ? '100% referral — after Sanstha profit' : 'Not eligible this month (need ₹200 txn)'}
             </div>
           </button>
 
