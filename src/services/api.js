@@ -228,6 +228,45 @@ export const api = {
     }
     return data;
   },
+
+  async cancelOrder(orderId) {
+    const res = await fetchWithTimeout(`${API_BASE}/orders/${orderId}/cancel`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({}),
+    }, 15000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Unable to cancel order.');
+    }
+    return data;
+  },
+
+  async getKyc() {
+    const res = await fetchWithTimeout(`${API_BASE}/me/kyc`, { headers: getAuthHeaders() }, 10000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Failed to load KYC.');
+    }
+    return data;
+  },
+
+  async submitKyc(formData) {
+    const token = localStorage.getItem('kharchdaan_auth_token');
+    const res = await fetchWithTimeout(`${API_BASE}/me/kyc`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    }, 30000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'KYC submit failed.');
+    }
+    return data;
+  },
 };
 
 export function loadRazorpayCheckoutScript() {
