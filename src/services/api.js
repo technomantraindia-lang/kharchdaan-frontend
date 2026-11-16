@@ -214,5 +214,44 @@ export const api = {
       throw new Error(data.message || `Order creation failed with status ${res.status}`);
     }
     return data;
-  }
+  },
+
+  async verifyRazorpayPayment(payload) {
+    const res = await fetchWithTimeout(`${API_BASE}/payments/razorpay/verify`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    }, 20000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Payment verification failed.');
+    }
+    return data;
+  },
 };
+
+export function loadRazorpayCheckoutScript() {
+  if (typeof window === 'undefined') {
+    return Promise.reject(new Error('Razorpay is only available in the browser.'));
+  }
+  if (window.Razorpay) {
+    return Promise.resolve(window.Razorpay);
+  }
+
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-razorpay-checkout]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.Razorpay));
+      existing.addEventListener('error', () => reject(new Error('Failed to load Razorpay Checkout.')));
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.dataset.razorpayCheckout = '1';
+    script.onload = () => resolve(window.Razorpay);
+    script.onerror = () => reject(new Error('Failed to load Razorpay Checkout.'));
+    document.body.appendChild(script);
+  });
+}

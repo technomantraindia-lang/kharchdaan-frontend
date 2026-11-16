@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, Lock, CheckCircle2, ArrowRight, ArrowLeft, Truck, 
-  CreditCard, Smartphone, Building, Banknote, Coins, MapPin, 
+  Smartphone, Banknote, Coins, MapPin, 
   User, Phone, Mail, Clock, ShoppingBag, HeartHandshake, Check, AlertCircle,
   HelpCircle, RefreshCw
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
-import { api } from '../services/api';
+import { api, loadRazorpayCheckoutScript } from '../services/api';
 
 export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOpenAuth }) => {
   const { 
@@ -42,8 +42,7 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
   });
 
   const [deliverySlot, setDeliverySlot] = useState('morning');
-  const [paymentMethod, setPaymentMethod] = useState('upi');
-  const [upiId, setUpiId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [orderChannel, setOrderChannel] = useState('online');
   const [specialInstruction, setSpecialInstruction] = useState('');
   const [offlineAmount, setOfflineAmount] = useState('');
@@ -163,26 +162,87 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
       }
 
       const orderTotal = orderChannel === 'offline' ? Number(offlineAmount) : grandTotal;
-      const generatedOrder = {
+      const buildSuccessOrder = (paymentModeLabel, statusLabel) => ({
         orderNumber: apiRes.data.order_number,
         date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
         itemsCount: orderChannel === 'offline' ? 1 : totalItems,
         totalAmount: orderTotal,
         cashbackEarned: orderChannel === 'offline' ? 0 : estimatedCashback,
         deliverySlotText: deliverySlot === 'morning' ? 'Tomorrow Morning (7:00 AM - 11:00 AM)' : deliverySlot === 'afternoon' ? 'Tomorrow Afternoon (12:00 PM - 4:00 PM)' : 'Tomorrow Evening (5:00 PM - 9:00 PM)',
-        paymentMode: paymentMethod.toUpperCase(),
+        paymentMode: paymentModeLabel,
         shippingAddress: fullShippingAddr,
         customerName: formData.fullName,
         customerPhone: formData.phone,
         channel: orderChannel,
         specialInstruction: specialInstruction.trim(),
-        status: apiRes.data.status || 'pending'
-      };
+        status: statusLabel || apiRes.data.status || 'pending'
+      });
 
-      setCreatedOrder(generatedOrder);
-      setOrderSuccess(true);
-      if (orderChannel === 'online') clearCart();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (paymentMethod === 'cod' || !apiRes.data.requires_payment) {
+        setCreatedOrder(buildSuccessOrder('COD', apiRes.data.status || 'pending'));
+        setOrderSuccess(true);
+        if (orderChannel === 'online') clearCart();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      const rzp = apiRes.data.razorpay;
+      if (!rzp?.razorpay_order_id || !rzp?.razorpay_key_id) {
+        throw new Error('Payment gateway did not return checkout details. Please try again or use COD.');
+      }
+
+      await loadRazorpayCheckoutScript();
+      if (!window.Razorpay) {
+        throw new Error('Razorpay Checkout failed to load. Please refresh and try again.');
+      }
+
+      await new Promise((resolve, reject) => {
+        const checkout = new window.Razorpay({
+          key: rzp.razorpay_key_id,
+          amount: rzp.amount_paise,
+          currency: rzp.currency || 'INR',
+          name: 'KharchDaan',
+          description: `Order ${apiRes.data.order_number}`,
+          order_id: rzp.razorpay_order_id,
+          prefill: {
+            name: formData.fullName,
+            email: formData.email || undefined,
+            contact: formData.phone,
+          },
+          notes: {
+            order_number: apiRes.data.order_number,
+          },
+          theme: { color: '#F97316' },
+          handler: async (response) => {
+            try {
+              const verified = await api.verifyRazorpayPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              setCreatedOrder(buildSuccessOrder(
+                'RAZORPAY',
+                verified?.data?.status || 'pending'
+              ));
+              setOrderSuccess(true);
+              if (orderChannel === 'online') clearCart();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              resolve();
+            } catch (verifyErr) {
+              reject(verifyErr);
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              reject(new Error('Payment was cancelled. Your order is saved as unpaid — you can place it again or contact support.'));
+            },
+          },
+        });
+        checkout.on('payment.failed', (resp) => {
+          reject(new Error(resp?.error?.description || 'Payment failed. Please try again.'));
+        });
+        checkout.open();
+      });
     } catch (apiErr) {
       setFormError(apiErr.message || 'Unable to place order. Please check delivery area and try again.');
     } finally {
@@ -633,110 +693,43 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                 </div>
 
                 <div className="co-payments-list">
-                  
-                  {/* UPI Option */}
-                  <div 
-                    onClick={() => setPaymentMethod('upi')}
-                    className={`co-payment-option ${paymentMethod === 'upi' ? 'active' : ''}`}
+                  <div
+                    onClick={() => setPaymentMethod('razorpay')}
+                    className={`co-payment-option ${paymentMethod === 'razorpay' ? 'active' : ''}`}
                   >
                     <div className="co-payment-main-row">
                       <div className="co-payment-left">
-                        <input 
-                          type="radio" 
-                          name="paymentMethod" 
-                          value="upi" 
-                          checked={paymentMethod === 'upi'} 
-                          onChange={() => setPaymentMethod('upi')}
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="razorpay"
+                          checked={paymentMethod === 'razorpay'}
+                          onChange={() => setPaymentMethod('razorpay')}
                           className="co-radio-circle"
                         />
                         <div className="co-payment-icon-box icon-upi">
                           <Smartphone size={20} />
                         </div>
                         <div>
-                          <div className="co-payment-title">UPI (GPay / PhonePe / Paytm / BHIM)</div>
-                          <div className="co-payment-desc">Fast 1-click payment with instant cashback credit</div>
+                          <div className="co-payment-title">Pay Online (UPI / Cards / Net Banking)</div>
+                          <div className="co-payment-desc">Secure Razorpay checkout — GPay, PhonePe, cards &amp; banks</div>
                         </div>
                       </div>
                       <span className="co-rec-badge">Recommended</span>
                     </div>
-
-                    {paymentMethod === 'upi' && (
-                      <div className="co-upi-expand-box" onClick={(e) => e.stopPropagation()}>
-                        <input 
-                          type="text" 
-                          placeholder="Enter your UPI ID (e.g. yourname@okhdfcbank or 9876543210@paytm)" 
-                          value={upiId}
-                          onChange={(e) => setUpiId(e.target.value)}
-                          className="co-upi-input"
-                        />
-                      </div>
-                    )}
                   </div>
 
-                  {/* Cards Option */}
-                  <div 
-                    onClick={() => setPaymentMethod('cards')}
-                    className={`co-payment-option ${paymentMethod === 'cards' ? 'active' : ''}`}
-                  >
-                    <div className="co-payment-main-row">
-                      <div className="co-payment-left">
-                        <input 
-                          type="radio" 
-                          name="paymentMethod" 
-                          value="cards" 
-                          checked={paymentMethod === 'cards'} 
-                          onChange={() => setPaymentMethod('cards')}
-                          className="co-radio-circle"
-                        />
-                        <div className="co-payment-icon-box icon-cards">
-                          <CreditCard size={20} />
-                        </div>
-                        <div>
-                          <div className="co-payment-title">Credit / Debit Cards</div>
-                          <div className="co-payment-desc">Visa, MasterCard, RuPay & Maestro with zero surcharge</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Net Banking */}
-                  <div 
-                    onClick={() => setPaymentMethod('netbanking')}
-                    className={`co-payment-option ${paymentMethod === 'netbanking' ? 'active' : ''}`}
-                  >
-                    <div className="co-payment-main-row">
-                      <div className="co-payment-left">
-                        <input 
-                          type="radio" 
-                          name="paymentMethod" 
-                          value="netbanking" 
-                          checked={paymentMethod === 'netbanking'} 
-                          onChange={() => setPaymentMethod('netbanking')}
-                          className="co-radio-circle"
-                        />
-                        <div className="co-payment-icon-box icon-netbanking">
-                          <Building size={20} />
-                        </div>
-                        <div>
-                          <div className="co-payment-title">Net Banking</div>
-                          <div className="co-payment-desc">SBI, HDFC, ICICI, Axis, Kotak, PNB & 50+ Banks</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Cash on Delivery */}
-                  <div 
+                  <div
                     onClick={() => setPaymentMethod('cod')}
                     className={`co-payment-option ${paymentMethod === 'cod' ? 'active' : ''}`}
                   >
                     <div className="co-payment-main-row">
                       <div className="co-payment-left">
-                        <input 
-                          type="radio" 
-                          name="paymentMethod" 
-                          value="cod" 
-                          checked={paymentMethod === 'cod'} 
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="cod"
+                          checked={paymentMethod === 'cod'}
                           onChange={() => setPaymentMethod('cod')}
                           className="co-radio-circle"
                         />
@@ -750,7 +743,6 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
 
