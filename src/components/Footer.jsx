@@ -7,7 +7,7 @@ import {
 import { TempleHeritageIllustration } from './StepIllustrations';
 
 export const Footer = ({ onNavigate, onOpenAuth }) => {
-  const handleLinkClick = (e, target) => {
+  const handleLinkClick = (e, target, anchorId = null) => {
     e.preventDefault();
     const dedicatedRoutes = [
       'about', 'how-it-works', 'contact', 'contact-us', 
@@ -18,7 +18,15 @@ export const Footer = ({ onNavigate, onOpenAuth }) => {
 
     if (dedicatedRoutes.includes(target)) {
       if (onNavigate) onNavigate(target === 'contact-us' ? 'contact' : target);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (anchorId) {
+        window.history.replaceState(null, '', `#${anchorId}`);
+        setTimeout(() => {
+          const el = document.getElementById(anchorId);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
 
@@ -318,13 +326,13 @@ export const Footer = ({ onNavigate, onOpenAuth }) => {
           </div>
 
           <div className="sub-footer-right-links">
-            <a href="#terms" onClick={(e) => handleLinkClick(e, 'about')}>Terms & Conditions</a>
+            <a href="#terms" onClick={(e) => handleLinkClick(e, 'about', 'terms')}>Terms & Conditions</a>
             <span className="sep">|</span>
-            <a href="#privacy" onClick={(e) => handleLinkClick(e, 'about')}>Privacy Policy</a>
+            <a href="#privacy" onClick={(e) => handleLinkClick(e, 'about', 'privacy')}>Privacy Policy</a>
             <span className="sep">|</span>
-            <a href="#refund" onClick={(e) => handleLinkClick(e, 'about')}>Refund Policy</a>
+            <a href="#refund" onClick={(e) => handleLinkClick(e, 'about', 'refund')}>Refund Policy</a>
             <span className="sep">|</span>
-            <a href="#disclaimer" onClick={(e) => handleLinkClick(e, 'about')}>Direct Selling Disclaimer</a>
+            <a href="#disclaimer" onClick={(e) => handleLinkClick(e, 'about', 'disclaimer')}>Direct Selling Disclaimer</a>
           </div>
         </div>
       </div>

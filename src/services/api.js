@@ -145,17 +145,25 @@ export const api = {
     return await res.json();
   },
 
-  async acceptTerms() {
-    const res = await fetchWithTimeout(`${API_BASE}/me/accept-terms`, {
-      method: 'POST',
-      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accept_terms: true }),
-    }, 10000);
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.message || 'Unable to accept Terms & Conditions.');
+  async acceptTerms(retry = true) {
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/me/accept-terms`, {
+        method: 'POST',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accept_terms: true }),
+      }, 30000);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || 'Unable to accept Terms & Conditions.');
+      }
+      return data;
+    } catch (err) {
+      if (retry && String(err.message || '').toLowerCase().includes('timed out')) {
+        await new Promise((r) => setTimeout(r, 1500));
+        return this.acceptTerms(false);
+      }
+      throw err;
     }
-    return data;
   },
 
   async getTransactions(params = {}) {

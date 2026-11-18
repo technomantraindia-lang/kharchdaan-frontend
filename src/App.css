@@ -18006,4 +18006,161 @@ button {
 }
 .terms-gate-backdrop {
   backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.terms-gate-modal {
+  width: min(720px, 96vw);
+  max-height: min(92vh, 860px);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  border-radius: 28px;
+  box-shadow: 0 25px 60px -12px rgba(234, 88, 12, 0.2), 0 12px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.terms-gate-header {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 28px 28px 12px;
+}
+
+.terms-gate-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px;
+  letter-spacing: -0.015em;
+}
+
+.terms-gate-header p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 520px;
+}
+
+.terms-gate-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 8px 20px 12px;
+  padding: 14px 16px;
+  background: linear-gradient(180deg, #fff7ed, #fff);
+  border: 2px solid #fdba74;
+  border-radius: 16px;
+}
+
+.terms-gate-section {
+  padding: 12px 0;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.terms-gate-section:last-child {
+  border-bottom: 0;
+  padding-bottom: 4px;
+}
+
+.terms-gate-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #9a3412;
+  line-height: 1.3;
+}
+
+.terms-gate-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.terms-gate-section p {
+  margin: 0;
+  padding-left: 34px;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #1f2937;
+}
+
+.terms-gate-footer {
+  flex-shrink: 0;
+  padding: 12px 28px 24px;
+  border-top: 1px solid #ffedd5;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.terms-gate-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.98rem;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.terms-gate-check input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #ea580c;
+}
+
+.terms-gate-footer .btn-primary,
+.terms-gate-footer .glossy-orange-btn {
+  width: 100%;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .terms-gate-modal {
+    border-radius: 20px;
+    max-height: 94vh;
+  }
+
+  .terms-gate-header {
+    padding: 20px 16px 8px;
+  }
+
+  .terms-gate-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .terms-gate-scroll {
+    margin: 4px 12px 8px;
+    padding: 12px;
+  }
+
+  .terms-gate-footer {
+    padding: 10px 16px 18px;
+  }
+
+  .terms-gate-section p {
+    padding-left: 0;
+  }
 }

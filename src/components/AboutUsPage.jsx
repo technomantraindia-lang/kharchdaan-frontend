@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   ShieldCheck, ShoppingBag, Users, Coins, Sparkles, Heart, Award, 
   TrendingUp, CheckCircle2, ArrowRight, Store, Star, Home, Building2,
   HeartHandshake, ChevronRight, Zap, Target, Eye, Compass, Gift, 
   Clock, Check, BadgeCheck, FileText, Smartphone, RefreshCw, Layers
 } from 'lucide-react';
+import { TERMS_SECTIONS } from '../data/termsContent';
 
 export const AboutUsPage = ({ onNavigateHome, onOpenAuth, onShopClick }) => {
+  useEffect(() => {
+    const hash = window.location.hash?.replace('#', '');
+    if (!hash) return;
+    const el = document.getElementById(hash);
+    if (el) {
+      requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+  }, []);
+
   return (
     <div className="about-page-wrapper">
       {/* 1. Hero / Header Showcase with Warm Saffron Ambient Glow */}
@@ -453,7 +463,54 @@ export const AboutUsPage = ({ onNavigateHome, onOpenAuth, onShopClick }) => {
         </div>
       </section>
 
-      {/* 7. Grand CTA Showcase Banner */}
+      {/* 7. Legal Policies (footer anchors) */}
+      <section className="about-legal-section" style={{ padding: '48px 0 24px', background: '#fff7ed' }}>
+        <div className="container" style={{ maxWidth: 920 }}>
+          <div id="terms" className="about-legal-card" style={{ scrollMarginTop: 96, background: '#fff', border: '1.5px solid #fed7aa', borderRadius: 20, padding: '28px 24px', marginBottom: 20, boxShadow: '0 8px 24px rgba(234,88,12,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <FileText size={20} className="text-orange" />
+              <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>Terms &amp; Conditions</h2>
+            </div>
+            <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '0.95rem' }}>
+              Please read carefully. First login requires acceptance before shopping or Direct Selling features.
+            </p>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {TERMS_SECTIONS.map((section) => (
+                <div key={section.id} style={{ padding: '12px 0', borderBottom: section.id === TERMS_SECTIONS.length ? '0' : '1px solid #ffedd5' }}>
+                  <h3 style={{ margin: '0 0 6px', fontSize: '1rem', fontWeight: 800, color: '#9a3412', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ width: 24, height: 24, borderRadius: 999, background: '#ea580c', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>{section.id}</span>
+                    {section.title}
+                  </h3>
+                  <p style={{ margin: 0, paddingLeft: 32, color: '#1f2937', lineHeight: 1.65, fontSize: '0.95rem' }}>{section.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div id="privacy" className="about-legal-card" style={{ scrollMarginTop: 96, background: '#fff', border: '1.5px solid #fed7aa', borderRadius: 20, padding: '24px', marginBottom: 16 }}>
+            <h2 style={{ margin: '0 0 8px', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>Privacy Policy</h2>
+            <p style={{ margin: 0, color: '#334155', lineHeight: 1.65, fontSize: '0.95rem' }}>
+              We collect account, order, KYC, and contact details only to operate KharchDaan services, process payouts, and improve support. Data is not sold. Access is limited to authorised staff and required payment/compliance partners.
+            </p>
+          </div>
+
+          <div id="refund" className="about-legal-card" style={{ scrollMarginTop: 96, background: '#fff', border: '1.5px solid #fed7aa', borderRadius: 20, padding: '24px', marginBottom: 16 }}>
+            <h2 style={{ margin: '0 0 8px', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>Refund Policy</h2>
+            <p style={{ margin: 0, color: '#334155', lineHeight: 1.65, fontSize: '0.95rem' }}>
+              Refund and cancellation follow company process for eligible orders. Approved refunds may reverse related Direct Selling commissions and cashback eligibility. Status updates appear on your order.
+            </p>
+          </div>
+
+          <div id="disclaimer" className="about-legal-card" style={{ scrollMarginTop: 96, background: '#fff', border: '1.5px solid #fed7aa', borderRadius: 20, padding: '24px', marginBottom: 8 }}>
+            <h2 style={{ margin: '0 0 8px', fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>Direct Selling Disclaimer</h2>
+            <p style={{ margin: 0, color: '#334155', lineHeight: 1.65, fontSize: '0.95rem' }}>
+              KharchDaan is a Direct Selling platform linked to real product purchases. Income depends on personal and team purchase activity, published rules, and (where applicable) Sanstha profit availability. No earnings are guaranteed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Grand CTA Showcase Banner */}
       <section className="about-cta-section">
         <div className="container">
           <div className="about-cta-card">
