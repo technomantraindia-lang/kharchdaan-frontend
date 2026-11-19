@@ -208,7 +208,7 @@ function MainStore() {
   const [searchTerm, setSearchTerm] = useState('');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [accountModalOpen, setAccountModalOpen] = useState(false);
-  const { termsRequired, clearTermsRequired, isAuthenticated } = useAuth();
+  const { termsRequired, clearTermsRequired, isAuthenticated, logout } = useAuth();
   const [mlmFlowchartModalOpen, setMlmFlowchartModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [targetProductId, setTargetProductId] = useState(initialRoute.productId);
@@ -591,6 +591,15 @@ function MainStore() {
       <TermsGateModal
         isOpen={Boolean(isAuthenticated && termsRequired)}
         onAccepted={() => clearTermsRequired()}
+        onReauth={async () => {
+          try {
+            await logout();
+          } catch {
+            /* ignore */
+          }
+          clearTermsRequired();
+          setAuthModalOpen(true);
+        }}
       />
 
       <AccountModal

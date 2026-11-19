@@ -77,8 +77,17 @@ export const AuthProvider = ({ children }) => {
     setTermsRequired(needsTerms);
   };
 
+  const clearSession = () => {
+    setToken(null);
+    setUser(null);
+    setTermsRequired(false);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
+  };
+
   const refreshUser = async () => {
-    if (!token || token.startsWith('local_auth_')) return null;
+    const liveToken = (token || localStorage.getItem(STORAGE_KEYS.TOKEN) || '').trim();
+    if (!liveToken || liveToken.startsWith('local_auth_')) return null;
     const res = await api.getMe();
     if (res?.data) {
       applyUser(res.data, res.terms_required ?? res.data.terms_required);
@@ -88,23 +97,32 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (token && !user) {
-      if (token.startsWith('local_auth_')) {
-        return;
-      }
-      api.getMe()
-        .then((res) => {
-          if (res?.data) {
-            applyUser(res.data, res.terms_required ?? res.data.terms_required);
-          }
-        })
-        .catch((err) => {
-          console.warn('getMe failed:', err);
-          if (err.message && (err.message.includes('401') || err.message.includes('Unauthenticated'))) {
-            logout();
-          }
-        });
+    const liveToken = (token || '').trim();
+    if (!liveToken) return;
+
+    // Fake offline tokens cannot call the API — clear them so Terms Accept never hits 401.
+    if (liveToken.startsWith('local_auth_')) {
+      clearSession();
+      return;
     }
+
+    api.getMe()
+      .then((res) => {
+        if (res?.data) {
+          applyUser(res.data, res.terms_required ?? res.data.terms_required);
+        }
+      })
+      .catch((err) => {
+        console.warn('getMe failed:', err);
+        const msg = String(err.message || '');
+        if (
+          msg.includes('401')
+          || msg.toLowerCase().includes('unauthenticated')
+          || msg.toLowerCase().includes('invalid or expired')
+        ) {
+          clearSession();
+        }
+      });
   }, [token]);
 
   const login = async (identifier, password) => {
@@ -128,40 +146,8 @@ export const AuthProvider = ({ children }) => {
           return { success: true, user: userData, terms_required: response.data.terms_required };
         }
       } catch (apiErr) {
-        console.warn('API login error, checking local fallback:', apiErr.message);
-
-        // 2. Check local fallback cache
-        const localUsers = getLocalUsers();
-        const matched = localUsers.find(u =>
-          u.email?.toLowerCase() === cleanEmail
-          || u.phone === cleanLogin
-          || u.mlm_member_id?.toUpperCase() === cleanLogin.toUpperCase()
-          || u.login === cleanLogin
-        );
-
-        if (matched) {
-          if (matched.password && matched.password !== password) {
-            throw new Error('Invalid email or password credentials.');
-          }
-
-          const fallbackToken = `local_auth_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-          const fallbackUser = {
-            id: matched.id || 999,
-            name: matched.name || cleanEmail.split('@')[0],
-            email: cleanEmail,
-            phone: matched.phone || '',
-            role: 'Customer',
-            wallet_balance: matched.wallet_balance || 0,
-            cashback_earned: matched.cashback_earned || 0
-          };
-
-          setToken(fallbackToken);
-          setUser(fallbackUser);
-          localStorage.setItem(STORAGE_KEYS.TOKEN, fallbackToken);
-          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(fallbackUser));
-          return { success: true, user: fallbackUser };
-        }
-
+        // Never invent a local_auth token — Terms Accept and orders need a real API token.
+        console.warn('API login error:', apiErr.message);
         throw apiErr;
       }
     } finally {
@@ -226,17 +212,14 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      if (token && !token.startsWith('local_auth_')) {
+      const liveToken = (token || localStorage.getItem(STORAGE_KEYS.TOKEN) || '').trim();
+      if (liveToken && !liveToken.startsWith('local_auth_')) {
         await api.logout();
       }
     } catch (e) {
       console.warn('Logout error:', e);
     } finally {
-      setToken(null);
-      setUser(null);
-      setTermsRequired(false);
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.USER);
+      clearSession();
     }
   };
 

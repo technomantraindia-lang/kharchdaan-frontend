@@ -1,8 +1,18 @@
 const rawBase = import.meta.env.VITE_API_URL || '/api';
 const API_BASE = rawBase.endsWith('/v1') ? rawBase : `${rawBase.replace(/\/$/, '')}/v1`;
 
+export const getStoredAuthToken = () => {
+  try {
+    const token = (localStorage.getItem('kharchdaan_auth_token') || '').trim();
+    if (!token || token.startsWith('local_auth_')) return null;
+    return token;
+  } catch {
+    return null;
+  }
+};
+
 export const getAuthHeaders = () => {
-  const token = localStorage.getItem('kharchdaan_auth_token');
+  const token = getStoredAuthToken();
   return {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -140,12 +150,29 @@ export const api = {
   },
 
   async getMe() {
-    const res = await fetchWithTimeout(`${API_BASE}/me`, { headers: getAuthHeaders() }, 8000);
-    if (!res.ok) throw new Error('Failed to fetch profile');
-    return await res.json();
+    const res = await fetchWithTimeout(`${API_BASE}/me`, { headers: getAuthHeaders() }, 15000);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const err = new Error(
+        res.status === 401
+          ? (data.message || 'Invalid or expired API token.')
+          : (data.message || 'Failed to fetch profile')
+      );
+      err.status = res.status;
+      throw err;
+    }
+    return data;
   },
 
   async acceptTerms(retry = true) {
+    const token = getStoredAuthToken();
+    if (!token) {
+      const err = new Error('Your session expired. Please log in again to accept Terms.');
+      err.status = 401;
+      err.code = 'SESSION_EXPIRED';
+      throw err;
+    }
+
     try {
       const res = await fetchWithTimeout(`${API_BASE}/me/accept-terms`, {
         method: 'POST',
@@ -154,7 +181,14 @@ export const api = {
       }, 30000);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.message || 'Unable to accept Terms & Conditions.');
+        const err = new Error(
+          res.status === 401
+            ? 'Your session expired. Please log in again to accept Terms.'
+            : (data.message || 'Unable to accept Terms & Conditions.')
+        );
+        err.status = res.status;
+        err.code = res.status === 401 ? 'SESSION_EXPIRED' : 'ACCEPT_FAILED';
+        throw err;
       }
       return data;
     } catch (err) {
