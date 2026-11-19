@@ -52,6 +52,33 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrder, setCreatedOrder] = useState(null);
   const [formError, setFormError] = useState('');
+  const [checkoutDraftOrderId, setCheckoutDraftOrderId] = useState(() => {
+    try {
+      const raw = sessionStorage.getItem('kharchdaan_checkout_draft_order_id');
+      return raw ? Number(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const rememberDraftOrderId = (orderId) => {
+    if (!orderId) return;
+    setCheckoutDraftOrderId(Number(orderId));
+    try {
+      sessionStorage.setItem('kharchdaan_checkout_draft_order_id', String(orderId));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const clearDraftOrderId = () => {
+    setCheckoutDraftOrderId(null);
+    try {
+      sessionStorage.removeItem('kharchdaan_checkout_draft_order_id');
+    } catch {
+      /* ignore */
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -134,6 +161,9 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
         fd.append('items[0][name]', 'Offline Purchase');
         fd.append('items[0][price]', String(offlineAmount));
         fd.append('items[0][qty]', '1');
+        if (checkoutDraftOrderId) {
+          fd.append('reuse_order_id', String(checkoutDraftOrderId));
+        }
         fd.append('offline_document', offlineDocument);
         apiRes = await api.createOrder(fd);
       } else {
@@ -153,12 +183,17 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
           shipping_charge: 0,
           platform_fee: platformFee,
           discount: discountAmount,
-          total: grandTotal
+          total: grandTotal,
+          ...(checkoutDraftOrderId ? { reuse_order_id: checkoutDraftOrderId } : {}),
         });
       }
 
       if (!apiRes?.success || !apiRes?.data?.order_number) {
         throw new Error(apiRes?.error || apiRes?.message || 'Order could not be created.');
+      }
+
+      if (apiRes.data.id) {
+        rememberDraftOrderId(apiRes.data.id);
       }
 
       const orderTotal = orderChannel === 'offline' ? Number(offlineAmount) : grandTotal;
@@ -179,6 +214,7 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
       });
 
       if (paymentMethod === 'cod' || !apiRes.data.requires_payment) {
+        clearDraftOrderId();
         setCreatedOrder(buildSuccessOrder('COD', apiRes.data.status || 'pending'));
         setOrderSuccess(true);
         if (orderChannel === 'online') clearCart();
@@ -220,6 +256,7 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               });
+              clearDraftOrderId();
               setCreatedOrder(buildSuccessOrder(
                 'RAZORPAY',
                 verified?.data?.status || 'pending'
@@ -234,12 +271,12 @@ export const CheckoutPage = ({ onNavigateHome, onNavigateCart, onShopClick, onOp
           },
           modal: {
             ondismiss: () => {
-              reject(new Error('Payment was cancelled. Your order is saved as unpaid — you can place it again or contact support.'));
+              reject(new Error('Payment was cancelled. Your unpaid order was kept — tap Place Order again to retry the same order (no duplicate).'));
             },
           },
         });
         checkout.on('payment.failed', (resp) => {
-          reject(new Error(resp?.error?.description || 'Payment failed. Please try again.'));
+          reject(new Error(resp?.error?.description || 'Payment failed. Tap Place Order again to retry the same unpaid order.'));
         });
         checkout.open();
       });
