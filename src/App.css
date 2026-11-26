@@ -18071,7 +18071,7 @@ button {
   align-items: center;
   gap: 10px;
   margin: 0 0 6px;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #9a3412;
   line-height: 1.3;
@@ -18094,8 +18094,9 @@ button {
 .terms-gate-section p {
   margin: 0;
   padding-left: 34px;
-  font-size: 0.95rem;
-  line-height: 1.65;
+  /* SRS 10: T&C must be easy to read — larger body text */
+  font-size: 1.125rem;
+  line-height: 1.75;
   color: #1f2937;
 }
 

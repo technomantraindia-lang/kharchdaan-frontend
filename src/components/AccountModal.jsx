@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   X, Share2, Package, LogOut, Check, Award, Copy, ShoppingBag, ShieldCheck,
-  ArrowRight, Users, Loader2, Wallet, TrendingUp, FileText, IndianRupee
+  ArrowRight, Users, Loader2, Wallet, TrendingUp, FileText, IndianRupee, Search
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -17,6 +17,11 @@ export const AccountModal = ({ isOpen, onClose }) => {
   const [txnSummary, setTxnSummary] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loadingTxns, setLoadingTxns] = useState(false);
+  // SRS 13: search & filter on own transactions
+  const [txnSearch, setTxnSearch] = useState('');
+  const [txnFilter, setTxnFilter] = useState('all');
+  const [txnFrom, setTxnFrom] = useState('');
+  const [txnTo, setTxnTo] = useState('');
   const [kyc, setKyc] = useState(null);
   const [kycForm, setKycForm] = useState({
     pan_number: '',
@@ -90,6 +95,17 @@ export const AccountModal = ({ isOpen, onClose }) => {
   }, [isOpen, user?.direct_referral_count]);
 
   if (!isOpen || !user) return null;
+
+  const txnNeedle = txnSearch.trim().toLowerCase();
+  const filteredTxns = transactions.filter((row) => {
+    if (txnFilter === 'eligible' && row.highlight_red) return false;
+    if (txnFilter === 'not_eligible' && !row.highlight_red) return false;
+    if (txnFrom && row.date && row.date < txnFrom) return false;
+    if (txnTo && row.date && row.date > txnTo) return false;
+    if (!txnNeedle) return true;
+    return [row.transaction_id, row.status, row.pay_status, row.channel, row.date]
+      .some((v) => String(v || '').toLowerCase().includes(txnNeedle));
+  });
 
   const referralCode = user.mlm_member_id || user.customer_id || null;
   const referralLink = referralCode
@@ -351,18 +367,24 @@ export const AccountModal = ({ isOpen, onClose }) => {
                   <tr>
                     <th>Member ID</th>
                     <th>Name / Contact</th>
+                    <th>This month</th>
+                    <th>Eligible (DS ₹1000)</th>
                     <th>Status</th>
                     <th>Joined</th>
                   </tr>
                 </thead>
                 <tbody>
                   {referrals.map((ref) => (
-                    <tr key={ref.id}>
+                    <tr key={ref.id} style={ref.highlight_red ? { background: '#fef2f2', boxShadow: 'inset 3px 0 0 #dc2626' } : undefined}>
                       <td className="order-id-cell">{ref.customer_id || '—'}</td>
                       <td>
                         <div>{ref.name || 'Unnamed'}</div>
                         {ref.phone ? <div style={{ fontSize: 11, color: '#94a3b8' }}>📞 {ref.phone}</div> : null}
                         {ref.email ? <div style={{ fontSize: 11, color: '#94a3b8' }}>{ref.email}</div> : null}
+                      </td>
+                      <td>₹{Number(ref.month_purchase_total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td style={{ fontWeight: 700, color: ref.ds_eligible ? '#15803d' : '#b91c1c' }}>
+                        {ref.ds_eligible ? 'Eligible' : 'Not eligible'}
                       </td>
                       <td>
                         <span className={`order-status-pill status-${(ref.status || 'active').toLowerCase()}`}>
@@ -377,7 +399,6 @@ export const AccountModal = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
-
         <div className="account-orders-section">
           <div className="orders-section-heading">
             <div className="heading-with-icon">
@@ -390,32 +411,72 @@ export const AccountModal = ({ isOpen, onClose }) => {
           ) : transactions.length === 0 ? (
             <p style={{ fontSize: 12, color: '#94a3b8' }}>No transactions yet.</p>
           ) : (
-            <div className="orders-table-wrapper">
-              <table className="orders-mini-table">
-                <thead>
-                  <tr>
-                    <th>Txn</th>
-                    <th>Amount</th>
-                    <th>Customer CB</th>
-                    <th>Sponsor CB</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.slice(0, 12).map((row) => (
-                    <tr key={row.order_id} style={row.highlight_red ? { background: '#fef2f2' } : undefined}>
-                      <td className="order-id-cell">{row.transaction_id}</td>
-                      <td>₹{Number(row.amount || 0).toLocaleString('en-IN')}</td>
-                      <td>₹{Number(row.cashback?.customer_cashback || row.cashback?.rounded_amount || 0).toLocaleString('en-IN')}</td>
-                      <td>₹{Number(row.cashback?.sponsor_cashback || 0).toLocaleString('en-IN')}</td>
-                      <td>
-                        <span className={`order-status-pill status-${(row.status || '').toLowerCase()}`}>{row.status}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ position: 'relative', flex: '1 1 180px' }}>
+                  <Search size={14} style={{ position: 'absolute', left: 8, top: 9, color: '#94a3b8' }} />
+                  <input
+                    type="text"
+                    value={txnSearch}
+                    onChange={(e) => setTxnSearch(e.target.value)}
+                    placeholder="Search Txn ID, status, date"
+                    style={{ width: '100%', padding: '6px 8px 6px 28px', fontSize: 12, border: '1px solid #e2e8f0', borderRadius: 8 }}
+                  />
+                </div>
+                <select
+                  value={txnFilter}
+                  onChange={(e) => setTxnFilter(e.target.value)}
+                  style={{ padding: '6px 8px', fontSize: 12, border: '1px solid #e2e8f0', borderRadius: 8 }}
+                >
+                  <option value="all">All</option>
+                  <option value="eligible">Eligible</option>
+                  <option value="not_eligible">Not eligible (red)</option>
+                </select>
+                <input type="date" value={txnFrom} onChange={(e) => setTxnFrom(e.target.value)} style={{ padding: '5px 6px', fontSize: 12, border: '1px solid #e2e8f0', borderRadius: 8 }} />
+                <input type="date" value={txnTo} onChange={(e) => setTxnTo(e.target.value)} style={{ padding: '5px 6px', fontSize: 12, border: '1px solid #e2e8f0', borderRadius: 8 }} />
+              </div>
+              {filteredTxns.length === 0 ? (
+                <p style={{ fontSize: 12, color: '#94a3b8' }}>No transactions match your search or filter.</p>
+              ) : (
+                <div className="orders-table-wrapper" style={{ maxHeight: 360, overflowY: 'auto' }}>
+                  <table className="orders-mini-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Txn</th>
+                        <th>Amount</th>
+                        <th>Customer CB</th>
+                        <th>Sponsor CB</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredTxns.map((row) => (
+                        <tr
+                          key={row.order_id}
+                          title={row.highlight_red ? 'Not eligible for CashBack / Referral / DS on this transaction' : undefined}
+                          style={row.highlight_red ? { background: '#fef2f2', boxShadow: 'inset 3px 0 0 #dc2626' } : undefined}
+                        >
+                          <td>{row.date || '—'}</td>
+                          <td className="order-id-cell">
+                            {row.transaction_id}
+                            {row.highlight_red && (
+                              <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#b91c1c' }}>● Not eligible</span>
+                            )}
+                          </td>
+                          <td>₹{Number(row.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                          <td>₹{Number(row.cashback?.customer_cashback || row.cashback?.rounded_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                          <td>₹{Number(row.cashback?.sponsor_cashback || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                          <td>
+                            <span className={`order-status-pill status-${(row.status || '').toLowerCase()}`}>{row.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
 
