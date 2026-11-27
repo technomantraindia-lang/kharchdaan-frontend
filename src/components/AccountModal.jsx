@@ -16,6 +16,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
   const [loadingReferrals, setLoadingReferrals] = useState(false);
   const [txnSummary, setTxnSummary] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [downline, setDownline] = useState(null);
   const [loadingTxns, setLoadingTxns] = useState(false);
   // SRS 13: search & filter on own transactions
   const [txnSearch, setTxnSearch] = useState('');
@@ -70,6 +71,7 @@ export const AccountModal = ({ isOpen, onClose }) => {
     api.getTransactions()
       .then((res) => {
         setTxnSummary(res?.data?.summary || res?.summary || null);
+        setDownline(res?.data?.downline || null);
         setTransactions(Array.isArray(res?.data?.transactions) ? res.data.transactions : (res?.transactions || []));
       })
       .catch(() => {
@@ -399,6 +401,92 @@ export const AccountModal = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
+        {/* SRS 13/14/17: downline performance, eligibility and red-marked downline transactions */}
+        <div className="account-orders-section" id="account-downline">
+          <div className="orders-section-heading">
+            <div className="heading-with-icon">
+              <Users size={17} className="text-orange" />
+              <h4>My Downline Performance</h4>
+            </div>
+          </div>
+          {!downline ? (
+            <p style={{ fontSize: 12, color: '#94a3b8' }}>Downline performance will appear here.</p>
+          ) : (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 12 }}>
+                <div style={{ background: '#fff7ed', borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 11, color: '#9a3412', fontWeight: 700 }}>Direct members</div>
+                  <div style={{ fontSize: 18, fontWeight: 800 }}>{downline.direct_count || 0}</div>
+                </div>
+                <div style={{ background: '#f0fdf4', borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 11, color: '#166534', fontWeight: 700 }}>DS eligible this month</div>
+                  <div style={{ fontSize: 18, fontWeight: 800 }}>{downline.eligible_count || 0} of {downline.direct_count || 0}</div>
+                </div>
+                <div style={{ background: '#eff6ff', borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ fontSize: 11, color: '#1e40af', fontWeight: 700 }}>Team volume (this month)</div>
+                  <div style={{ fontSize: 18, fontWeight: 800 }}>₹{Number(downline.month_volume || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </div>
+              </div>
+
+              {(downline.monthly_volume || []).length > 0 && (() => {
+                const bars = downline.monthly_volume;
+                const max = Math.max(1, ...bars.map((m) => Number(m.volume || 0)));
+                return (
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 120, marginBottom: 12 }}>
+                    {bars.map((m) => (
+                      <div key={m.month} style={{ flex: 1, textAlign: 'center' }}>
+                        <div
+                          title={`₹${Number(m.volume || 0).toLocaleString('en-IN')}`}
+                          style={{ height: Math.max(8, Math.round((Number(m.volume || 0) / max) * 90)), background: 'linear-gradient(180deg,#fb923c,#ea580c)', borderRadius: 6 }}
+                        />
+                        <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>{m.month}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {(downline.transactions || []).length === 0 ? (
+                <p style={{ fontSize: 12, color: '#94a3b8' }}>No downline purchases yet.</p>
+              ) : (
+                <div className="orders-table-wrapper" style={{ maxHeight: 320, overflowY: 'auto' }}>
+                  <table className="orders-mini-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Member</th>
+                        <th>Txn</th>
+                        <th>Amount</th>
+                        <th>CashBack</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {downline.transactions.map((row) => (
+                        <tr
+                          key={`dl-${row.order_id}`}
+                          title={row.highlight_red ? 'Not eligible for CashBack on this transaction' : undefined}
+                          style={row.highlight_red ? { background: '#fef2f2', boxShadow: 'inset 3px 0 0 #dc2626' } : undefined}
+                        >
+                          <td>{row.date || '—'}</td>
+                          <td>
+                            <div>{row.member_name || '—'}</div>
+                            <div style={{ fontSize: 11, color: '#94a3b8' }}>{row.member_customer_id || ''}</div>
+                          </td>
+                          <td className="order-id-cell">{row.transaction_id}</td>
+                          <td>₹{Number(row.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                          <td style={{ fontWeight: 700, color: row.highlight_red ? '#b91c1c' : '#15803d' }}>
+                            {row.highlight_red ? '● Not eligible' : 'Eligible'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
         <div className="account-orders-section">
           <div className="orders-section-heading">
             <div className="heading-with-icon">
